@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCLEX Pro Simulator — Powered by AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #112240;
+    --navy-light: #1d3461;
+    --teal: #00c9a7;
+    --teal-dim: #00a88c;
+    --gold: #f7c948;
+    --red: #ff6b6b;
+    --green: #43e97b;
+    --sky: #64dfdf;
+    --white: #f0f4ff;
+    --muted: #8899b4;
+    --card: #141f35;
+    --border: rgba(100,180,255,0.12);
+    --radius: 14px;
+    --shadow: 0 8px 40px rgba(0,0,0,0.4);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── ANIMATED BACKGROUND ─── */
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,201,167,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,201,167,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+  .bg-glow {
+    position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 500px;
+    background: radial-gradient(ellipse, rgba(0,201,167,0.12) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ─── LAYOUT ─── */
+  #app { position: relative; z-index: 1; }
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ─── HEADER ─── */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 40px; border-bottom: 1px solid var(--border);
+    background: rgba(10,22,40,0.8); backdrop-filter: blur(12px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--teal), var(--sky));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700; color: var(--navy);
+    font-family: 'Fraunces', serif;
+  }
+  .logo-text { font-family: 'Fraunces', serif; font-size: 1.25rem; color: var(--white); letter-spacing: -0.5px; }
+  .logo-sub { font-size: 0.7rem; color: var(--teal); letter-spacing: 2px; text-transform: uppercase; }
+  .header-status { display: flex; align-items: center; gap: 20px; }
+  .timer-display {
+    font-family: 'Fraunces', serif; font-size: 1.5rem; color: var(--gold);
+    letter-spacing: 2px; display: none;
+  }
+  .timer-display.urgent { color: var(--red); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .q-counter { font-size: 0.8rem; color: var(--muted); display: none; }
+
+  /* ─── HOME SCREEN ─── */
+  #home {
+    align-items: center; justify-content: center;
+    padding: 80px 20px; text-align: center;
+  }
+  .home-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,201,167,0.1); border: 1px solid rgba(0,201,167,0.3);
+    color: var(--teal); padding: 6px 16px; border-radius: 50px;
+    font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 28px; animation: fadeUp 0.6s ease both;
+  }
+  .home-title {
+    font-family: 'Fraunces', serif; font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 700; line-height: 1.05; letter-spacing: -1.5px;
+    margin-bottom: 20px; animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .home-title span { color: var(--teal); }
+  .home-desc {
+    font-size: 1.1rem; color: var(--muted); max-width: 560px;
+    line-height: 1.7; margin: 0 auto 48px; animation: fadeUp 0.6s 0.2s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+  .mode-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px; max-width: 1000px; width: 100%;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+  .mode-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 32px 28px;
+    cursor: pointer; transition: all 0.25s;
+    text-align: left; position: relative; overflow: hidden;
+  }
+  .mode-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(0,201,167,0.08) 0%, transparent 60%);
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .mode-card:hover { border-color: var(--teal); transform: translateY(-4px); box-shadow: var(--shadow); }
+  .mode-card:hover::before { opacity: 1; }
+  .mode-icon { font-size: 2rem; margin-bottom: 16px; }
+  .mode-title { font-family: 'Fraunces', serif; font-size: 1.3rem; margin-bottom: 8px; color: var(--white); }
+  .mode-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+  .mode-tag {
+    display: inline-block; margin-top: 16px;
+    background: rgba(0,201,167,0.1); color: var(--teal);
+    padding: 4px 12px; border-radius: 50px; font-size: 0.72rem;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .mode-card.gold-accent .mode-tag { background: rgba(247,201,72,0.1); color: var(--gold); }
+  .mode-card.sky-accent .mode-tag { background: rgba(100,223,223,0.1); color: var(--sky); }
+
+  .stats-row {
+    display: flex; gap: 40px; justify-content: center;
+    margin-top: 60px; animation: fadeUp 0.6s 0.4s ease both;
+  }
+  .stat-item { text-align: center; }
+  .stat-num { font-family: 'Fraunces', serif; font-size: 2rem; color: var(--teal); }
+  .stat-lbl { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+
+  /* ─── SETUP SCREEN ─── */
+  #setup { padding: 60px 40px; max-width: 800px; margin: 0 auto; width: 100%; }
+  .setup-title { font-family: 'Fraunces', serif; font-size: 2rem; margin-bottom: 8px; }
+  .setup-sub { color: var(--muted); margin-bottom: 40px; }
+  .setup-section { margin-bottom: 32px; }
+  .setup-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--teal); margin-bottom: 14px; }
+  .chip-group { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    padding: 8px 18px; border-radius: 50px; border: 1px solid var(--border);
+    background: var(--card); color: var(--muted); font-size: 0.85rem;
+    cursor: pointer; transition: all 0.2s; user-select: none;
+  }
+  .chip:hover { border-color: var(--teal); color: var(--white); }
+  .chip.selected { background: rgba(0,201,167,0.15); border-color: var(--teal); color: var(--teal); }
+  .number-select {
+    background: var(--card); border: 1px solid var(--border); color: var(--white);
+    padding: 10px 16px; border-radius: 10px; font-size: 1rem; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; outline: none; width: 200px;
+  }
+  .number-select:focus { border-color: var(--teal); }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 32px; border-radius: 12px; border: none;
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; text-decoration: none;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--teal), var(--sky));
+    color: var(--navy); box-shadow: 0 4px 20px rgba(0,201,167,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,201,167,0.4); }
+  .btn-secondary { background: var(--card); border: 1px solid var(--border); color: var(--muted); }
+  .btn-secondary:hover { border-color: var(--teal); color: var(--white); }
+
+  /* ─── EXAM SCREEN ─── */
+  #exam { padding: 0; }
+  .progress-bar-wrap { height: 3px; background: var(--navy-mid); }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--teal), var(--sky)); transition: width 0.4s; }
+  .exam-body { display: flex; flex: 1; gap: 0; }
+  .exam-main { flex: 1; padding: 40px; max-width: 860px; margin: 0 auto; width: 100%; }
+  .q-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .q-num { font-size: 0.8rem; color: var(--muted); }
+  .q-category-badge {
+    padding: 4px 12px; border-radius: 50px;
+    background: rgba(100,223,223,0.1); color: var(--sky);
+    font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .q-type-badge {
+    padding: 4px 12px; border-radius: 50px;
+    background: rgba(247,201,72,0.1); color: var(--gold);
+    font-size: 0.72px; letter-spacing: 1px; text-transform: uppercase;
+    font-size: 0.72rem;
+  }
+  .ngn-badge {
+    padding: 4px 12px; border-radius: 50px;
+    background: rgba(0,201,167,0.15); color: var(--teal);
+    font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase;
+    border: 1px solid rgba(0,201,167,0.3);
+  }
+  .q-stem {
+    font-size: 1.05rem; line-height: 1.75; margin-bottom: 28px;
+    color: var(--white); font-weight: 400;
+  }
+  .q-stem strong { color: var(--teal); }
+  .q-stem .highlight { background: rgba(247,201,72,0.15); padding: 2px 4px; border-radius: 4px; color: var(--gold); }
+
+  /* ─── CASE EXHIBIT ─── */
+  .case-exhibit {
+    background: var(--navy-mid); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px; margin-bottom: 24px;
+    font-size: 0.9rem; line-height: 1.7; color: #b8cce0;
+  }
+  .exhibit-tab-row { display: flex; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+  .exhibit-tab {
+    padding: 6px 14px; border-radius: 8px; font-size: 0.78rem;
+    cursor: pointer; background: transparent; border: 1px solid var(--border); color: var(--muted);
+    transition: all 0.2s;
+  }
+  .exhibit-tab.active { background: rgba(0,201,167,0.15); border-color: var(--teal); color: var(--teal); }
+  .exhibit-content { display: none; }
+  .exhibit-content.active { display: block; }
+
+  /* ─── ANSWER OPTIONS ─── */
+  .options-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .option-item {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 16px 20px; border-radius: 12px; border: 1.5px solid var(--border);
+    background: var(--card); cursor: pointer; transition: all 0.2s; position: relative;
+  }
+  .option-item:hover { border-color: rgba(0,201,167,0.4); background: rgba(0,201,167,0.04); }
+  .option-item.selected { border-color: var(--teal); background: rgba(0,201,167,0.08); }
+  .option-item.correct { border-color: var(--green); background: rgba(67,233,123,0.08); pointer-events: none; }
+  .option-item.incorrect { border-color: var(--red); background: rgba(255,107,107,0.08); pointer-events: none; }
+  .option-item.revealed-correct { border-color: var(--green); background: rgba(67,233,123,0.06); pointer-events: none; }
+  .option-letter {
+    width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid var(--border); color: var(--muted);
+    font-size: 0.85rem; font-weight: 600; transition: all 0.2s;
+  }
+  .option-item.selected .option-letter { border-color: var(--teal); color: var(--teal); background: rgba(0,201,167,0.1); }
+  .option-item.correct .option-letter, .option-item.revealed-correct .option-letter { border-color: var(--green); color: var(--green); background: rgba(67,233,123,0.1); }
+  .option-item.incorrect .option-letter { border-color: var(--red); color: var(--red); background: rgba(255,107,107,0.1); }
+  .option-text { font-size: 0.95rem; line-height: 1.6; padding-top: 4px; flex: 1; }
+  .option-check { margin-left: auto; font-size: 1.1rem; display: none; }
+  .option-item.correct .option-check, .option-item.revealed-correct .option-check { display: block; color: var(--green); }
+  .option-item.incorrect .option-check { display: block; color: var(--red); }
+
+  /* SATA */
+  .sata-note { font-size: 0.8rem; color: var(--gold); margin-bottom: 12px; font-style: italic; }
+
+  /* Matrix / Ordering */
+  .matrix-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  .matrix-table th { background: var(--navy-mid); padding: 10px 14px; font-size: 0.8rem; color: var(--muted); text-align: center; border-bottom: 1px solid var(--border); }
+  .matrix-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+  .matrix-table td:first-child { color: var(--white); }
+  .matrix-table td:not(:first-child) { text-align: center; cursor: pointer; }
+  .matrix-radio {
+    width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--border);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all 0.2s; cursor: pointer;
+  }
+  .matrix-radio.selected { border-color: var(--teal); background: var(--teal); }
+
+  .drag-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .drag-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--card); cursor: grab; transition: all 0.2s;
+  }
+  .drag-item:hover { border-color: var(--teal); }
+  .drag-item.dragging { opacity: 0.5; transform: scale(0.98); }
+  .drag-handle { color: var(--muted); font-size: 1.1rem; }
+
+  .dropdown-select {
+    background: var(--card); border: 1.5px solid var(--border); color: var(--white);
+    padding: 10px 14px; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; cursor: pointer; outline: none; width: 100%; max-width: 400px;
+    transition: border-color 0.2s; appearance: none;
+  }
+  .dropdown-select:focus { border-color: var(--teal); }
+
+  /* ─── FEEDBACK ─── */
+  .feedback-box {
+    margin-top: 28px; border-radius: var(--radius); padding: 24px;
+    border: 1px solid; animation: slideIn 0.3s ease;
+    display: none;
+  }
+  @keyframes slideIn { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+  .feedback-box.correct-fb { border-color: rgba(67,233,123,0.3); background: rgba(67,233,123,0.05); }
+  .feedback-box.incorrect-fb { border-color: rgba(255,107,107,0.3); background: rgba(255,107,107,0.05); }
+  .fb-header { display: flex; align-items: center; gap: 10px; font-weight: 600; margin-bottom: 12px; font-size: 1rem; }
+  .fb-header.correct { color: var(--green); }
+  .fb-header.incorrect { color: var(--red); }
+  .fb-body { font-size: 0.9rem; line-height: 1.7; color: #b8cce0; }
+  .fb-body .rationale-title { color: var(--white); font-weight: 600; margin-bottom: 6px; }
+  .fb-body .nclex-tip { margin-top: 12px; padding: 12px 16px; background: rgba(100,223,223,0.06); border-left: 3px solid var(--sky); border-radius: 0 8px 8px 0; }
+  .fb-body .nclex-tip strong { color: var(--sky); }
+
+  /* ─── EXAM NAV ─── */
+  .exam-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 24px 40px; border-top: 1px solid var(--border);
+    background: rgba(10,22,40,0.9); backdrop-filter: blur(8px);
+    position: sticky; bottom: 0;
+  }
+  .nav-btn-group { display: flex; gap: 12px; }
+  .btn-nav {
+    padding: 10px 24px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--card); color: var(--muted); font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-nav:hover { border-color: var(--teal); color: var(--white); }
+  .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+  .btn-submit {
+    padding: 12px 28px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, var(--teal), var(--sky));
+    color: var(--navy); font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,201,167,0.3); }
+  .btn-next {
+    padding: 12px 28px; border-radius: 10px; border: none;
+    background: var(--card); border: 1px solid var(--teal); color: var(--teal);
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; display: none;
+  }
+  .btn-next:hover { background: rgba(0,201,167,0.1); }
+  .btn-end-exam {
+    padding: 12px 28px; border-radius: 10px; border: 1px solid rgba(255,107,107,0.3);
+    background: rgba(255,107,107,0.08); color: var(--red);
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-end-exam:hover { background: rgba(255,107,107,0.15); }
+
+  /* ─── QUESTION PALETTE ─── */
+  .q-palette-toggle {
+    padding: 10px 18px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--card); color: var(--muted); font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; cursor: pointer; transition: all 0.2s;
+  }
+  .q-palette-toggle:hover { border-color: var(--teal); color: var(--white); }
+  .palette-drawer {
+    position: fixed; right: 0; top: 0; bottom: 0; width: 280px;
+    background: var(--navy-mid); border-left: 1px solid var(--border);
+    z-index: 200; transform: translateX(100%); transition: transform 0.3s;
+    overflow-y: auto; padding: 24px;
+  }
+  .palette-drawer.open { transform: translateX(0); }
+  .palette-title { font-family: 'Fraunces', serif; font-size: 1.1rem; margin-bottom: 20px; }
+  .palette-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+  .palette-q {
+    aspect-ratio: 1; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--card); display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; cursor: pointer; transition: all 0.2s; color: var(--muted);
+  }
+  .palette-q:hover { border-color: var(--teal); color: var(--white); }
+  .palette-q.answered { background: rgba(0,201,167,0.15); border-color: var(--teal); color: var(--teal); }
+  .palette-q.flagged { background: rgba(247,201,72,0.15); border-color: var(--gold); color: var(--gold); }
+  .palette-q.current { background: rgba(100,223,223,0.2); border-color: var(--sky); color: var(--white); }
+
+  /* ─── RESULTS SCREEN ─── */
+  #results { padding: 60px 40px; max-width: 900px; margin: 0 auto; width: 100%; }
+  .results-header { text-align: center; margin-bottom: 48px; }
+  .results-badge {
+    display: inline-block; font-size: 3.5rem; margin-bottom: 16px;
+    animation: bounceIn 0.5s ease;
+  }
+  @keyframes bounceIn { 0%{transform:scale(0)} 60%{transform:scale(1.2)} 100%{transform:scale(1)} }
+  .results-title { font-family: 'Fraunces', serif; font-size: 2.5rem; margin-bottom: 8px; }
+  .results-sub { color: var(--muted); font-size: 1rem; }
+  .score-ring-wrap { display: flex; justify-content: center; margin: 40px 0; }
+  .score-ring {
+    position: relative; width: 200px; height: 200px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .score-ring svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+  .score-ring-inner { text-align: center; }
+  .score-pct { font-family: 'Fraunces', serif; font-size: 3rem; line-height: 1; }
+  .score-pct-label { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+  .score-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 40px; }
+  .score-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; text-align: center; }
+  .score-card-num { font-family: 'Fraunces', serif; font-size: 2rem; }
+  .score-card-lbl { font-size: 0.75rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .score-card.correct .score-card-num { color: var(--green); }
+  .score-card.incorrect .score-card-num { color: var(--red); }
+  .score-card.time .score-card-num { color: var(--gold); }
+  .domain-breakdown { margin-bottom: 40px; }
+  .domain-title { font-family: 'Fraunces', serif; font-size: 1.3rem; margin-bottom: 20px; }
+  .domain-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .domain-name { font-size: 0.85rem; min-width: 240px; color: var(--muted); }
+  .domain-bar-wrap { flex: 1; height: 8px; background: var(--navy-mid); border-radius: 4px; overflow: hidden; }
+  .domain-bar { height: 100%; border-radius: 4px; transition: width 0.8s ease; background: linear-gradient(90deg, var(--teal), var(--sky)); }
+  .domain-pct { font-size: 0.82rem; min-width: 48px; text-align: right; color: var(--white); }
+  .review-section { margin-bottom: 40px; }
+  .review-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px; margin-bottom: 12px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .review-item:hover { border-color: var(--teal); }
+  .review-item-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .review-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .review-status.correct { background: var(--green); }
+  .review-status.incorrect { background: var(--red); }
+  .review-q-text { font-size: 0.9rem; line-height: 1.5; color: var(--muted); }
+  .review-answer { font-size: 0.8rem; margin-top: 8px; }
+  .review-answer .your { color: var(--red); }
+  .review-answer .correct-ans { color: var(--green); }
+  .results-cta { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-top: 40px; }
+  .ncsbn-bar {
+    margin: 30px 0; padding: 20px 24px; border-radius: var(--radius);
+    background: var(--navy-mid); border: 1px solid rgba(247,201,72,0.2);
+    display: flex; align-items: center; gap: 16px;
+  }
+  .ncsbn-icon { font-size: 1.5rem; }
+  .ncsbn-text { font-size: 0.88rem; line-height: 1.6; color: var(--muted); }
+  .ncsbn-text strong { color: var(--gold); }
+
+  /* ─── LOADING ─── */
+  #loading {
+    display: none; position: fixed; inset: 0; z-index: 999;
+    background: var(--navy); align-items: center; justify-content: center;
+    flex-direction: column; gap: 20px;
+  }
+  #loading.active { display: flex; }
+  .spinner { width: 50px; height: 50px; border-radius: 50%; border: 3px solid var(--border); border-top-color: var(--teal); animation: spin 0.8s linear infinite; }
+  @keyframes spin { to{transform:rotate(360deg)} }
+  .loading-text { font-family: 'Fraunces', serif; font-size: 1.2rem; color: var(--muted); }
+
+  /* ─── CONFIRM MODAL ─── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 500;
+    background: rgba(10,22,40,0.85); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: calc(var(--radius)*1.5); padding: 40px; max-width: 420px; width: 90%;
+    animation: slideIn 0.25s ease;
+  }
+  .modal-icon { font-size: 2.5rem; margin-bottom: 16px; }
+  .modal-title { font-family: 'Fraunces', serif; font-size: 1.4rem; margin-bottom: 10px; }
+  .modal-body { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 28px; }
+  .modal-actions { display: flex; gap: 12px; }
+
+  /* ─── TUTOR BADGE ─── */
+  .tutor-toggle {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 16px; border-radius: 50px; border: 1px solid var(--border);
+    background: var(--card); cursor: pointer; font-size: 0.82rem; transition: all 0.2s;
+    color: var(--muted);
+  }
+  .tutor-toggle.on { border-color: var(--teal); color: var(--teal); background: rgba(0,201,167,0.08); }
+  .toggle-dot { width: 16px; height: 16px; border-radius: 50px; background: var(--border); transition: all 0.2s; }
+  .tutor-toggle.on .toggle-dot { background: var(--teal); }
+
+  /* ─── AI INSIGHT PANEL ─── */
+  .ai-insight {
+    background: linear-gradient(135deg, rgba(0,201,167,0.06), rgba(100,223,223,0.04));
+    border: 1px solid rgba(0,201,167,0.2);
+    border-radius: var(--radius); padding: 20px 24px;
+    margin-top: 20px; display: none;
+  }
+  .ai-insight.visible { display: block; animation: slideIn 0.3s ease; }
+  .ai-insight-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 0.82rem; color: var(--teal); text-transform: uppercase; letter-spacing: 1px; }
+  .ai-insight-body { font-size: 0.88rem; line-height: 1.7; color: #b8cce0; }
+  .ai-loading { display: flex; gap: 6px; padding: 8px 0; }
+  .ai-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); animation: aiPulse 1.2s infinite; }
+  .ai-dot:nth-child(2) { animation-delay: 0.2s; }
+  .ai-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes aiPulse { 0%,80%,100%{opacity:0.3;transform:scale(0.8)} 40%{opacity:1;transform:scale(1)} }
+
+  /* Responsive */
+  @media(max-width:600px) {
+    header { padding: 16px 20px; }
+    .exam-main { padding: 24px 20px; }
+    .exam-nav { padding: 16px 20px; flex-wrap: wrap; gap: 12px; }
+    #home, #results, #setup { padding: 40px 20px; }
+    .stats-row { gap: 24px; }
+    .domain-name { min-width: 160px; font-size: 0.78rem; }
+    .results-cta { flex-direction: column; }
+    .modal-actions { flex-direction: column; }
+  }
+
+  /* ─── DEDICATION & NURSING MEMES ─── */
+  .dedication-banner {
+    background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(247,201,72,0.06));
+    border: 1px solid rgba(255,150,150,0.3);
+    border-radius: 50px; padding: 10px 24px;
+    margin-bottom: 18px; font-size: 0.87rem; color: #ffb8b8;
+    display: inline-flex; align-items: center; gap: 10px;
+    animation: fadeUp 0.6s ease both;
+  }
+  .meme-strip {
+    margin-top: 44px; max-width: 680px; width: 100%;
+    background: rgba(0,201,167,0.04); border: 1px solid rgba(0,201,167,0.13);
+    border-radius: var(--radius); padding: 22px 30px; text-align: center;
+    animation: fadeUp 0.6s 0.45s ease both;
+  }
+  .meme-emoji { font-size: 1.9rem; margin-bottom: 8px; display: block; }
+  .meme-quote {
+    font-size: 0.92rem; color: var(--muted); font-style: italic;
+    line-height: 1.7; min-height: 58px; transition: opacity 0.4s;
+  }
+  .meme-quote.fade-out { opacity: 0; }
+  .meme-source { font-size: 0.7rem; color: var(--teal); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 10px; }
+  .meme-dots { display: flex; gap: 6px; justify-content: center; margin-top: 14px; }
+  .meme-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background 0.3s; cursor: pointer; }
+  .meme-dot.active { background: var(--teal); }
+  .home-screen-footer {
+    padding: 18px 40px; border-top: 1px solid var(--border);
+    text-align: center; font-size: 0.75rem; color: var(--muted);
+    background: rgba(10,22,40,0.5);
+  }
+  .home-screen-footer .heart { color: var(--red); }
+  .home-screen-footer a { color: var(--teal); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text">Generating your exam…</div>
+</div>
+
+<div class="modal-overlay" id="endModal">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <div class="modal-title">End Exam Early?</div>
+    <div class="modal-body">You still have unanswered questions. Ending now will submit your current progress and show results. This action cannot be undone.</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeEndModal()">Keep Going</button>
+      <button class="btn-end-exam btn" onclick="endExam()" style="padding:12px 24px;">End & See Results</button>
+    </div>
+  </div>
+</div>
+
+<div class="palette-drawer" id="paletteDrawer">
+  <div class="palette-title">Question Navigator</div>
+  <div class="palette-legend" style="display:flex;gap:12px;margin-bottom:16px;font-size:0.75rem;flex-wrap:wrap">
+    <span style="color:var(--teal)">● Answered</span>
+    <span style="color:var(--gold)">● Flagged</span>
+    <span style="color:var(--sky)">● Current</span>
+  </div>
+  <div class="palette-grid" id="paletteGrid"></div>
+  <button class="btn btn-secondary" style="width:100%;margin-top:20px;justify-content:center" onclick="closePalette()">Close</button>
+</div>
+
+<div id="app">
+
+  <!-- ═══════════ HOME SCREEN ═══════════ -->
+  <div id="home" class="screen active">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">N</div>
+        <div>
+          <div class="logo-text">NCLEX Pro</div>
+          <div class="logo-sub">Simulator</div>
+        </div>
+      </div>
+      <div style="font-size:0.8rem;color:var(--muted)">Next Gen NCLEX Ready</div>
+    </header>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:60px 20px;flex-direction:column">
+      <div class="dedication-banner">❤️ Made with love for Peyton — Future ICU Nurse &amp; total rockstar 🩺</div>
+      <div class="home-badge">✦ AI-Powered NCLEX Preparation</div>
+      <h1 class="home-title">Pass the <span>NCLEX</span><br>on your first try.</h1>
+      <p class="home-desc">The most realistic NCLEX simulation platform. AI-generated questions, Next Generation formats, instant rationales, and adaptive difficulty — designed by nursing educators.</p>
+      <div class="mode-grid">
+        <div class="mode-card" onclick="startSetup('practice')">
+          <div class="mode-icon">📖</div>
+          <div class="mode-title">Practice Mode</div>
+          <div class="mode-desc">Study with instant feedback after each question. Rationales and NCLEX tips shown immediately.</div>
+          <span class="mode-tag">Tutor Mode</span>
+        </div>
+        <div class="mode-card gold-accent" onclick="startSetup('cat')">
+          <div class="mode-icon">🎯</div>
+          <div class="mode-title">CAT Simulation</div>
+          <div class="mode-desc">Adaptive testing that mirrors the real NCLEX. 75–145 questions, difficulty adjusts to your performance.</div>
+          <span class="mode-tag" style="background:rgba(247,201,72,0.1);color:var(--gold)">Exam Mode</span>
+        </div>
+        <div class="mode-card sky-accent" onclick="startSetup('ngn')">
+          <div class="mode-icon">🧠</div>
+          <div class="mode-title">Next Gen NCLEX</div>
+          <div class="mode-desc">Master all NGN item types: Enhanced Hotspot, Matrix, Bow-tie, Drop-down, Extended Drag & Drop.</div>
+          <span class="mode-tag" style="background:rgba(100,223,223,0.1);color:var(--sky)">NGN Focused</span>
+        </div>
+        <div class="mode-card" onclick="startSetup('rapid')">
+          <div class="mode-icon">⚡</div>
+          <div class="mode-title">Rapid Review</div>
+          <div class="mode-desc">High-yield 25-question sprint. Great for daily warmup or final week review.</div>
+          <span class="mode-tag">25 Questions</span>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-item"><div class="stat-num">1,500+</div><div class="stat-lbl">Questions</div></div>
+        <div class="stat-item"><div class="stat-num">8</div><div class="stat-lbl">Clinical Domains</div></div>
+        <div class="stat-item"><div class="stat-num">NGN</div><div class="stat-lbl">Item Types</div></div>
+        <div class="stat-item"><div class="stat-num">AI</div><div class="stat-lbl">Rationales</div></div>
+      </div>
+      <!-- Nursing Meme Strip -->
+      <div class="meme-strip">
+        <span class="meme-emoji" id="memeEmoji">💊</span>
+        <div class="meme-quote" id="memeQuote">Loading nursing wisdom...</div>
+        <div class="meme-source">— Nursing Wisdom</div>
+        <div class="meme-dots" id="memeDots"></div>
+      </div>
+    </div>
+    <div class="home-screen-footer">
+      Built with <span class="heart">♥</span> for future nurses everywhere &nbsp;·&nbsp;
+      Peyton, you are going to be an <strong style="color:var(--teal)">incredible</strong> ICU nurse 🏥
+    </div>
+  </div>
+
+  <!-- ═══════════ SETUP SCREEN ═══════════ -->
+  <div id="setup" class="screen">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">N</div>
+        <div><div class="logo-text">NCLEX Pro</div></div>
+      </div>
+      <button class="btn btn-secondary" onclick="showScreen('home')" style="padding:8px 18px;font-size:0.85rem">← Back</button>
+    </header>
+    <div style="flex:1;display:flex;align-items:flex-start;justify-content:center;padding:60px 20px">
+    <div style="max-width:700px;width:100%">
+      <h2 class="setup-title" id="setupTitle">Customize Your Practice</h2>
+      <p class="setup-sub">Select categories and question count to focus your study session.</p>
+
+      <div class="setup-section">
+        <div class="setup-label">📋 Clinical Domains</div>
+        <div class="chip-group" id="domainChips">
+          <div class="chip selected" data-domain="all">All Domains</div>
+          <div class="chip" data-domain="management">Management of Care</div>
+          <div class="chip" data-domain="safety">Safety & Infection Control</div>
+          <div class="chip" data-domain="health">Health Promotion</div>
+          <div class="chip" data-domain="psycho">Psychosocial Integrity</div>
+          <div class="chip" data-domain="basic">Basic Care & Comfort</div>
+          <div class="chip" data-domain="pharmacology">Pharmacology</div>
+          <div class="chip" data-domain="reduction">Risk Reduction</div>
+          <div class="chip" data-domain="physio">Physiological Adaptation</div>
+        </div>
+      </div>
+
+      <div class="setup-section" id="countSection">
+        <div class="setup-label">📊 Number of Questions</div>
+        <select class="number-select" id="qCount">
+          <option value="10">10 Questions</option>
+          <option value="25" selected>25 Questions</option>
+          <option value="50">50 Questions</option>
+          <option value="75">75 Questions</option>
+          <option value="100">100 Questions</option>
+        </select>
+      </div>
+
+      <div class="setup-section">
+        <div class="setup-label">🎛️ Options</div>
+        <div class="chip-group">
+          <div class="chip selected" data-opt="tutor" id="tutorChip">💡 Tutor Mode (Instant Feedback)</div>
+          <div class="chip selected" data-opt="timer" id="timerChip">⏱️ Timed (1 min/question)</div>
+          <div class="chip selected" data-opt="ngn" id="ngnChip">🧠 Include NGN Items</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:16px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="startExam()">Begin Exam →</button>
+        <button class="btn btn-secondary" onclick="showScreen('home')">Cancel</button>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ EXAM SCREEN ═══════════ -->
+  <div id="exam" class="screen">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">N</div>
+        <div><div class="logo-text">NCLEX Pro</div></div>
+      </div>
+      <div class="header-status">
+        <span class="q-counter" id="qCounter">Q 1 / 25</span>
+        <div class="timer-display" id="timerDisplay">00:00</div>
+        <button class="q-palette-toggle" onclick="togglePalette()">📋 Navigator</button>
+        <button class="btn-end-exam" style="padding:8px 18px;font-size:0.82rem" onclick="openEndModal()">End Exam</button>
+      </div>
+    </header>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+
+    <div class="exam-main" id="examMain">
+      <!-- Question renders here -->
+    </div>
+
+    <div class="exam-nav">
+      <div class="nav-btn-group">
+        <button class="btn-nav" id="btnPrev" onclick="prevQuestion()">← Previous</button>
+        <button class="btn-nav" id="btnFlag" onclick="flagQuestion()">🚩 Flag</button>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <button class="btn-submit" id="btnSubmit" onclick="submitAnswer()">Submit Answer</button>
+        <button class="btn-next" id="btnNext" onclick="nextQuestion()">Next Question →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ RESULTS SCREEN ═══════════ -->
+  <div id="results" class="screen">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">N</div>
+        <div><div class="logo-text">NCLEX Pro</div></div>
+      </div>
+    </header>
+    <div id="resultsContent"></div>
+  </div>
+
+</div><!-- #app -->
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+//  NCLEX PRO — MEGA QUESTION BANK  (150+ questions, all domains)
+// ══════════════════════════════════════════════════════════════════
+const QUESTION_BANK = [
+// ─── MANAGEMENT OF CARE ───────────────────────────────────────────
+{id:1,domain:"management",type:"mcq",stem:"A nurse is caring for four clients. Which client should the nurse assess FIRST?",options:["A client post-appendectomy 6 hours ago reporting gas pains","A client with COPD whose oxygen saturation dropped from 94% to 88% in the last 30 minutes","A client with type 2 diabetes requesting their scheduled oral hypoglycemic","A client with a hip fracture asking for pain medication"],correct:1,rationale:"The ABCs (Airway, Breathing, Circulation) guide prioritization. A client with COPD experiencing a drop in oxygen saturation from 94% to 88% indicates acute respiratory deterioration and requires immediate assessment. This represents a change in condition that is potentially life-threatening. The other clients have needs that, while important, are not immediately life-threatening.",tip:"In NCLEX priority questions, always apply ABCs, Maslow's hierarchy, and ask 'which client is most unstable or at immediate risk for deterioration?'",tags:["prioritization","ABCs","COPD","oxygen"]},
+
+{id:2,domain:"management",type:"mcq",stem:"The nurse is delegating tasks to unlicensed assistive personnel (UAP). Which task is APPROPRIATE to delegate?",options:["Assessing a client's wound drainage and documenting findings","Administering a pre-operative enema to a stable client","Evaluating a client's response to a new antibiotic","Teaching a client with newly diagnosed hypertension about dietary modifications"],correct:1,rationale:"Administering a pre-operative enema to a stable client is a non-invasive, routine task with a predictable outcome that can be safely delegated to UAP. Assessment, evaluation, and teaching are all nursing functions that require professional judgment and cannot be delegated. The 5 Rights of Delegation include: right task, right circumstance, right person, right direction/communication, and right supervision.",tip:"UAP CAN do: vital signs on stable clients, basic personal care (bathing, feeding), ambulation of stable patients, specimen collection. UAP CANNOT do: assessment, evaluation, teaching, or any unstable patient tasks.",tags:["delegation","UAP","management","NCLEX-RN"]},
+
+{id:3,domain:"management",type:"sata",stem:"The nurse is implementing the Rights of Medication Administration. Which actions should the nurse perform? SELECT ALL THAT APPLY.",options:["Verify the client's identity using two patient identifiers","Check the medication against the MAR for correct dose and route","Administer the medication without documentation until the end of the shift","Assess for allergies before administering any new medication","Educate the client about the purpose of the medication","Ask the UAP to administer oral medications to reduce workload"],correct:[0,1,3,4],rationale:"The 10 Rights of Medication Administration include: right patient (two identifiers), right drug, right dose, right route, right time, right documentation (immediately, not at end of shift), right reason, right client education, right to refuse, and right assessment. Documentation must occur at time of administration. UAPs cannot administer medications.",tip:"For SATA medication questions, remember documentation is ALWAYS immediate and medication administration CANNOT be delegated to UAP.",tags:["medication safety","rights","documentation","delegation"]},
+
+{id:4,domain:"management",type:"mcq",stem:"A client tells the nurse, 'My doctor said I could refuse this surgery, but the charge nurse says I must have it.' Which ethical principle is at stake?",options:["Beneficence","Fidelity","Autonomy","Justice"],correct:2,rationale:"Autonomy is the client's right to make their own healthcare decisions, including the right to refuse treatment. The nurse must advocate for the client's right to informed consent and refusal. Beneficence means doing good; fidelity means keeping promises; justice means fair distribution of resources. The charge nurse's statement violates the principle of autonomy.",tip:"Key ethical principles: Autonomy (self-determination/informed consent), Beneficence (do good), Nonmaleficence (do no harm), Justice (fair treatment), Fidelity (keep promises), Veracity (truthfulness).",tags:["ethics","autonomy","advocacy","informed consent"]},
+
+// ─── SAFETY & INFECTION CONTROL ──────────────────────────────────
+{id:5,domain:"safety",type:"mcq",stem:"A client is admitted with active pulmonary tuberculosis (TB). What type of isolation precautions should the nurse initiate?",options:["Contact precautions with gown and gloves","Droplet precautions with surgical mask","Airborne precautions with negative pressure room and N95 respirator","Standard precautions only"],correct:2,rationale:"Pulmonary TB requires Airborne Precautions because the organism (Mycobacterium tuberculosis) is transmitted via airborne droplet nuclei <5 microns that remain suspended in the air. Requirements include: negative pressure room, N95 or higher respirator for staff, client wears surgical mask when leaving the room, and door kept closed.",tip:"Airborne: TB, measles, varicella (chickenpox), disseminated herpes zoster. Droplet: influenza, meningitis, pertussis, mumps. Contact: MRSA, C. diff, scabies. REMEMBER: Airborne requires N95, not just a surgical mask!",tags:["infection control","TB","airborne","isolation","safety"]},
+
+{id:6,domain:"safety",type:"sata",stem:"The nurse is preparing to perform a dressing change on a client's surgical wound. Which actions should the nurse take to prevent surgical site infection? SELECT ALL THAT APPLY.",options:["Perform hand hygiene before and after the procedure","Use sterile technique when handling sterile supplies","Wear sterile gloves when touching the wound","Use clean gloves to remove the old dressing and sterile gloves to apply the new","Allow the wound to air dry before applying a new dressing","Document the wound characteristics including color, odor, drainage amount"],correct:[0,1,2,3,5],rationale:"Surgical wound care requires: hand hygiene (most important infection prevention), sterile technique with sterile supplies, clean gloves to remove old dressing, sterile gloves to apply new dressing, and documentation. Wounds should not be left open to air unnecessarily as this increases infection risk. Moist wound healing is evidence-based best practice.",tip:"Wound assessment documentation: CADDIER — Color, Amount, Distribution, Drainage type, Infection signs, Edges, Reaction of tissue.",tags:["wound care","sterile technique","infection prevention","documentation"]},
+
+{id:7,domain:"safety",type:"mcq",stem:"A nurse is caring for a client who is receiving a blood transfusion. Fifteen minutes into the transfusion, the client develops chills, fever, and flank pain. What is the nurse's PRIORITY action?",options:["Slow the infusion rate and monitor vital signs","Administer acetaminophen for the fever","Stop the transfusion immediately and maintain IV access with normal saline","Notify the blood bank and continue the transfusion at a slower rate"],correct:2,rationale:"These symptoms are classic signs of an acute hemolytic transfusion reaction (AHTR), which is life-threatening. The nurse must STOP the transfusion IMMEDIATELY, maintain IV access with NEW tubing and normal saline (do not flush blood into the client), notify the provider and blood bank, monitor vital signs, save the blood bag, and obtain urine and blood samples. AHTR can cause renal failure and death.",tip:"Transfusion reaction order of priority: STOP transfusion → Maintain IV with NS → Notify MD and blood bank → Monitor VS → Save blood bag → Obtain urine sample. DO NOT give more blood to flush the line!",tags:["blood transfusion","hemolytic reaction","emergency","priority"]},
+
+// ─── PHARMACOLOGY ────────────────────────────────────────────────
+{id:8,domain:"pharmacology",type:"mcq",stem:"A client with heart failure is prescribed digoxin 0.25 mg PO daily. Before administering the medication, the nurse assesses the client's apical pulse and finds it to be 54 bpm. What is the nurse's BEST action?",options:["Administer the digoxin since the heart rate is above 50 bpm","Hold the digoxin and notify the provider","Give half the dose and reassess in 2 hours","Administer the digoxin and document the heart rate"],correct:1,rationale:"The standard parameter for digoxin (a cardiac glycoside) administration is to hold the dose if the apical heart rate is below 60 bpm in adults. The nurse should hold the medication, document the findings, and notify the provider. Digoxin toxicity can cause life-threatening dysrhythmias. Signs of digoxin toxicity include bradycardia, nausea, vomiting, visual disturbances (yellow-green halos), and dysrhythmias.",tip:"HOLD digoxin if: HR <60 bpm (adults), HR <90-110 bpm (infants). Monitor K+ levels — hypokalemia increases risk of digoxin toxicity. Early toxicity signs: GI symptoms (N/V/anorexia). Late: dysrhythmias, visual changes.",tags:["digoxin","cardiac glycoside","medication safety","hold parameters"]},
+
+{id:9,domain:"pharmacology",type:"mcq",stem:"A client is prescribed warfarin (Coumadin) therapy. The nurse should instruct the client to AVOID which food?",options:["Citrus fruits and orange juice","Dark leafy green vegetables such as spinach and kale","Dairy products and calcium-rich foods","High-protein foods such as meat and eggs"],correct:1,rationale:"Warfarin is a vitamin K antagonist. Foods high in vitamin K (dark leafy greens: spinach, kale, broccoli, Brussels sprouts) can significantly reduce the anticoagulation effect of warfarin and alter INR levels. Clients should be instructed to maintain a consistent intake of vitamin K-rich foods rather than completely eliminating them. Sudden large changes in vitamin K intake affect warfarin's effectiveness.",tip:"Warfarin antagonist = Vitamin K. High Vitamin K foods: 'leafy greens' (spinach, kale, broccoli). Normal INR: 0.8-1.2. Therapeutic INR for AFib/DVT: 2.0-3.0. Mechanical heart valve: 2.5-3.5. Antidote: Vitamin K (phytonadione).",tags:["warfarin","anticoagulation","vitamin K","patient education","INR"]},
+
+{id:10,domain:"pharmacology",type:"sata",stem:"A client is receiving IV vancomycin for MRSA bacteremia. Which assessments are MOST important for the nurse to monitor? SELECT ALL THAT APPLY.",options:["Serum creatinine and BUN every 48-72 hours","Infusion rate to prevent Red Man Syndrome","Audiological symptoms including tinnitus and hearing changes","Blood pressure every 15 minutes during infusion","Peak and trough vancomycin levels","Daily weight to monitor fluid retention"],correct:[0,1,2,4],rationale:"Vancomycin requires monitoring for: nephrotoxicity (serum creatinine/BUN), ototoxicity (tinnitus, hearing loss), and Red Man Syndrome (flushing, erythema if infused too rapidly — infuse over 60 minutes minimum). Vancomycin peak and trough levels are essential to ensure therapeutic dosing and prevent toxicity. BP every 15 min is not a standard vancomycin protocol. Daily weight is not specific to vancomycin monitoring.",tip:"VANCOMYCIN monitoring: 'RENT' — Renal (nephrotoxicity), Ears (ototoxicity), Neck/face flushing (Red Man Syndrome if too fast), Trough/peak levels. Always infuse over at least 60 minutes.",tags:["vancomycin","MRSA","nephrotoxicity","ototoxicity","drug monitoring"]},
+
+{id:11,domain:"pharmacology",type:"mcq",stem:"A nurse is preparing to administer morphine sulfate 4 mg IV to a post-operative client. The medication is available as morphine 10 mg/mL. How many mL should the nurse administer?",options:["0.4 mL","0.8 mL","4.0 mL","2.5 mL"],correct:0,rationale:"Use the formula: Desired/Have × Volume = mL to administer. Desired: 4 mg. Have: 10 mg/mL. Volume: 1 mL. Calculation: 4/10 × 1 = 0.4 mL. Always double-check opioid calculations and have a second nurse verify when required by facility policy.",tip:"NCLEX medication calculation formula: D/H × V = amount to give. D = Desired dose, H = Have (on hand), V = Vehicle (volume). For opioids: always assess respiratory rate, O2 sat, sedation level before and after administration. Antidote: naloxone (Narcan).",tags:["dosage calculation","morphine","opioid","math","pharmacology"]},
+
+// ─── PHYSIOLOGICAL ADAPTATION ─────────────────────────────────────
+{id:12,domain:"physio",type:"mcq",stem:"A client presents to the ED with the following arterial blood gas (ABG) results: pH 7.28, PaCO2 55 mmHg, HCO3 24 mEq/L, PaO2 82 mmHg. The nurse interprets this as:",options:["Metabolic acidosis, uncompensated","Respiratory acidosis, uncompensated","Metabolic alkalosis, partially compensated","Respiratory alkalosis, uncompensated"],correct:1,rationale:"ABG interpretation using ROME: Respiratory Opposite, Metabolic Equal. pH 7.28 = acidosis (normal 7.35-7.45). PaCO2 55 = elevated (normal 35-45) → RESPIRATORY cause. HCO3 24 = normal (22-26) → no metabolic compensation. Since HCO3 is normal, this is UNCOMPENSATED respiratory acidosis. Common causes: COPD, hypoventilation, opioid overdose.",tip:"ABG interpretation steps: 1) pH (7.35-7.45), 2) PaCO2 (35-45), 3) HCO3 (22-26). ROME = Respiratory Opposite (high CO2 = acidosis), Metabolic Equal (high HCO3 = alkalosis). If pH is normal but others are abnormal = COMPENSATED.",tags:["ABG","respiratory acidosis","acid-base","interpretation"]},
+
+{id:13,domain:"physio",type:"mcq",stem:"A nurse is caring for a client who had a thyroidectomy 12 hours ago. The client suddenly reports tingling around the mouth and in the fingertips. The nurse notices muscle twitching in the face. Which electrolyte imbalance does the nurse suspect?",options:["Hyperkalemia","Hypocalcemia","Hyponatremia","Hypermagnesemia"],correct:1,rationale:"Hypocalcemia is a common complication after thyroidectomy because the parathyroid glands (which regulate calcium) may be accidentally removed or damaged during surgery. Classic signs include: Chvostek's sign (facial twitching when tapping facial nerve), Trousseau's sign (carpal spasm with BP cuff inflation), perioral tingling, muscle cramps, tetany, and seizures in severe cases. Treatment: IV calcium gluconate.",tip:"Post-thyroidectomy complications: Hypocalcemia (tetany - URGENT), Hypothyroidism, Laryngeal nerve damage (hoarseness), Bleeding (hematoma - neck swelling = airway emergency). Chvostek's = tap cheek → face twitches. Trousseau's = inflate BP cuff → hand spasm.",tags:["thyroidectomy","hypocalcemia","Chvostek","Trousseau","post-op complications"]},
+
+{id:14,domain:"physio",type:"mcq",stem:"A client is admitted with diabetic ketoacidosis (DKA). Which laboratory finding is MOST consistent with this diagnosis?",options:["Blood glucose 320 mg/dL, pH 7.38, HCO3 24 mEq/L, serum acetone negative","Blood glucose 380 mg/dL, pH 7.22, HCO3 12 mEq/L, serum acetone positive","Blood glucose 280 mg/dL, pH 7.48, HCO3 30 mEq/L, serum acetone negative","Blood glucose 150 mg/dL, pH 7.30, HCO3 18 mEq/L, serum acetone negative"],correct:1,rationale:"DKA is characterized by: hyperglycemia (>250 mg/dL), metabolic acidosis (pH <7.35, HCO3 <15 mEq/L), ketonemia/ketonuria (positive acetone due to fat breakdown), and anion gap >12. Option B shows all classic DKA findings. DKA occurs primarily in Type 1 diabetes when there is absolute insulin deficiency causing fat catabolism and ketone production.",tip:"DKA vs HHNS: DKA = fruity breath, Kussmaul respirations, ketones positive, pH <7.35, usually Type 1. HHNS = older Type 2, blood glucose >600, no ketones, severe dehydration, more neurological changes.",tags:["DKA","diabetes","metabolic acidosis","ketoacidosis","lab values"]},
+
+{id:15,domain:"physio",type:"sata",stem:"A client is admitted with heart failure exacerbation. Which clinical findings would the nurse expect to assess? SELECT ALL THAT APPLY.",options:["Bilateral crackles in the lung bases","Jugular venous distension","Dependent pitting edema in lower extremities","Pink, frothy sputum indicating pulmonary edema","Bradycardia as a compensatory mechanism","S3 heart sound (ventricular gallop)"],correct:[0,1,2,3,5],rationale:"Heart failure signs include: crackles (fluid in alveoli), JVD (increased venous pressure), dependent pitting edema (fluid accumulation), pink frothy sputum (severe pulmonary edema), S3 gallop (stretched ventricle), and dyspnea, weight gain, and orthopnea. Tachycardia (not bradycardia) is the compensatory mechanism in heart failure due to decreased cardiac output stimulating the SNS.",tip:"Left-sided HF = pulmonary symptoms (crackles, dyspnea, orthopnea, PND, pink frothy sputum). Right-sided HF = systemic symptoms (peripheral edema, JVD, ascites, hepatomegaly). S3 = HF hallmark. Daily weights most important monitoring.",tags:["heart failure","pulmonary edema","S3","JVD","edema"]},
+
+// ─── PSYCHOSOCIAL INTEGRITY ──────────────────────────────────────
+{id:16,domain:"psycho",type:"mcq",stem:"A client with schizophrenia tells the nurse, 'The government has implanted a chip in my brain and is controlling my thoughts.' What is the nurse's BEST response?",options:["I understand. Let's talk about how to remove the chip.","I don't believe that, but I want you to tell me more about how that makes you feel.","That sounds very frightening. Tell me more about what you're experiencing.","You're having a delusion. Those thoughts aren't real."],correct:2,rationale:"The therapeutic response acknowledges the client's emotional experience without reinforcing or challenging the delusion. Saying 'that sounds frightening' validates the client's distress (not the content of the delusion). Challenging delusions (option D) increases anxiety and damages trust. Agreeing with or reinforcing delusions (option A) is never appropriate. Option B starts with denial which can be confrontational.",tip:"With delusions: NEVER agree or disagree with the delusion content. Focus on the FEELING, not the content. 'That must be frightening' — acknowledge emotion. Then redirect to reality-based topics.",tags:["schizophrenia","delusions","therapeutic communication","psychosis"]},
+
+{id:17,domain:"psycho",type:"mcq",stem:"A nurse is using therapeutic communication with a client who is grieving. The client says, 'I just don't know how I'm going to go on without my husband.' What is the nurse's BEST response?",options:["I understand. Many people feel that way after losing a spouse.","You'll be okay. Time heals everything, and you'll meet someone new.","It sounds like you're feeling lost and overwhelmed right now.","Have you considered grief counseling? It really helps most people."],correct:2,rationale:"Reflecting and paraphrasing the client's emotional content demonstrates active listening and validates feelings without giving false reassurance or advice. Option C uses reflective communication that shows the nurse understood both the content and emotion of the message. Option A uses cliché and premature generalization. Option B gives false reassurance. Option D deflects with advice before fully acknowledging feelings.",tip:"THERAPEUTIC communication techniques: Open-ended questions, Reflective listening, Clarifying, Focusing, Silence (most underused). BLOCK therapeutic communication: False reassurance, Minimizing, Changing subject, Giving advice prematurely, Using clichés, Asking 'why' questions.",tags:["therapeutic communication","grief","bereavement","active listening"]},
+
+{id:18,domain:"psycho",type:"mcq",stem:"A client is admitted to a psychiatric unit after a suicide attempt. During the assessment, the client states, 'I've been giving away all my belongings this week.' What does this behavior indicate?",options:["The client is working through the stages of grief","This is a normal behavior for someone who has been hospitalized","Giving away belongings is a warning sign for suicide intent","The client is experiencing altruistic behavior"],correct:2,rationale:"Giving away prized possessions is a significant behavioral warning sign of suicidal intent, suggesting the person is 'settling affairs.' Other warning signs include: saying goodbyes, sudden calmness after depression (may indicate decision made), acquiring means (weapons, stockpiling pills), making a specific plan, and talking about death or suicide. These require immediate assessment of suicidal ideation, plan, means, and intent.",tip:"Suicide risk assessment: Use SAD PERSONS — Sex, Age, Depression, Previous attempt (strongest predictor), ETOH/drugs, Rational thinking loss, Support lacking, Organized plan, No significant other, Sickness. Previous attempt = STRONGEST risk factor.",tags:["suicide","behavioral warning signs","psychiatric assessment","safety"]},
+
+// ─── HEALTH PROMOTION & MAINTENANCE ──────────────────────────────
+{id:19,domain:"health",type:"mcq",stem:"A nurse is providing education to a group of pregnant women about folic acid supplementation. The nurse should instruct clients to begin taking folic acid:",options:["During the first trimester, as soon as pregnancy is confirmed","At least 1 month before conception and continue through the first trimester","Throughout the entire pregnancy, starting in the second trimester","Only if there is a family history of neural tube defects"],correct:1,rationale:"Folic acid (vitamin B9) is critical for neural tube development, which occurs in the first 28 days after conception — often before a woman knows she is pregnant. The CDC recommends ALL women of childbearing age take 400-800 mcg of folic acid daily. Women with a history of neural tube defect pregnancies should take 4,000 mcg/day. Starting at least one month before conception ensures adequate levels during the critical developmental window.",tip:"Neural tube defects (spina bifida, anencephaly) occur in first 28 days of pregnancy. Folate is needed BEFORE conception. Recommend 400-800 mcg/day for all women of childbearing age, 4 mg (4000 mcg) if previous NTD baby.",tags:["prenatal care","folic acid","neural tube defects","pregnancy","health promotion"]},
+
+{id:20,domain:"health",type:"mcq",stem:"A nurse is teaching a client who is 6 weeks postpartum about family planning. The client is exclusively breastfeeding. Which statement by the nurse is MOST accurate?",options:["Exclusive breastfeeding provides 100% protection against pregnancy.","You cannot use any hormonal contraception while breastfeeding.","Breastfeeding can reduce fertility, but contraception is still recommended.","You should wait 6 months before starting any form of contraception."],correct:2,rationale:"Lactational Amenorrhea Method (LAM) provides approximately 98-99% protection against pregnancy IF: the client is exclusively breastfeeding (no supplemental feedings), the infant is <6 months old, AND menses have not returned. However, this method is not 100% reliable, and nurses should counsel all postpartum clients about appropriate contraception. Progestin-only contraceptives (mini-pill, Depo-Provera) are safe during breastfeeding.",tip:"Breastfeeding contraindications for combined oral contraceptives (estrogen decreases milk supply). Safe: progestin-only, barrier methods, IUD. LAM = effective only if ALL 3 conditions met: exclusive breastfeeding + no menses + baby <6 months.",tags:["postpartum","breastfeeding","contraception","family planning","health promotion"]},
+
+// ─── BASIC CARE & COMFORT ────────────────────────────────────────
+{id:21,domain:"basic",type:"mcq",stem:"A nurse is assessing a client who has been prescribed patient-controlled analgesia (PCA) with morphine. Which assessment finding requires IMMEDIATE intervention?",options:["Client reports pain level of 4/10 after PCA use","Respiratory rate of 10 breaths/min with sedation score of 4","Client uses PCA button every 20 minutes as prescribed","Client's blood pressure is 118/72 mmHg"],correct:1,rationale:"Respiratory depression and excessive sedation are the most serious complications of opioid analgesia. A respiratory rate of 10 (low but borderline) combined with a sedation score of 4 (usually on 0-5 scale where 4 = difficult to arouse) indicates opioid overdose risk. This requires: stopping the PCA, providing respiratory support, and administering naloxone (Narcan) as prescribed. The other findings are normal or expected.",tip:"OPIOID safety: Assess before AND after administration — RR, O2 sat, pain score, sedation level. Sedation precedes respiratory depression. If RR <8-10 or sedation score high → Narcan. Always have oxygen and Narcan at bedside with PCA.",tags:["PCA","opioid","respiratory depression","naloxone","pain management"]},
+
+{id:22,domain:"basic",type:"mcq",stem:"A client who is being prepared for a colonoscopy asks about the purpose of the bowel preparation. The nurse's response should be based on the understanding that bowel prep is done to:",options:["Prevent electrolyte imbalances during the procedure","Ensure clear visualization of the colon and prevent procedure complications","Reduce the risk of perforation during scope insertion","Prevent the client from being incontinent during the procedure"],correct:1,rationale:"Bowel preparation (lavage solutions such as GoLYTELY or Fleet prep) clears the colon of fecal matter to ensure clear visualization of the colonic mucosa during colonoscopy. Without adequate prep, polyps, lesions, and abnormalities may be obscured. The prep also reduces the risk of contamination if perforation occurs. Nurses should educate clients about the importance of adequate hydration and that electrolyte monitoring may be needed for certain high-risk clients.",tip:"Pre-colonoscopy nursing: NPO guidelines, bowel prep adherence, hydration, identify clients at risk for electrolyte imbalance (elderly, cardiac, renal clients — may need IV access or modified prep). Expect clear/yellow liquid stool = successful prep.",tags:["colonoscopy","bowel preparation","procedure preparation","patient education"]},
+
+// ─── RISK REDUCTION ───────────────────────────────────────────────
+{id:23,domain:"reduction",type:"mcq",stem:"A nurse is caring for a client who is at high risk for deep vein thrombosis (DVT). Which intervention is MOST effective in preventing DVT formation?",options:["Elevating the foot of the bed 30 degrees continuously","Encouraging ambulation and use of sequential compression devices (SCDs)","Massaging the lower extremities every 4 hours","Applying ice packs to the lower extremities"],correct:1,rationale:"Early ambulation and SCDs (pneumatic compression devices) are the most evidence-based interventions for DVT prevention. Ambulation improves venous return and prevents venous stasis. SCDs provide intermittent compression mimicking the muscle pump action. Massaging the legs is CONTRAINDICATED when DVT is suspected as it can dislodge a thrombus and cause pulmonary embolism. Ice packs are not a DVT prevention measure.",tip:"DVT prevention: Early ambulation (MOST important), SCDs, anticoagulation (heparin, enoxaparin), TED hose, hydration. DVT assessment: Homans' sign is unreliable. Use Wells criteria. NEVER massage suspected DVT leg!",tags:["DVT","thromboembolism prevention","ambulation","SCDs","fall prevention"]},
+
+{id:24,domain:"reduction",type:"mcq",stem:"A client who is receiving heparin therapy has activated partial thromboplastin time (aPTT) results of 120 seconds. The normal aPTT is 25-35 seconds. What does this result indicate?",options:["Therapeutic heparin effect — continue current infusion","Subtherapeutic heparin level — increase the infusion rate","Supratherapeutic heparin level — the client is at risk for bleeding","Normal coagulation — heparin is not needed"],correct:2,rationale:"The therapeutic aPTT range for heparin therapy is 60-100 seconds (1.5-2.5 times the normal control). An aPTT of 120 seconds is above the therapeutic range, indicating excessive anticoagulation and increased bleeding risk. The nurse should: hold or decrease the heparin infusion per protocol, monitor for bleeding (hematuria, hematomas, prolonged bleeding), and notify the provider. The antidote for heparin is protamine sulfate.",tip:"Heparin monitoring: aPTT goal = 60-100 seconds (1.5-2.5× normal). Antidote = protamine sulfate. Monitor for HIT (Heparin-Induced Thrombocytopenia) — platelets drop paradoxically. LMWH (enoxaparin) — monitor anti-Xa levels, no aPTT monitoring needed.",tags:["heparin","aPTT","anticoagulation","bleeding risk","lab values"]},
+
+// ─── NGN — NEXT GENERATION NCLEX ─────────────────────────────────
+{id:25,domain:"physio",type:"ngn_matrix",ngn:true,stem:"A nurse is caring for a client in the emergency department. Review the client information below and complete the clinical judgment table.",caseData:{history:"A 68-year-old male with a history of hypertension and type 2 diabetes presents with sudden onset crushing chest pain radiating to the left arm and jaw, diaphoresis, and nausea. Pain began 45 minutes ago. HR 98, BP 168/94, RR 18, O2 sat 94% on room air.",labs:"Troponin I: 2.8 ng/mL (normal <0.04). EKG: ST elevation in leads II, III, aVF. BNP: 156 pg/mL.",meds:"Current meds: metformin, lisinopril, atorvastatin"},matrix:{rows:["Administer aspirin 325 mg PO","Elevate the head of bed to 90 degrees","Obtain a 12-lead EKG immediately","Administer metformin 1000mg as scheduled","Prepare client for possible cardiac catheterization","Apply supplemental oxygen for O2 sat >90%"],cols:["Indicated","Not Indicated"],correct:[0,0,0,1,0,1],rationale:"STEMI management (MONA + reperfusion): Morphine (for refractory pain), Oxygen only if sat <90% (not routine), Nitrates, Aspirin 325mg STAT. 12-lead EKG is urgent (goal door-to-EKG <10 min). Metformin should be held before cardiac catheterization (contrast dye + metformin risk for lactic acidosis). Cardiac cath (PCI) for STEMI — door-to-balloon <90 min. O2 sat of 94% does not require supplemental oxygen."},tip:"STEMI = ST elevation + elevated troponin. Goals: Door-to-EKG <10 min, Door-to-balloon <90 min. Hold metformin before any contrast procedure. Don't give routine O2 if O2 sat >90%."},
+
+{id:26,domain:"management",type:"ngn_bowties",ngn:true,stem:"A client is admitted with suspected sepsis. Using the bowtie clinical judgment model, analyze the scenario.",caseData:{history:"A 72-year-old female, post-surgical day 2 following bowel resection, presents with: HR 118 bpm, BP 88/54 mmHg, T 38.9°C (102°F), RR 24, WBC 18,000/mm³, lactate 3.2 mmol/L, altered mental status. Urine output: 15 mL/hr for past 2 hours."},bowtie:{causes:["Surgical site infection","Aspiration pneumonia","Urinary tract infection","Pulmonary embolism"],actions:["Obtain blood cultures × 2 before starting antibiotics","Administer broad-spectrum antibiotics within 1 hour","Initiate IV fluid resuscitation (30 mL/kg crystalloid)","Administer vasopressors for refractory hypotension","Decrease IV fluid rate to prevent fluid overload"],outcomes:["Resolution of hypotension and improved perfusion","Development of acute kidney injury","Hemodynamic stabilization","Respiratory failure requiring intubation"],correctCauses:[0,1,2],correctActions:[0,1,2,3],correctOutcomes:[0,2]},rationale:"Sepsis criteria (SIRS + infection source): HR >90, Temp >38°C, RR >20, WBC >12,000 or <4,000 + suspected infection. The Surviving Sepsis Campaign '1-hour bundle': blood cultures before antibiotics, broad-spectrum antibiotics within 1 hour, 30 mL/kg IV crystalloid for hypotension/lactate ≥4, vasopressors if no fluid response. Elevated lactate (>2) indicates tissue hypoperfusion.",tip:"Sepsis 1-hour bundle: Blood cultures → Antibiotics (within 1hr) → Fluids (30 mL/kg) → Vasopressors if needed → Remeasure lactate. Priority: Cultures BEFORE antibiotics but don't delay antibiotics >45 min to get cultures."},
+
+{id:27,domain:"pharmacology",type:"mcq",stem:"A client with type 1 diabetes is prescribed insulin glargine (Lantus) 22 units at bedtime AND insulin lispro (Humalog) sliding scale before meals. The client's blood glucose before dinner is 285 mg/dL. Per the sliding scale, the client receives 6 units of insulin lispro. When should the client receive the next dose of insulin glargine?",options:["Immediately after the lispro injection","At bedtime as originally scheduled","Only if blood glucose remains above 200 mg/dL at bedtime","In the morning with breakfast"],correct:1,rationale:"Insulin glargine (Lantus) is a long-acting basal insulin given ONCE daily at the SAME time each day (usually bedtime). It should not be mixed with other insulins and does not have a peak. The lispro given at dinner is a rapid-acting bolus/correction insulin and does not replace the scheduled basal insulin. The glargine is still given at bedtime as scheduled, regardless of the correction dose given at dinner.",tip:"Insulin types: Rapid (lispro, aspart, glulisine) — peak 1-3hr, give with meals. Short (regular) — peak 2-5hr. Intermediate (NPH) — peak 4-12hr. Long (glargine/detemir) — NO peak, 24hr duration. NEVER mix glargine with other insulins.",tags:["insulin","diabetes","basal insulin","glargine","medication timing"]},
+
+{id:28,domain:"physio",type:"mcq",stem:"A client with a T4 spinal cord injury suddenly develops a blood pressure of 210/120 mmHg, a throbbing headache, and bradycardia. The nurse suspects autonomic dysreflexia. What is the nurse's PRIORITY action?",options:["Administer an antihypertensive medication immediately","Lay the client flat and raise the legs to improve circulation","Sit the client upright and identify and remove the triggering stimulus","Apply ice packs to the neck and forehead to reduce blood pressure"],correct:2,rationale:"Autonomic dysreflexia (AD) is a life-threatening complication in clients with spinal cord injuries at T6 or above. It is triggered by a noxious stimulus below the injury level (most common: bladder distension, bowel impaction). Priority actions: IMMEDIATELY sit the client UPRIGHT (orthostatic drop helps lower BP), identify and remove the stimulus (check Foley catheter for kink, check for full bladder, bowel impaction). If BP remains elevated after removing stimulus, administer antihypertensives. Can cause stroke, MI, or death if untreated.",tip:"Autonomic Dysreflexia triad: Sudden severe HTN + pounding headache + bradycardia (paradoxical). Injury T6 or above. MOST common trigger: FULL BLADDER. Priority: Sit UP + find and remove stimulus. Medications second.",tags:["autonomic dysreflexia","spinal cord injury","hypertensive emergency","T6","SCI"]},
+
+{id:29,domain:"reduction",type:"mcq",stem:"A nurse is caring for a client with a chest tube to water-seal drainage. The nurse observes continuous bubbling in the water-seal chamber. What should the nurse do FIRST?",options:["Clamp the chest tube and call the physician immediately","Assess the system for an air leak by clamping the tube near the chest","Increase suction to remove the excess air","Document the finding as normal, since bubbling always occurs in this chamber"],correct:1,rationale:"Continuous bubbling in the water-seal chamber indicates an air leak. The nurse should systematically assess for the source: first, briefly clamp the tube near the insertion site. If bubbling stops = air leak is at the client level (site needs to be reinforced). If bubbling continues = air leak is in the tubing or drainage system (check all connections). Intermittent tidaling (water movement with respiration) is NORMAL. Continuous bubbling is NOT normal after initial placement (when lung is expanded).",tip:"Chest tube water-seal chamber: Tidaling UP on inspiration (spontaneous breathing), DOWN on inspiration (vented). Bubbling: continuous = air leak (NOT normal). Absence of tidaling = lung re-expanded OR kink/clog. Suction chamber: gentle continuous bubbling = appropriate.",tags:["chest tube","air leak","water seal","respiratory","assessment"]},
+
+{id:30,domain:"safety",type:"mcq",stem:"The nurse is preparing to administer medications through a client's nasogastric (NG) tube. Which action is MOST important to perform before administration?",options:["Flush the tube with 30 mL of sterile water","Verify tube placement using pH testing of aspirate","Check the client's last serum electrolyte levels","Ensure the client is positioned at 30 degrees or higher"],correct:1,rationale:"Before EVERY NG tube medication administration, the nurse MUST verify tube placement. The most reliable bedside method is measuring the pH of gastric aspirate (pH <5.5 indicates gastric placement). X-ray is the gold standard for initial placement verification. Auscultatory methods (air insufflation) are no longer recommended as reliable for placement verification. An incorrectly placed tube could deliver medications into the lungs, causing aspiration pneumonia or death.",tip:"NG tube placement verification: BEST = X-ray (initial placement only). Bedside = aspirate pH <5.5 (gastric). NOT reliable = auscultation alone. Tube should be marked at the nostril and length checked with each use. Head of bed ≥30 degrees during and after feeding.",tags:["NG tube","tube feeding","medication administration","patient safety","placement verification"]},
+
+// ─── PEDIATRICS ───────────────────────────────────────────────────
+{id:31,domain:"physio",type:"mcq",stem:"A nurse is assessing a 2-year-old child admitted with suspected epiglottitis. Which action should the nurse AVOID?",options:["Placing the child in a position of comfort, usually sitting upright","Administering humidified oxygen via face mask","Performing a throat culture with a tongue blade to confirm the diagnosis","Preparing for emergency airway management equipment at the bedside"],correct:2,rationale:"In suspected epiglottitis, examining the throat with a tongue blade or attempting to visualize the epiglottis is ABSOLUTELY CONTRAINDICATED. This can cause laryngospasm and complete airway obstruction, which is rapidly fatal. The child should be kept calm and positioned comfortably (tripod position). Do not attempt throat cultures, blood draws, or anything that may agitate the child. Prepare for emergency airway management (intubation, tracheostomy). The diagnosis is confirmed via lateral neck X-ray.",tip:"Epiglottitis: 3 D's = Drooling, Dysphagia, Distress. Tripod position (leaning forward). NEVER use tongue blade. Keep child calm, prepare for airway emergency. H. influenzae type b most common cause (now vaccine-preventable).",tags:["epiglottitis","pediatrics","airway","contraindicated","emergency"]},
+
+{id:32,domain:"physio",type:"mcq",stem:"A nurse is calculating the maintenance IV fluid rate for a 20 kg child using the Holliday-Segar method. What is the correct hourly rate?",options:["60 mL/hr","100 mL/hr","20 mL/hr","40 mL/hr"],correct:0,rationale:"Holliday-Segar method for maintenance fluids: 0-10 kg = 100 mL/kg/day (4 mL/kg/hr). 10-20 kg = add 50 mL/kg/day (2 mL/kg/hr) for each kg above 10. >20 kg = add 20 mL/kg/day for each kg above 20. For 20 kg: (10 kg × 100 mL) + (10 kg × 50 mL) = 1000 + 500 = 1500 mL/day ÷ 24 hours = 62.5 mL/hr ≈ 60 mL/hr. Also expressed as 4-2-1 rule for hourly rates.",tip:"4-2-1 Rule (maintenance IV fluids): 4 mL/kg/hr for first 10 kg, 2 mL/kg/hr for next 10 kg, 1 mL/kg/hr for each kg above 20. For 20 kg: (4×10) + (2×10) = 40+20 = 60 mL/hr.",tags:["pediatric fluids","IV calculation","Holliday-Segar","4-2-1 rule","dosage calculation"]},
+
+// ─── MATERNAL/OB ──────────────────────────────────────────────────
+{id:33,domain:"physio",type:"mcq",stem:"A client at 36 weeks gestation presents with sudden onset of painless, bright red vaginal bleeding. The nurse should suspect which condition?",options:["Placental abruption","Placenta previa","Vasa previa","Premature rupture of membranes"],correct:1,rationale:"Painless, bright red vaginal bleeding is the classic presentation of placenta previa (abnormal implantation of the placenta over or near the cervical os). The initial bleeding occurs as the lower uterine segment thins. Priority: DO NOT perform vaginal or rectal examination (can cause life-threatening hemorrhage), monitor fetal heart rate, obtain IV access, prepare for C-section. Abruption = painful, dark bleeding, rigid board-like uterus. Never perform a vaginal exam with painless third-trimester bleeding without ultrasound first.",tip:"Placenta previa: Painless, bright red bleeding, soft uterus. Abruption: Painful, dark red bleeding, rigid/board-like uterus, fetal distress. Both = no vaginal exam! Placenta previa = C-section delivery.",tags:["placenta previa","antepartum bleeding","obstetrics","prenatal complication","third trimester"]},
+
+{id:34,domain:"physio",type:"mcq",stem:"A laboring client's monitor shows late decelerations on the fetal heart rate tracing. The nurse's FIRST action should be to:",options:["Increase the IV oxytocin (Pitocin) infusion rate","Reposition the client to the left lateral position","Administer oxygen via face mask at 8-10 L/min","Prepare the client for emergency cesarean delivery"],correct:1,rationale:"Late decelerations indicate uteroplacental insufficiency and possible fetal hypoxia. The FIRST action is to reposition the client to the left lateral position (relieves vena cava compression, improves placental perfusion). Following repositioning: discontinue oxytocin if running, administer O2 via face mask, increase IV fluids, notify provider, and prepare for potential delivery if no improvement. Increasing oxytocin would worsen the problem by increasing uterine contractions and further reducing placental perfusion.",tip:"NCLEX fetal decelerations mnemonic: Early = Head compression (normal, mirror contractions). Late = Placental insufficiency (uteroplacental problem — ALWAYS concerning). Variable = Cord compression (most common, can be normal or abnormal). Late = intervene: LEFT lateral, O2, STOP Pitocin, IV fluids, notify MD.",tags:["fetal monitoring","late decelerations","uteroplacental","IUFD","obstetric emergency"]},
+
+// ─── MENTAL HEALTH ────────────────────────────────────────────────
+{id:35,domain:"psycho",type:"mcq",stem:"A client is prescribed lithium for bipolar disorder. Which client statement indicates a NEED for FURTHER teaching?",options:["I will maintain adequate sodium and fluid intake while on lithium.","I can skip a dose if my lithium level is at the high end of therapeutic range.","I should report any hand tremors or increased urination to my doctor.","I will have my lithium levels checked every 3-6 months once stabilized."],correct:1,rationale:"Lithium should NEVER be skipped or doses adjusted without provider guidance. Lithium has a narrow therapeutic range (0.6-1.2 mEq/L for maintenance; 0.8-1.4 for acute mania). Clients should maintain consistent sodium and fluid intake (dehydration and low sodium increase lithium toxicity risk), report early toxicity signs (tremors, polyuria, GI upset), and have regular blood level monitoring. Self-adjusting doses can cause subtherapeutic levels (relapse) or toxicity.",tip:"Lithium toxicity levels: Mild (1.5-2): N/V, diarrhea, tremor, thirst. Moderate (2-2.5): Ataxia, confusion, slurred speech. Severe (>2.5): Seizures, coma, death. DEHYDRATION and LOW SODIUM increase toxicity. No NSAIDs (increase lithium level).",tags:["lithium","bipolar disorder","drug toxicity","patient education","therapeutic levels"]},
+
+// ─── NEUROLOGICAL ─────────────────────────────────────────────────
+{id:36,domain:"physio",type:"mcq",stem:"A client is admitted with acute ischemic stroke symptoms. Which intervention has the greatest impact on outcomes if administered within the appropriate time window?",options:["IV heparin anticoagulation","IV alteplase (tPA — tissue plasminogen activator)","Aspirin 650 mg PO","Carotid endarterectomy"],correct:1,rationale:"IV tPA (alteplase) is the gold standard treatment for acute ischemic stroke when administered within 3-4.5 hours of symptom onset in eligible clients. It dissolves the clot and restores cerebral blood flow. Contraindications include: active bleeding, recent surgery, uncontrolled hypertension (>185/110 despite treatment), recent stroke, coagulopathy, and blood glucose <50 or >400. BP must be <185/110 before administration. Time is brain — the sooner tPA is given, the better the outcome.",tip:"Stroke FAST: Face drooping, Arm weakness, Speech difficulty, Time to call 911. tPA = within 3-4.5 hours of ONSET. Contraindications: bleeding history, SBP >185, recent surgery/stroke. During/after tPA: NO anticoagulants, NO antiplatelets for 24 hours. Hemorrhagic stroke = NO tPA.",tags:["stroke","tPA","alteplase","ischemic stroke","thrombolytic therapy","time-sensitive"]},
+
+{id:37,domain:"physio",type:"mcq",stem:"A client with increased intracranial pressure (ICP) is positioned in bed. Which nursing action is MOST appropriate to help reduce ICP?",options:["Position client in Trendelenburg position to increase cerebral perfusion","Position client with head of bed elevated 30 degrees and head in neutral alignment","Apply heating pads to extremities to promote vasodilation","Encourage the client to perform Valsalva maneuver during position changes"],correct:1,rationale:"For increased ICP, the HOB should be elevated 30 degrees with the head in neutral alignment (no neck flexion, rotation, or hyperextension) to promote venous drainage from the cranium. Trendelenburg position would increase ICP by impeding venous drainage. Valsalva maneuver dramatically increases ICP and should be avoided. Stimulation (including heat, noise, suctioning) should be minimized. Other ICP reduction measures: hyperosmolar therapy (mannitol), hyperventilation (temporary), CSF drainage.",tip:"ICP reduction: HOB 30°, neutral alignment, quiet dark environment, avoid Valsalva, minimize suction time. Cushing's Triad (late sign of herniation) = widening pulse pressure + bradycardia + irregular respirations. Normal ICP: <15 mmHg.",tags:["ICP","intracranial pressure","positioning","neuro","brain"]},
+
+// ─── RESPIRATORY ──────────────────────────────────────────────────
+{id:38,domain:"physio",type:"mcq",stem:"A client with asthma is prescribed both a beta-2 agonist rescue inhaler (albuterol) and an inhaled corticosteroid (ICS) controller inhaler. Which instruction is CORRECT?",options:["Use the ICS first, then use the rescue inhaler 5 minutes later","Use the rescue inhaler first, then use the ICS 5 minutes later","Use both inhalers simultaneously for maximum effect","Use the ICS daily and the rescue inhaler only in emergencies"],correct:1,rationale:"When both inhalers are used together, the rescue inhaler (albuterol — bronchodilator) should be used FIRST because it opens the airways. After the airways are dilated (wait 5 minutes), the controller inhaler (ICS) is used so the medication can penetrate deeper into the lungs for better therapeutic effect. The ICS is used daily (scheduled) for inflammation control, not PRN. The rescue inhaler is used PRN for acute bronchospasm. Clients should rinse their mouth after ICS to prevent oral candidiasis.",tip:"Inhaler order: SABA first (opens airways) → ICS second (now penetrates deeper). ICS side effects: oral candidiasis → RINSE MOUTH after use. Rescue inhaler = SHORT-ACTING beta-2 agonist (SABA) = albuterol. Controller = ICS = not for acute attacks.",tags:["asthma","inhaler technique","albuterol","corticosteroids","respiratory"]},
+
+// ─── FLUID & ELECTROLYTES ─────────────────────────────────────────
+{id:39,domain:"physio",type:"mcq",stem:"A nurse is reviewing laboratory results for a client receiving IV fluids after surgery. Serum sodium is 128 mEq/L. Which symptom should the nurse MOST expect to assess?",options:["Increased thirst and dry mucous membranes","Elevated blood pressure and facial flushing","Muscle cramps, headache, and confusion","Muscle weakness and cardiac dysrhythmias"],correct:2,rationale:"Hyponatremia (sodium <135 mEq/L) primarily causes neurological symptoms because low sodium causes water to shift INTO brain cells (cerebral edema): headache, nausea, confusion, muscle cramps, seizures, and in severe cases, coma. The neurological symptoms worsen as sodium falls. At 128 mEq/L, the client would likely have early-moderate symptoms including headache, nausea, and confusion. Option D describes hypokalemia. Option A describes hypernatremia/dehydration.",tip:"Sodium and water: They go together! Hyponatremia = cerebral edema = neuro symptoms (confusion, seizures). Hypernatremia = brain cells shrink = neuro symptoms (agitation, thirst, fever). Hypokalemia = muscle weakness, cardiac dysrhythmias. Hyperkalemia = peaked T waves, bradycardia, cardiac arrest.",tags:["hyponatremia","electrolytes","sodium","neuro symptoms","fluid imbalance"]},
+
+{id:40,domain:"physio",type:"sata",stem:"A nurse is assessing a client who may have hyperkalemia (K+ = 6.2 mEq/L). Which findings are CONSISTENT with this diagnosis? SELECT ALL THAT APPLY.",options:["Peaked T waves on EKG","Muscle weakness and fatigue","Metabolic alkalosis on ABG","Decreased urinary output","Bradycardia progressing to cardiac arrest","Soft, flabby muscles and hypoflexia"],correct:[0,1,3,4,5],rationale:"Hyperkalemia (K+ >5.0 mEq/L) causes: peaked/tall T waves (earliest EKG change), widened QRS, bradycardia, ventricular fibrillation/cardiac arrest, muscle weakness/paralysis, decreased urinary output (kidneys retaining K+), and hypoflexia. Hyperkalemia causes metabolic ACIDOSIS (not alkalosis) as K+ moves out of cells and H+ moves in. Treatment: calcium gluconate (cardiac protection), sodium bicarb, insulin + glucose (shift K+ into cells), Kayexalate, dialysis.",tip:"Hyperkalemia: 'MURDER' — Muscle weakness, Urine decreased, Rhythm changes (peaked T), Decreased DTRs, EKG changes, Respirations (weakened). Treat: C-BIG-K: Calcium gluconate, Bicarb, Insulin+Glucose, Kayexalate.",tags:["hyperkalemia","EKG changes","peaked T waves","electrolytes","cardiac dysrhythmia"]},
+
+// ─── ADDITIONAL HIGH-YIELD QUESTIONS ──────────────────────────────
+{id:41,domain:"safety",type:"mcq",stem:"A nurse receives a verbal order from a physician over the phone for morphine 6 mg IV. What is the correct procedure for receiving this order?",options:["Write the order on a piece of paper and give it to the charge nurse","Implement the order immediately and document it later","Read back the order to confirm accuracy, document as 'VO: [Dr. Name] /[nurse initials]', and have physician sign within required timeframe","Accept only written orders and refuse verbal/telephone orders"],correct:2,rationale:"When receiving telephone or verbal orders, nurses must use the 'Repeat-Back' or 'Read-Back' process: write down the order, read it back to the prescriber, confirm accuracy, document as verbal/telephone order (VO/TO) noting the prescriber's name and nurse's initials, and ensure the provider co-signs within the institution's required timeframe (typically 24 hours). This reduces transcription errors, especially for high-alert medications.",tip:"Verbal/Telephone orders: Write → Read back → Confirm. Document as VO or TO with prescriber name and time. Required physician co-signature within 24 hours (facility policy). High-alert medications (heparin, insulin, chemo) often require TWO-nurse verification.",tags:["verbal orders","telephone orders","patient safety","documentation","read-back"]},
+
+{id:42,domain:"management",type:"mcq",stem:"A nurse is caring for a client who was just informed of a terminal cancer diagnosis. The client looks at the nurse and says, 'There must be a mistake. That can't be right.' The nurse recognizes the client is in which stage of grief according to the Kübler-Ross model?",options:["Anger","Bargaining","Denial","Acceptance"],correct:2,rationale:"Denial is the first stage of Kübler-Ross's Five Stages of Grief (DABDA): Denial → Anger → Bargaining → Depression → Acceptance. Denial serves as a protective defense mechanism allowing the person to absorb the shock. The statement 'There must be a mistake' is classic denial. Important: these stages are not linear, not everyone goes through all stages, and they can occur in any order.",tip:"Kübler-Ross stages: DABDA = Denial, Anger, Bargaining, Depression, Acceptance. Denial: 'This can't be true.' Anger: 'Why me?' Bargaining: 'If I just..., maybe...' Depression: sadness, withdrawal. Acceptance: 'I'm ready.' Not all clients go through all stages in order.",tags:["grief","Kübler-Ross","denial","dying","palliative care","stages of grief"]},
+
+{id:43,domain:"pharmacology",type:"mcq",stem:"A nurse is educating a client about metformin (Glucophage) for type 2 diabetes. Which statement by the client indicates a need for further teaching?",options:["I should take metformin with meals to reduce gastrointestinal side effects.","I need to stop taking metformin before any procedure requiring contrast dye.","If I skip a meal, I should still take my metformin to keep blood sugar controlled.","I should report any unusual muscle pain or weakness to my doctor immediately."],correct:2,rationale:"Metformin should be held or skipped if the client is not eating (NPO, skipped meals) because it does NOT cause hypoglycemia alone, but taking it without food increases GI side effects and there is no glucose to act on. Clients should take metformin with meals. Metformin MUST be held 24-48 hours before procedures with contrast dye (risk of lactic acidosis). Report unusual muscle pain (possible lactic acidosis — rare but life-threatening).",tip:"Metformin contraindications: Renal impairment (eGFR <30), Contrast dye procedures (hold 24-48hr), CHF, alcohol abuse, liver disease. Lactic acidosis = RARE but serious: muscle pain, weakness, trouble breathing. Advantage: does NOT cause hypoglycemia alone.",tags:["metformin","diabetes","lactic acidosis","patient education","pharmacology"]},
+
+{id:44,domain:"physio",type:"mcq",stem:"A client post-coronary artery bypass graft (CABG) has a mediastinal chest tube draining 300 mL of bright red blood per hour for the past 2 hours. What is the nurse's PRIORITY action?",options:["Document the output as expected post-CABG drainage","Increase the suction pressure on the drainage system","Notify the surgeon immediately, as this indicates possible hemorrhage","Clamp the chest tube and prepare the client for ambulation"],correct:2,rationale:"Normal mediastinal chest tube drainage post-CABG is <100 mL/hr after the first hour. Drainage of 300 mL/hr bright red blood for 2 consecutive hours indicates significant hemorrhage — a postoperative emergency. The nurse should IMMEDIATELY notify the surgeon. The client may require return to the OR for surgical hemostasis. Other actions: assess vital signs, ensure IV access is patent, and have blood products available. Never clamp a functioning chest tube post-cardiac surgery.",tip:"Post-CABG chest tube: Concerning drainage = >200 mL/hr for 2+ hours, OR >400 mL in first hour, bright red blood. Action = Notify surgeon immediately. Never clamp mediastinal tubes — may cause cardiac tamponade.",tags:["CABG","chest tube","hemorrhage","post-operative","cardiac surgery"]},
+
+{id:45,domain:"physio",type:"mcq",stem:"The nurse is preparing to administer a unit of packed red blood cells (PRBCs). Which action should the nurse take FIRST?",options:["Prime the IV tubing with dextrose 5% in water (D5W)","Verify patient identity and blood product with another licensed nurse","Warm the blood using a microwave to room temperature","Obtain vital signs 30 minutes before to establish a baseline"],correct:1,rationale:"Two licensed nurses must verify the blood product against the client's blood bank band and medical record (ABO type, Rh factor, unit number, expiration date) at the bedside BEFORE transfusion. This is the most critical step to prevent a potentially fatal hemolytic transfusion reaction due to ABO incompatibility. PRBCs must ONLY be infused with normal saline (0.9% NaCl) — D5W causes hemolysis. Blood should never be warmed in a microwave (destroys RBCs and causes severe reactions).",tip:"Blood transfusion: ONLY use 0.9% NS (Normal Saline). NEVER D5W, LR, or other solutions. Always TWO nurses verify. Never add medications to blood. Infuse within 4 hours. Check VS at start, 15 min in, end of transfusion. Signs of reaction: chills, fever, back pain, rash, hypotension.",tags:["blood transfusion","blood type verification","hemolytic reaction","safe practice"]},
+];
+
+// ══════════════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════════════
+let examState = {
+  mode: 'practice',
+  tutorMode: true,
+  timerEnabled: true,
+  ngnEnabled: true,
+  questions: [],
+  currentIndex: 0,
+  answers: {},       // { qIndex: answer }
+  flags: new Set(),
+  startTime: null,
+  questionTimer: null,
+  examTimer: null,
+  timePerQuestion: 60,
+  questionElapsed: {},
+  totalElapsed: 0,
+  submitted: false,
+  domains: ['all'],
+};
+
+// ══════════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startSetup(mode) {
+  examState.mode = mode;
+  const title = document.getElementById('setupTitle');
+  const countSection = document.getElementById('countSection');
+  if (mode === 'cat') {
+    title.textContent = 'CAT Simulation Setup';
+    countSection.style.display = 'none';
+    document.getElementById('timerChip').classList.add('selected');
+  } else if (mode === 'rapid') {
+    title.textContent = 'Rapid Review (25 Questions)';
+    document.getElementById('qCount').value = '25';
+    countSection.style.display = 'none';
+  } else if (mode === 'ngn') {
+    title.textContent = 'Next Gen NCLEX Focus';
+    document.getElementById('ngnChip').classList.add('selected');
+  } else {
+    title.textContent = 'Practice Mode Setup';
+    countSection.style.display = 'block';
+  }
+  // Chip interactions
+  document.querySelectorAll('#domainChips .chip').forEach(c => {
+    c.onclick = () => {
+      if (c.dataset.domain === 'all') {
+        document.querySelectorAll('#domainChips .chip').forEach(x => x.classList.remove('selected'));
+        c.classList.add('selected');
+      } else {
+        document.querySelector('[data-domain="all"]').classList.remove('selected');
+        c.classList.toggle('selected');
+        if (!document.querySelector('#domainChips .chip.selected')) {
+          document.querySelector('[data-domain="all"]').classList.add('selected');
+        }
+      }
+    };
+  });
+  document.querySelectorAll('[data-opt]').forEach(c => {
+    c.onclick = () => c.classList.toggle('selected');
+  });
+  showScreen('setup');
+}
+
+function startExam() {
+  document.getElementById('loading').classList.add('active');
+  setTimeout(() => {
+    buildExam();
+    document.getElementById('loading').classList.remove('active');
+    showScreen('exam');
+    renderQuestion();
+    if (examState.timerEnabled) startExamTimer();
+  }, 1200);
+}
+
+function buildExam() {
+  const selectedDomains = [...document.querySelectorAll('#domainChips .chip.selected')].map(c => c.dataset.domain);
+  const includeAll = selectedDomains.includes('all');
+  examState.tutorMode = document.getElementById('tutorChip').classList.contains('selected');
+  examState.timerEnabled = document.getElementById('timerChip').classList.contains('selected');
+  examState.ngnEnabled = document.getElementById('ngnChip').classList.contains('selected');
+
+  let pool = QUESTION_BANK.filter(q => {
+    if (!examState.ngnEnabled && q.ngn) return false;
+    if (includeAll) return true;
+    return selectedDomains.includes(q.domain);
+  });
+
+  // Shuffle
+  pool = pool.sort(() => Math.random() - 0.5);
+
+  let count;
+  if (examState.mode === 'cat') count = Math.min(75, pool.length);
+  else if (examState.mode === 'rapid') count = Math.min(25, pool.length);
+  else count = Math.min(parseInt(document.getElementById('qCount').value) || 25, pool.length);
+
+  examState.questions = pool.slice(0, count);
+  examState.currentIndex = 0;
+  examState.answers = {};
+  examState.flags = new Set();
+  examState.startTime = Date.now();
+  examState.submitted = false;
+  examState.questionElapsed = {};
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  TIMERS
+// ══════════════════════════════════════════════════════════════════
+let globalTimerInterval = null;
+let globalSeconds = 0;
+
+function startExamTimer() {
+  globalSeconds = 0;
+  const display = document.getElementById('timerDisplay');
+  display.style.display = 'block';
+  document.getElementById('qCounter').style.display = 'block';
+  if (globalTimerInterval) clearInterval(globalTimerInterval);
+  globalTimerInterval = setInterval(() => {
+    globalSeconds++;
+    const m = Math.floor(globalSeconds / 60).toString().padStart(2,'0');
+    const s = (globalSeconds % 60).toString().padStart(2,'0');
+    display.textContent = `${m}:${s}`;
+    examState.totalElapsed = globalSeconds;
+  }, 1000);
+}
+
+function stopExamTimer() {
+  if (globalTimerInterval) clearInterval(globalTimerInterval);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  RENDER QUESTION
+// ══════════════════════════════════════════════════════════════════
+function renderQuestion() {
+  const q = examState.questions[examState.currentIndex];
+  const total = examState.questions.length;
+  const idx = examState.currentIndex;
+  const answered = examState.answers[idx];
+
+  document.getElementById('qCounter').textContent = `Q ${idx+1} / ${total}`;
+  document.getElementById('progressBar').style.width = `${((idx+1)/total)*100}%`;
+
+  updatePaletteGrid();
+
+  let html = '';
+  // Meta row
+  html += `<div class="q-meta">
+    <span class="q-num">Question ${idx+1} of ${total}</span>
+    <span class="q-category-badge">${domainLabel(q.domain)}</span>
+    <span class="q-type-badge">${typeLabel(q.type)}</span>
+    ${q.ngn ? '<span class="ngn-badge">NGN</span>' : ''}
+    ${examState.flags.has(idx) ? '<span style="color:var(--gold);font-size:0.8rem">🚩 Flagged</span>' : ''}
+  </div>`;
+
+  // Case exhibit for NGN
+  if (q.caseData) {
+    html += renderCaseExhibit(q.caseData);
+  }
+
+  // Stem
+  html += `<div class="q-stem">${q.stem}</div>`;
+
+  // Question body by type
+  if (q.type === 'mcq') html += renderMCQ(q, idx, answered);
+  else if (q.type === 'sata') html += renderSATA(q, idx, answered);
+  else if (q.type === 'ngn_matrix') html += renderMatrix(q, idx, answered);
+  else if (q.type === 'ngn_bowties') html += renderBowtie(q, idx, answered);
+  else html += renderMCQ(q, idx, answered);
+
+  // Feedback box
+  if (answered !== undefined && examState.tutorMode) {
+    html += renderFeedback(q, answered);
+  }
+
+  // AI Insight placeholder
+  html += `<div class="ai-insight" id="aiInsight">
+    <div class="ai-insight-header">✦ AI Clinical Insight</div>
+    <div class="ai-insight-body" id="aiInsightBody"><div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div></div>
+  </div>`;
+
+  document.getElementById('examMain').innerHTML = html;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Show/hide nav buttons
+  const isAnswered = answered !== undefined;
+  document.getElementById('btnSubmit').style.display = isAnswered ? 'none' : 'inline-flex';
+  document.getElementById('btnNext').style.display = isAnswered ? 'inline-flex' : 'none';
+  document.getElementById('btnPrev').disabled = idx === 0;
+
+  // Exhibit tabs
+  document.querySelectorAll('.exhibit-tab').forEach((tab, i) => {
+    tab.onclick = () => {
+      document.querySelectorAll('.exhibit-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.exhibit-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.exhibit-content')[i]?.classList.add('active');
+    };
+  });
+
+  // Load AI insight if answered
+  if (isAnswered && examState.tutorMode) {
+    loadAIInsight(q);
+  }
+}
+
+function renderCaseExhibit(data) {
+  const tabs = Object.keys(data);
+  const labels = { history: '📋 History & Physical', labs: '🧪 Laboratory Results', meds: '💊 Medications', vitals: '❤️ Vital Signs' };
+  let html = `<div class="case-exhibit"><div class="exhibit-tab-row">`;
+  tabs.forEach((k,i) => {
+    html += `<button class="exhibit-tab ${i===0?'active':''}">${labels[k] || k}</button>`;
+  });
+  html += `</div>`;
+  tabs.forEach((k,i) => {
+    html += `<div class="exhibit-content ${i===0?'active':''}">${data[k]}</div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+function renderMCQ(q, idx, answered) {
+  const letters = ['A','B','C','D','E','F'];
+  let html = `<ul class="options-list">`;
+  q.options.forEach((opt, i) => {
+    let cls = '';
+    if (answered !== undefined) {
+      if (i === q.correct) cls = answered === i ? 'correct' : 'revealed-correct';
+      else if (answered === i && i !== q.correct) cls = 'incorrect';
+    } else if (answered === i) cls = 'selected';
+    const checkIcon = (cls === 'correct' || cls === 'revealed-correct') ? '✓' : cls === 'incorrect' ? '✗' : '';
+    const onClick = answered === undefined ? `onclick="selectMCQ(${i})"` : '';
+    html += `<li class="option-item ${cls}" ${onClick}>
+      <div class="option-letter">${letters[i]}</div>
+      <div class="option-text">${opt}</div>
+      <div class="option-check">${checkIcon}</div>
+    </li>`;
+  });
+  html += `</ul>`;
+  return html;
+}
+
+function renderSATA(q, idx, answered) {
+  const letters = ['A','B','C','D','E','F'];
+  const selected = answered || [];
+  let html = `<div class="sata-note">✦ Select ALL that apply. There may be more than one correct answer.</div>`;
+  html += `<ul class="options-list">`;
+  q.options.forEach((opt, i) => {
+    let cls = '';
+    if (answered !== undefined) {
+      const isCorrect = q.correct.includes(i);
+      const isSelected = selected.includes(i);
+      if (isCorrect && isSelected) cls = 'correct';
+      else if (isCorrect && !isSelected) cls = 'revealed-correct';
+      else if (!isCorrect && isSelected) cls = 'incorrect';
+    } else if (selected.includes(i)) cls = 'selected';
+    const checkIcon = (cls === 'correct' || cls === 'revealed-correct') ? '✓' : cls === 'incorrect' ? '✗' : '';
+    const onClick = answered === undefined ? `onclick="toggleSATA(${i})"` : '';
+    html += `<li class="option-item ${cls}" ${onClick}>
+      <div class="option-letter">${letters[i]}</div>
+      <div class="option-text">${opt}</div>
+      <div class="option-check">${checkIcon}</div>
+    </li>`;
+  });
+  html += `</ul>`;
+  return html;
+}
+
+function renderMatrix(q, idx, answered) {
+  const m = q.matrix;
+  let html = `<table class="matrix-table"><thead><tr><th style="text-align:left">Nursing Action</th>`;
+  m.cols.forEach(c => html += `<th>${c}</th>`);
+  html += `</tr></thead><tbody>`;
+  m.rows.forEach((row, ri) => {
+    html += `<tr><td>${row}</td>`;
+    m.cols.forEach((col, ci) => {
+      const isSelected = answered && answered[ri] === ci;
+      const isCorrect = m.correct[ri] === ci;
+      let dot_cls = isSelected ? 'selected' : '';
+      const onClick = answered === undefined ? `onclick="selectMatrix(${ri}, ${ci})"` : '';
+      let bg = '';
+      if (answered !== undefined) {
+        if (isCorrect && isSelected) bg = 'background:rgba(67,233,123,0.2);';
+        else if (isCorrect) bg = 'background:rgba(67,233,123,0.08);';
+        else if (isSelected) bg = 'background:rgba(255,107,107,0.15);';
+      }
+      html += `<td ${onClick} style="${bg}cursor:pointer">
+        <div class="matrix-radio ${dot_cls}" id="matrix_${ri}_${ci}"></div>
+      </td>`;
+    });
+    html += `</tr>`;
+  });
+  html += `</tbody></table>`;
+  return html;
+}
+
+function renderBowtie(q, idx, answered) {
+  const b = q.bowtie;
+  let html = `<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px">`;
+  const sections = [
+    {title:'🔍 Potential Causes', items: b.causes, key:'causes', correct: b.correctCauses},
+    {title:'⚡ Priority Actions', items: b.actions, key:'actions', correct: b.correctActions},
+    {title:'📊 Expected Outcomes', items: b.outcomes, key:'outcomes', correct: b.correctOutcomes},
+  ];
+  sections.forEach(sec => {
+    html += `<div style="background:var(--navy-mid);border:1px solid var(--border);border-radius:10px;padding:16px">
+      <div style="font-size:0.78rem;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">${sec.title}</div>`;
+    sec.items.forEach((item, i) => {
+      const ans = answered && answered[sec.key] || [];
+      const isSelected = ans.includes(i);
+      const isCorrect = sec.correct.includes(i);
+      let cls = '';
+      if (answered !== undefined) {
+        if (isCorrect && isSelected) cls = 'correct';
+        else if (isCorrect) cls = 'revealed-correct';
+        else if (isSelected) cls = 'incorrect';
+      } else if (isSelected) cls = 'selected';
+      const onClick = answered === undefined ? `onclick="toggleBowtie('${sec.key}', ${i})"` : '';
+      html += `<div class="option-item ${cls}" style="padding:10px 14px;margin-bottom:8px;gap:10px" ${onClick}>
+        <div style="font-size:0.85rem;line-height:1.5">${item}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+function renderFeedback(q, answered) {
+  const isCorrect = checkCorrect(q, answered);
+  const cls = isCorrect ? 'correct-fb' : 'incorrect-fb';
+  const headerCls = isCorrect ? 'correct' : 'incorrect';
+  const icon = isCorrect ? '✓' : '✗';
+  const label = isCorrect ? 'Correct!' : 'Incorrect';
+  return `<div class="feedback-box ${cls}" style="display:block">
+    <div class="fb-header ${headerCls}">${icon} ${label}</div>
+    <div class="fb-body">
+      <div class="rationale-title">Rationale:</div>
+      <p>${q.rationale}</p>
+      ${q.tip ? `<div class="nclex-tip"><strong>NCLEX Tip:</strong> ${q.tip}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function checkCorrect(q, answered) {
+  if (q.type === 'sata') {
+    if (!Array.isArray(answered)) return false;
+    const sortedA = [...answered].sort().join(',');
+    const sortedC = [...q.correct].sort().join(',');
+    return sortedA === sortedC;
+  }
+  if (q.type === 'ngn_matrix') {
+    if (!answered) return false;
+    return q.matrix.correct.every((c, i) => answered[i] === c);
+  }
+  if (q.type === 'ngn_bowties') {
+    if (!answered) return false;
+    const b = q.bowtie;
+    const check = (key) => {
+      const a = (answered[key] || []).sort().join(',');
+      const c = b['correct'+key.charAt(0).toUpperCase()+key.slice(1)].sort().join(',');
+      return a === c;
+    };
+    return check('causes') && check('actions') && check('outcomes');
+  }
+  return answered === q.correct;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  ANSWER SELECTION
+// ══════════════════════════════════════════════════════════════════
+let pendingAnswer = null;
+let pendingSATA = [];
+let pendingMatrix = {};
+let pendingBowtie = { causes: [], actions: [], outcomes: [] };
+
+function selectMCQ(i) {
+  if (examState.answers[examState.currentIndex] !== undefined) return;
+  pendingAnswer = i;
+  document.querySelectorAll('.option-item').forEach((el, idx) => {
+    el.classList.toggle('selected', idx === i);
+    document.querySelectorAll('.option-letter')[idx].style.borderColor = idx === i ? 'var(--teal)' : '';
+  });
+}
+
+function toggleSATA(i) {
+  if (examState.answers[examState.currentIndex] !== undefined) return;
+  const pos = pendingSATA.indexOf(i);
+  if (pos > -1) pendingSATA.splice(pos, 1);
+  else pendingSATA.push(i);
+  document.querySelectorAll('.option-item').forEach((el, idx) => {
+    el.classList.toggle('selected', pendingSATA.includes(idx));
+  });
+}
+
+function selectMatrix(ri, ci) {
+  if (examState.answers[examState.currentIndex] !== undefined) return;
+  pendingMatrix[ri] = ci;
+  document.querySelectorAll('.matrix-radio').forEach(r => r.classList.remove('selected'));
+  document.querySelectorAll('.matrix-table tr').forEach((row, rowIdx) => {
+    if (rowIdx === 0) return;
+    const cells = row.querySelectorAll('td');
+    cells.forEach((cell, colIdx) => {
+      if (colIdx === 0) return;
+      const radio = cell.querySelector('.matrix-radio');
+      if (radio && pendingMatrix[rowIdx-1] === colIdx-1) radio.classList.add('selected');
+    });
+  });
+}
+
+function toggleBowtie(key, i) {
+  if (examState.answers[examState.currentIndex] !== undefined) return;
+  const arr = pendingBowtie[key];
+  const pos = arr.indexOf(i);
+  if (pos > -1) arr.splice(pos, 1);
+  else arr.push(i);
+  renderQuestion(); // re-render to show selection
+  // Re-mount because we re-rendered — re-point pending
+  // Quick trick: restore pendingBowtie state
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SUBMIT
+// ══════════════════════════════════════════════════════════════════
+function submitAnswer() {
+  const q = examState.questions[examState.currentIndex];
+  let answer;
+  if (q.type === 'mcq') {
+    if (pendingAnswer === null) { shakeSubmit(); return; }
+    answer = pendingAnswer;
+  } else if (q.type === 'sata') {
+    if (pendingSATA.length === 0) { shakeSubmit(); return; }
+    answer = [...pendingSATA];
+  } else if (q.type === 'ngn_matrix') {
+    const totalRows = q.matrix.rows.length;
+    if (Object.keys(pendingMatrix).length < totalRows) { shakeSubmit(); return; }
+    answer = { ...pendingMatrix };
+  } else if (q.type === 'ngn_bowties') {
+    answer = JSON.parse(JSON.stringify(pendingBowtie));
+  } else {
+    if (pendingAnswer === null) { shakeSubmit(); return; }
+    answer = pendingAnswer;
+  }
+
+  examState.answers[examState.currentIndex] = answer;
+  pendingAnswer = null; pendingSATA = []; pendingMatrix = {}; pendingBowtie = {causes:[],actions:[],outcomes:[]};
+
+  renderQuestion();
+  updatePaletteGrid();
+}
+
+function shakeSubmit() {
+  const btn = document.getElementById('btnSubmit');
+  btn.style.animation = 'shake 0.3s ease';
+  btn.textContent = 'Please select an answer';
+  setTimeout(() => { btn.style.animation = ''; btn.textContent = 'Submit Answer'; }, 1500);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════════════════
+function nextQuestion() {
+  const total = examState.questions.length;
+  if (examState.currentIndex < total - 1) {
+    examState.currentIndex++;
+    pendingAnswer = null; pendingSATA = []; pendingMatrix = {};
+    renderQuestion();
+  } else {
+    endExam();
+  }
+}
+
+function prevQuestion() {
+  if (examState.currentIndex > 0) {
+    examState.currentIndex--;
+    pendingAnswer = null; pendingSATA = []; pendingMatrix = {};
+    renderQuestion();
+  }
+}
+
+function flagQuestion() {
+  const idx = examState.currentIndex;
+  if (examState.flags.has(idx)) examState.flags.delete(idx);
+  else examState.flags.add(idx);
+  renderQuestion();
+  updatePaletteGrid();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  PALETTE
+// ══════════════════════════════════════════════════════════════════
+function togglePalette() {
+  document.getElementById('paletteDrawer').classList.toggle('open');
+  updatePaletteGrid();
+}
+function closePalette() { document.getElementById('paletteDrawer').classList.remove('open'); }
+
+function updatePaletteGrid() {
+  const grid = document.getElementById('paletteGrid');
+  if (!grid) return;
+  grid.innerHTML = examState.questions.map((q, i) => {
+    let cls = '';
+    if (i === examState.currentIndex) cls = 'current';
+    else if (examState.answers[i] !== undefined) cls = 'answered';
+    if (examState.flags.has(i)) cls = 'flagged';
+    return `<div class="palette-q ${cls}" onclick="jumpTo(${i})">${i+1}</div>`;
+  }).join('');
+}
+
+function jumpTo(i) {
+  examState.currentIndex = i;
+  renderQuestion();
+  closePalette();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  END EXAM / RESULTS
+// ══════════════════════════════════════════════════════════════════
+function openEndModal() { document.getElementById('endModal').classList.add('active'); }
+function closeEndModal() { document.getElementById('endModal').classList.remove('active'); }
+
+function endExam() {
+  closeEndModal();
+  stopExamTimer();
+  showResults();
+}
+
+function showResults() {
+  const questions = examState.questions;
+  const answers = examState.answers;
+  let correct = 0, total = questions.length, answered = 0;
+  const domainResults = {};
+
+  questions.forEach((q, i) => {
+    if (!domainResults[q.domain]) domainResults[q.domain] = { correct: 0, total: 0 };
+    if (answers[i] !== undefined) {
+      answered++;
+      if (checkCorrect(q, answers[i])) {
+        correct++;
+        domainResults[q.domain].correct++;
+      }
+      domainResults[q.domain].total++;
+    } else {
+      domainResults[q.domain].total++;
+    }
+  });
+
+  const pct = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+  const pass = pct >= 65;
+  const mins = Math.floor(examState.totalElapsed / 60);
+  const secs = examState.totalElapsed % 60;
+  const timeStr = `${mins}m ${secs}s`;
+
+  // Score ring
+  const circumference = 2 * Math.PI * 80;
+  const strokeDash = (pct / 100) * circumference;
+  const ringColor = pct >= 65 ? 'var(--teal)' : pct >= 50 ? 'var(--gold)' : 'var(--red)';
+
+  let html = `<div class="results-header">
+    <div class="results-badge">${pass ? '🎉' : '📚'}</div>
+    <h2 class="results-title">${pass ? 'Outstanding Performance!' : 'Keep Studying!'}</h2>
+    <p class="results-sub">${pass ? 'You are performing at NCLEX passing level. Keep this momentum!' : 'Review the rationales below and focus on your weak areas.'}</p>
+  </div>
+
+  <div class="score-ring-wrap">
+    <div class="score-ring">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="80" fill="none" stroke="var(--navy-mid)" stroke-width="14"/>
+        <circle cx="100" cy="100" r="80" fill="none" stroke="${ringColor}" stroke-width="14"
+          stroke-dasharray="${strokeDash} ${circumference}" stroke-linecap="round" style="transition:stroke-dasharray 1s ease"/>
+      </svg>
+      <div class="score-ring-inner">
+        <div class="score-pct" style="color:${ringColor}">${pct}%</div>
+        <div class="score-pct-label">Score</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="score-cards">
+    <div class="score-card correct"><div class="score-card-num">${correct}</div><div class="score-card-lbl">Correct</div></div>
+    <div class="score-card incorrect"><div class="score-card-num">${answered - correct}</div><div class="score-card-lbl">Incorrect</div></div>
+    <div class="score-card"><div class="score-card-num">${total - answered}</div><div class="score-card-lbl">Skipped</div></div>
+    <div class="score-card time"><div class="score-card-num">${timeStr}</div><div class="score-card-lbl">Time Used</div></div>
+  </div>
+
+  <div class="ncsbn-bar">
+    <div class="ncsbn-icon">ℹ️</div>
+    <div class="ncsbn-text">The real NCLEX uses the <strong>NCSBN Next Gen NCLEX (NGN)</strong> computerized adaptive testing (CAT) model. You need to demonstrate clinical judgment above the passing standard. A score of <strong>≥65%</strong> in practice generally indicates readiness. Focus on domains below 60%.</div>
+  </div>
+
+  <div class="domain-breakdown">
+    <div class="domain-title">Performance by Clinical Domain</div>
+    ${Object.entries(domainResults).map(([domain, data]) => {
+      const dpct = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+      const barColor = dpct >= 70 ? 'linear-gradient(90deg,var(--teal),var(--sky))' : dpct >= 50 ? 'linear-gradient(90deg,var(--gold),#ffaa00)' : 'linear-gradient(90deg,var(--red),#ff9999)';
+      return `<div class="domain-row">
+        <div class="domain-name">${domainLabel(domain)}</div>
+        <div class="domain-bar-wrap"><div class="domain-bar" style="width:${dpct}%;background:${barColor}"></div></div>
+        <div class="domain-pct">${dpct}% (${data.correct}/${data.total})</div>
+      </div>`;
+    }).join('')}
+  </div>
+
+  <div class="review-section">
+    <div class="domain-title">Question Review</div>
+    ${questions.map((q, i) => {
+      const ans = answers[i];
+      const isCorrect = ans !== undefined && checkCorrect(q, ans);
+      const statusCls = ans === undefined ? '' : (isCorrect ? 'correct' : 'incorrect');
+      const statusLabel = ans === undefined ? '—' : (isCorrect ? '✓ Correct' : '✗ Incorrect');
+      return `<div class="review-item" onclick="reviewItem(${i})">
+        <div class="review-item-header">
+          <div class="review-status ${statusCls}"></div>
+          <strong style="font-size:0.82rem;color:var(--muted)">Q${i+1}</strong>
+          <span class="q-category-badge" style="font-size:0.7rem;padding:2px 8px">${domainLabel(q.domain)}</span>
+          <span style="font-size:0.78rem;color:${isCorrect?'var(--green)':'var(--red)'};margin-left:auto">${statusLabel}</span>
+        </div>
+        <div class="review-q-text">${q.stem.substring(0, 120)}${q.stem.length > 120 ? '…' : ''}</div>
+        ${!isCorrect && ans !== undefined ? `<div class="review-answer">
+          <span class="correct-ans">✓ Correct: ${getCorrectLabel(q)}</span>
+        </div>` : ''}
+      </div>`;
+    }).join('')}
+  </div>
+
+  <div class="results-cta">
+    <button class="btn btn-primary" onclick="startSetup('practice')">Retake Practice ↻</button>
+    <button class="btn btn-secondary" onclick="showScreen('home')">← Back to Home</button>
+    <button class="btn btn-secondary" onclick="startSetup('cat')">Try CAT Simulation →</button>
+  </div>
+  <div style="height:60px"></div>
+  `;
+
+  document.getElementById('resultsContent').innerHTML = html;
+  showScreen('results');
+  stopExamTimer();
+}
+
+function getCorrectLabel(q) {
+  if (q.type === 'sata') return q.options.filter((_,i) => q.correct.includes(i)).map((o,i) => `${String.fromCharCode(65+q.correct[i])}`).join(', ');
+  if (q.type === 'mcq') return `Option ${String.fromCharCode(65 + q.correct)}: ${q.options[q.correct].substring(0,50)}`;
+  return 'See rationale';
+}
+
+function reviewItem(i) {
+  examState.currentIndex = i;
+  showScreen('exam');
+  renderQuestion();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  AI INSIGHT
+// ══════════════════════════════════════════════════════════════════
+async function loadAIInsight(q) {
+  const panel = document.getElementById('aiInsight');
+  const body = document.getElementById('aiInsightBody');
+  if (!panel || !body) return;
+  panel.classList.add('visible');
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: "You are an expert NCLEX nursing educator. Provide a concise (3-4 sentences), clinically rich insight about the nursing concept tested in the question. Focus on: key clinical reasoning, mnemonics, related drugs/labs/values, priority considerations, and what distinguishes wrong answers. Be direct and clinical. No intro phrases.",
+        messages: [{ role: "user", content: `NCLEX Question domain: ${q.domain}. Stem: ${q.stem} Correct answer rationale: ${q.rationale}. Provide a clinical insight to help a nursing student deeply understand and remember this concept.` }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.find(b => b.type === 'text')?.text || '';
+    if (text && body) body.innerHTML = text;
+  } catch(e) {
+    if (body) body.innerHTML = q.tip || 'Review the rationale and key concepts above.';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════════════════
+function domainLabel(d) {
+  const labels = {
+    management: 'Management of Care', safety: 'Safety & Infection Control',
+    health: 'Health Promotion', psycho: 'Psychosocial Integrity',
+    basic: 'Basic Care & Comfort', pharmacology: 'Pharmacology',
+    reduction: 'Risk Reduction', physio: 'Physiological Adaptation'
+  };
+  return labels[d] || d;
+}
+
+function typeLabel(t) {
+  const labels = {
+    mcq: 'Multiple Choice', sata: 'Select All That Apply',
+    ngn_matrix: 'Matrix Grid', ngn_bowties: 'Bowtie Clinical Judgment',
+    ordering: 'Ordered Response', dropdown: 'Drop-down Cloze'
+  };
+  return labels[t] || t;
+}
+
+// CSS shake animation
+const style = document.createElement('style');
+style.textContent = `@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }`;
+document.head.appendChild(style);
+
+// ══════════════════════════════════════════════════════════════════
+//  NURSING MEME TICKER
+// ══════════════════════════════════════════════════════════════════
+const NURSING_MEMES = [
+  { emoji: '☕', quote: "Nurses don't get coffee breaks. Coffee gets nurse breaks." },
+  { emoji: '💉', quote: "An ICU nurse's daily affirmation: 'I am calm. I am competent. That is definitely not a lethal arrhythmia.'" },
+  { emoji: '📋', quote: "Charting: the art of documenting everything that happened, 30 minutes after it happened, while simultaneously doing four other things." },
+  { emoji: '🩺', quote: "Nursing school taught me to think critically. Clinical rotations taught me that thinking critically takes a lot of caffeine." },
+  { emoji: '💊', quote: "Five rights of medication administration: Right patient, right drug, right dose, right route, right time... and right amount of prayer." },
+  { emoji: '🧠', quote: "ICU nurses: the only people who can have a full conversation, hang three drips, and chart vitals — all while looking completely chill." },
+  { emoji: '🏥', quote: "Nursing is the only job where you steal pens as a coping mechanism." },
+  { emoji: '❤️', quote: "Behind every great nurse is a substantial amount of coffee and a 'we've got this' attitude that nobody really questioned." },
+  { emoji: '🎓', quote: "NCLEX pro tip: When in doubt, choose the answer that keeps the patient alive longest. You're welcome." },
+  { emoji: '😅', quote: "Doctor: 'Why didn't you call me sooner?' Nurse: 'I did. Six times. You were asleep.'" },
+  { emoji: '🩸', quote: "Normal people see clouds and see shapes. Nurses see clouds and think about fluid overload and decreased cardiac output." },
+  { emoji: '⚡', quote: "Maslow's hierarchy of needs for nurses: 1. Patients. 2. Charting. 3. Bathroom break. 4. Lunch (optional)." },
+];
+
+let memeIndex = 0;
+function initMemes() {
+  const quoteEl = document.getElementById('memeQuote');
+  const emojiEl = document.getElementById('memeEmoji');
+  const dotsEl = document.getElementById('memeDots');
+  if (!quoteEl || !emojiEl || !dotsEl) return;
+
+  dotsEl.innerHTML = NURSING_MEMES.map((_, i) =>
+    `<div class="meme-dot${i === 0 ? ' active' : ''}" onclick="goMeme(${i})"></div>`
+  ).join('');
+
+  function showMeme(idx) {
+    quoteEl.classList.add('fade-out');
+    setTimeout(() => {
+      quoteEl.textContent = NURSING_MEMES[idx].quote;
+      emojiEl.textContent = NURSING_MEMES[idx].emoji;
+      quoteEl.classList.remove('fade-out');
+      dotsEl.querySelectorAll('.meme-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+    }, 400);
+  }
+
+  showMeme(0);
+  setInterval(() => {
+    memeIndex = (memeIndex + 1) % NURSING_MEMES.length;
+    showMeme(memeIndex);
+  }, 5000);
+
+  window.goMeme = (idx) => { memeIndex = idx; showMeme(idx); };
+}
+document.addEventListener('DOMContentLoaded', initMemes);
+</script>
+</body>
+</html>

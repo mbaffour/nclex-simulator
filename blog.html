@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Introducing NCLEX Pro Simulator — Built for Future Nurses</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #112240;
+    --teal: #00c9a7;
+    --gold: #f7c948;
+    --red: #ff6b6b;
+    --green: #43e97b;
+    --sky: #64dfdf;
+    --white: #f0f4ff;
+    --muted: #8899b4;
+    --card: #141f35;
+    --border: rgba(100,180,255,0.12);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+  .bg-grid {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,201,167,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,201,167,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+  }
+  .bg-glow {
+    position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+    width: 900px; height: 500px;
+    background: radial-gradient(ellipse, rgba(0,201,167,0.12) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 48px; border-bottom: 1px solid var(--border);
+    background: rgba(10,22,40,0.85); backdrop-filter: blur(12px);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .nav-logo-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: linear-gradient(135deg, var(--teal), var(--sky));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: var(--navy);
+    font-family: 'Fraunces', serif;
+  }
+  .nav-logo-text { font-family: 'Fraunces', serif; font-size: 1.1rem; color: var(--white); }
+  .nav-cta {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 22px; border-radius: 10px; border: none;
+    background: linear-gradient(135deg, var(--teal), var(--sky));
+    color: var(--navy); font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; font-weight: 600; text-decoration: none;
+    transition: all 0.2s; cursor: pointer;
+  }
+  .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,201,167,0.35); }
+
+  /* HERO */
+  .hero {
+    position: relative; z-index: 1;
+    text-align: center; padding: 100px 24px 80px;
+    max-width: 860px; margin: 0 auto;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,201,167,0.1); border: 1px solid rgba(0,201,167,0.3);
+    color: var(--teal); padding: 6px 18px; border-radius: 50px;
+    font-size: 0.75rem; letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-title {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(2.2rem, 5.5vw, 4rem);
+    font-weight: 700; line-height: 1.1; letter-spacing: -1px;
+    margin-bottom: 22px;
+  }
+  .hero-title .accent { color: var(--teal); }
+  .hero-subtitle {
+    font-size: 1.1rem; color: var(--muted); line-height: 1.75;
+    max-width: 620px; margin: 0 auto 40px;
+  }
+  .hero-dedication {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(247,201,72,0.06));
+    border: 1px solid rgba(255,150,150,0.3);
+    border-radius: 50px; padding: 10px 24px;
+    font-size: 0.88rem; color: #ffb8b8; margin-top: 16px;
+  }
+  .cta-group { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 40px; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 36px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, var(--teal), var(--sky));
+    color: var(--navy); font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; font-weight: 600; text-decoration: none;
+    transition: all 0.2s; box-shadow: 0 4px 20px rgba(0,201,167,0.3);
+  }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0,201,167,0.45); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 16px 32px; border-radius: 12px;
+    border: 1px solid var(--border); color: var(--muted);
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500;
+    text-decoration: none; transition: all 0.2s; background: var(--card);
+  }
+  .btn-secondary:hover { border-color: var(--teal); color: var(--white); }
+
+  /* DIVIDER */
+  .divider { height: 1px; background: var(--border); max-width: 800px; margin: 0 auto; }
+
+  /* ARTICLE BODY */
+  article {
+    position: relative; z-index: 1;
+    max-width: 720px; margin: 0 auto;
+    padding: 60px 24px 100px;
+    font-size: 1.05rem; line-height: 1.85; color: #b8cce0;
+  }
+  article h2 {
+    font-family: 'Fraunces', serif; font-size: 1.75rem;
+    color: var(--white); margin: 52px 0 16px; letter-spacing: -0.5px;
+  }
+  article h3 {
+    font-family: 'Fraunces', serif; font-size: 1.25rem;
+    color: var(--white); margin: 36px 0 12px;
+  }
+  article p { margin-bottom: 20px; }
+  article strong { color: var(--white); }
+  article em { color: var(--gold); font-style: normal; }
+  article a { color: var(--teal); text-decoration: underline; text-underline-offset: 3px; }
+  article ul { margin: 16px 0 20px 24px; }
+  article li { margin-bottom: 10px; }
+
+  .callout {
+    background: var(--card); border: 1px solid var(--border);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 12px 12px 0;
+    padding: 20px 24px; margin: 28px 0;
+    font-size: 0.95rem; color: #b8cce0; line-height: 1.75;
+  }
+  .callout .callout-label {
+    font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--teal); margin-bottom: 8px;
+  }
+
+  .meme-card {
+    background: rgba(0,201,167,0.04); border: 1px solid rgba(0,201,167,0.15);
+    border-radius: 14px; padding: 24px 28px;
+    margin: 28px 0; text-align: center;
+  }
+  .meme-card .emoji { font-size: 2.2rem; display: block; margin-bottom: 12px; }
+  .meme-card .text { font-size: 1rem; font-style: italic; color: var(--muted); line-height: 1.7; }
+
+  .feature-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px; margin: 28px 0;
+  }
+  .feature-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 22px;
+  }
+  .feature-item .icon { font-size: 1.5rem; margin-bottom: 10px; display: block; }
+  .feature-item .title { font-family: 'Fraunces', serif; font-size: 1rem; color: var(--white); margin-bottom: 6px; }
+  .feature-item .desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+  .big-cta {
+    background: linear-gradient(135deg, rgba(0,201,167,0.08), rgba(100,223,223,0.05));
+    border: 1px solid rgba(0,201,167,0.2);
+    border-radius: 16px; padding: 48px 40px; text-align: center;
+    margin: 60px 0 0;
+  }
+  .big-cta h2 { font-family: 'Fraunces', serif; font-size: 2rem; color: var(--white); margin-bottom: 12px; }
+  .big-cta p { color: var(--muted); margin-bottom: 32px; font-size: 1rem; }
+
+  /* FOOTER */
+  footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 28px 48px; text-align: center;
+    font-size: 0.8rem; color: var(--muted);
+    background: rgba(10,22,40,0.6);
+  }
+  footer .heart { color: var(--red); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .hero { animation: fadeUp 0.7s ease both; }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<nav>
+  <a class="nav-logo" href="nclex_simulator.html">
+    <div class="nav-logo-icon">N</div>
+    <span class="nav-logo-text">NCLEX Pro</span>
+  </a>
+  <a class="nav-cta" href="nclex_simulator.html">🩺 Take the Practice Exam →</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">✦ Product Release · March 2025</div>
+  <h1 class="hero-title">Introducing <span class="accent">NCLEX Pro Simulator</span> — Study Smarter, Pass Faster</h1>
+  <p class="hero-subtitle">A free, AI-powered NCLEX practice platform with adaptive testing, Next Gen formats, instant AI rationales, and just enough nursing humor to keep you sane during exam prep.</p>
+  <div class="hero-dedication">❤️ Built with love for Peyton — future ICU nurse &amp; total rockstar 🩺</div>
+  <div class="cta-group">
+    <a class="btn-primary" href="nclex_simulator.html">🚀 Start Practicing Now — It's Free</a>
+    <a class="btn-secondary" href="https://github.com/mbaffour/nclex-simulator">⭐ View on GitHub</a>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<article>
+
+  <h2>Why I Built This</h2>
+  <p>
+    Watching someone you care about grind through nursing school is humbling. Pharmacology at midnight. Care plans on weekends. Clinical rotations that start before the sun rises. And through all of it, still showing up — still caring, still studying, still smiling.
+  </p>
+  <p>
+    I wanted to do something useful. So I built <strong>NCLEX Pro Simulator</strong>: a free, no-login, no-install practice tool that actually mirrors what the real NCLEX exam feels like — adaptive difficulty, Next Gen question formats, domain-level feedback, and AI-generated clinical insights for every question.
+  </p>
+  <p>
+    It's built for Peyton, who is going to be an absolutely incredible ICU nurse. But it's open to every nursing student who needs it.
+  </p>
+
+  <div class="meme-card">
+    <span class="emoji">☕</span>
+    <div class="text">"Nurses don't get coffee breaks. Coffee gets nurse breaks."<br><small style="color:var(--teal);font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;">— Ancient Nursing Wisdom</small></div>
+  </div>
+
+  <h2>What It Does</h2>
+  <p>
+    NCLEX Pro Simulator is a single HTML file you can open in any browser — no server, no account, no subscription. It covers all 8 official NCLEX clinical domains and supports every question format you'll see on the real exam.
+  </p>
+
+  <div class="feature-grid">
+    <div class="feature-item">
+      <span class="icon">📖</span>
+      <div class="title">Practice Mode</div>
+      <div class="desc">Tutor-style feedback after every question. Rationale, NCLEX tips, and AI clinical insight shown immediately.</div>
+    </div>
+    <div class="feature-item">
+      <span class="icon">🎯</span>
+      <div class="title">CAT Simulation</div>
+      <div class="desc">Adaptive difficulty that mirrors the real NCLEX. 75–145 questions, adjusts to your performance in real time.</div>
+    </div>
+    <div class="feature-item">
+      <span class="icon">🧠</span>
+      <div class="title">Next Gen NCLEX</div>
+      <div class="desc">Focused practice on NGN formats: Matrix Grid, Bow-tie, Enhanced Hotspot, Drop-down Cloze, and more.</div>
+    </div>
+    <div class="feature-item">
+      <span class="icon">⚡</span>
+      <div class="title">Rapid Review</div>
+      <div class="desc">25-question sprints for daily warmup or final week cramming. High-yield, fast feedback.</div>
+    </div>
+    <div class="feature-item">
+      <span class="icon">🤖</span>
+      <div class="title">AI Rationales</div>
+      <div class="desc">Claude AI generates a unique clinical insight for each question — mnemonics, key values, what distinguishes wrong answers.</div>
+    </div>
+    <div class="feature-item">
+      <span class="icon">📊</span>
+      <div class="title">Domain Breakdown</div>
+      <div class="desc">See exactly where you're strong and where you need work — across all 8 NCLEX clinical domains.</div>
+    </div>
+  </div>
+
+  <h2>The NCLEX is No Joke</h2>
+  <p>
+    The National Council Licensure Examination is a high-stakes, adaptive exam that every nursing graduate must pass to become a licensed RN. The passing standard is rigorous — you're not just answering questions, you're demonstrating <strong>clinical judgment</strong> at a safe practice level.
+  </p>
+  <p>
+    And then in 2023, NCSBN made it harder. The <em>Next Generation NCLEX</em> introduced new question formats that test clinical judgment more deeply: Matrix Grids, Bow-tie items, Enhanced Hotspots. The exam doesn't just want you to know facts — it wants you to think like a nurse.
+  </p>
+
+  <div class="callout">
+    <div class="callout-label">💡 Pro Study Tip</div>
+    When practicing, don't just memorize answers — understand the <strong>clinical reasoning</strong>. Ask yourself: why is this option wrong? What would happen to the patient if I chose it? That's what the NCLEX is actually testing.
+  </div>
+
+  <h2>Clinical Domains Covered</h2>
+  <ul>
+    <li><strong>Management of Care</strong> — delegation, prioritization, ethical/legal</li>
+    <li><strong>Safety &amp; Infection Control</strong> — standard precautions, fall prevention, error reporting</li>
+    <li><strong>Health Promotion &amp; Maintenance</strong> — screenings, developmental stages, lifestyle</li>
+    <li><strong>Psychosocial Integrity</strong> — mental health, therapeutic communication, coping</li>
+    <li><strong>Basic Care &amp; Comfort</strong> — ADLs, mobility, comfort measures</li>
+    <li><strong>Pharmacology &amp; Parenteral Therapies</strong> — drug classes, IV therapy, calculations</li>
+    <li><strong>Reduction of Risk Potential</strong> — lab values, diagnostic tests, complications</li>
+    <li><strong>Physiological Adaptation</strong> — acute care, emergencies, hemodynamics</li>
+  </ul>
+
+  <div class="meme-card">
+    <span class="emoji">💊</span>
+    <div class="text">"Five rights of medication administration: Right patient, right drug, right dose, right route, right time... and right amount of prayer."<br><small style="color:var(--teal);font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;">— Every Pharmacology Student Ever</small></div>
+  </div>
+
+  <h2>Completely Free. Always.</h2>
+  <p>
+    No account. No subscription. No paywalls. Just open the link and start practicing. The entire simulator runs in a single HTML file — you can even download it and run it offline.
+  </p>
+  <p>
+    The AI clinical insights require an internet connection (they're powered by Anthropic's Claude API), but if that's unavailable, the simulator falls back to hand-written tips and rationales for every question.
+  </p>
+
+  <h2>For Peyton, and Every Future Nurse</h2>
+  <p>
+    Peyton: you have done the hard work. You survived clinicals. You absorbed more anatomy, pharmacology, and patho than most people learn in a lifetime. You showed up for patients who needed someone to show up.
+  </p>
+  <p>
+    The NCLEX is the last step between where you are and where you're going. You are going to be a <strong>phenomenal ICU nurse</strong>. Your future patients are lucky, and they don't even know it yet.
+  </p>
+  <p>
+    Now go pass that exam. 💙
+  </p>
+
+  <div class="big-cta">
+    <h2>Ready to Practice?</h2>
+    <p>Free, no login, runs in your browser. Click below to start your first practice session right now.</p>
+    <a class="btn-primary" href="nclex_simulator.html" style="font-size:1.1rem;padding:18px 44px;">
+      🩺 Start the NCLEX Simulator →
+    </a>
+  </div>
+
+</article>
+
+<footer>
+  Built with <span class="heart">♥</span> for future nurses &nbsp;·&nbsp;
+  <a href="https://github.com/mbaffour/nclex-simulator" style="color:var(--teal);text-decoration:none;">Open source on GitHub</a> &nbsp;·&nbsp;
+  NCLEX® is a registered trademark of NCSBN. This tool is unofficial and for educational purposes only.
+</footer>
+
+</body>
+</html>
