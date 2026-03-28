@@ -616,7 +616,7 @@
     <div class="home-screen-footer">
       Built with <span class="heart">♥</span> for future nurses everywhere &nbsp;·&nbsp;
       Peyton, you are going to be an <strong style="color:var(--teal)">incredible</strong> ICU nurse 🏥
-      <br><span style="color:var(--teal);font-style:italic;">"Built with passion for science and discovery"</span> &nbsp;·&nbsp; <span style="color:var(--gold);font-style:italic;">"You can just build things"</span>
+      <br><span id="mantraDisplay" style="font-style:italic;"></span>
     </div>
   </div>
 
@@ -1892,7 +1892,31 @@ function initMemes() {
 
   window.goMeme = (idx) => { memeIndex = idx; showMeme(idx); };
 }
-document.addEventListener('DOMContentLoaded', initMemes);
+
+const MANTRAS = [
+  { text: 'Built with passion for science and discovery', color: 'var(--teal)' },
+  { text: 'You can just build things', color: 'var(--gold)' },
+];
+let mantraIndex = 0;
+function initMantra() {
+  const el = document.getElementById('mantraDisplay');
+  if (!el) return;
+  function showMantra() {
+    el.style.opacity = 0;
+    setTimeout(() => {
+      const m = MANTRAS[mantraIndex % MANTRAS.length];
+      el.textContent = m.text;
+      el.style.color = m.color;
+      el.style.transition = 'opacity 0.6s';
+      el.style.opacity = 1;
+      mantraIndex++;
+    }, 400);
+  }
+  showMantra();
+  setInterval(showMantra, 6000);
+}
+
+document.addEventListener('DOMContentLoaded', () => { initMemes(); initMantra(); });
 </script>
 </body>
 </html>

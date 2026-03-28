@@ -340,9 +340,27 @@
 <footer>
   Built with <span class="heart">♥</span> for future nurses &nbsp;·&nbsp;
   <a href="https://github.com/mbaffour/nclex-simulator" style="color:var(--teal);text-decoration:none;">Open source on GitHub</a> &nbsp;·&nbsp;
-  <em style="color:var(--teal)">"Built with passion for science and discovery"</em> &nbsp;·&nbsp; <em style="color:var(--gold)">"You can just build things"</em><br><br>
+  <em id="blogMantra" style="color:var(--teal)"></em><br><br>
   NCLEX® is a registered trademark of NCSBN. This tool is unofficial and for educational purposes only.
 </footer>
 
+<script>
+const _mantras = ['Built with passion for science and discovery', 'You can just build things'];
+const _colors = ['var(--teal)', 'var(--gold)'];
+let _mi = 0;
+function _cycleMantra() {
+  const el = document.getElementById('blogMantra');
+  if (!el) return;
+  el.style.opacity = 0;
+  setTimeout(() => {
+    el.textContent = _mantras[_mi % _mantras.length];
+    el.style.color = _colors[_mi % _colors.length];
+    el.style.transition = 'opacity 0.6s';
+    el.style.opacity = 1;
+    _mi++;
+  }, 400);
+}
+document.addEventListener('DOMContentLoaded', () => { _cycleMantra(); setInterval(_cycleMantra, 6000); });
+</script>
 </body>
 </html>
