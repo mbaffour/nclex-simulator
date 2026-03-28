@@ -513,6 +513,73 @@
   .meme-dots { display: flex; gap: 6px; justify-content: center; margin-top: 14px; }
   .meme-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background 0.3s; cursor: pointer; }
   .meme-dot.active { background: var(--teal); }
+  /* ─── MNEMONICS PANEL ─── */
+  .mnemo-wrap {
+    margin-top: 44px; max-width: 780px; width: 100%;
+    animation: fadeUp 0.6s 0.5s ease both;
+  }
+  .mnemo-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .mnemo-header-label {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--muted);
+  }
+  .mnemo-nav { display: flex; gap: 8px; }
+  .mnemo-btn {
+    background: var(--card); border: 1px solid var(--border); color: var(--muted);
+    width: 30px; height: 30px; border-radius: 8px; font-size: 0.85rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .mnemo-btn:hover { border-color: var(--teal); color: var(--white); }
+  .mnemo-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px 28px;
+    transition: opacity 0.35s;
+  }
+  .mnemo-card.fade-out { opacity: 0; }
+  .mnemo-top { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+  .mnemo-cat {
+    padding: 3px 12px; border-radius: 50px; font-size: 0.68rem;
+    letter-spacing: 1.2px; text-transform: uppercase; font-weight: 600;
+  }
+  .mnemo-cat.teal  { background: rgba(0,201,167,0.12); color: var(--teal); }
+  .mnemo-cat.gold  { background: rgba(247,201,72,0.12); color: var(--gold); }
+  .mnemo-cat.sky   { background: rgba(100,223,223,0.12); color: var(--sky); }
+  .mnemo-cat.red   { background: rgba(255,107,107,0.12); color: var(--red); }
+  .mnemo-cat.green { background: rgba(67,233,123,0.12); color: var(--green); }
+  .mnemo-title {
+    font-family: 'Fraunces', serif; font-size: 1.05rem; color: var(--white);
+  }
+  .mnemo-body {
+    display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;
+  }
+  .mnemo-row { display: flex; align-items: baseline; gap: 10px; font-size: 0.88rem; }
+  .mnemo-letter {
+    font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 700;
+    min-width: 22px; color: var(--teal);
+  }
+  .mnemo-meaning { color: #b8cce0; line-height: 1.5; }
+  .mnemo-tip {
+    border-top: 1px solid var(--border); padding-top: 12px;
+    font-size: 0.82rem; color: var(--muted); line-height: 1.6;
+  }
+  .mnemo-tip strong { color: var(--gold); }
+  .mnemo-progress {
+    display: flex; gap: 3px; margin-top: 14px; flex-wrap: wrap;
+    max-width: 100%; overflow: hidden;
+  }
+  .mnemo-pip {
+    height: 3px; flex: 1; min-width: 6px; max-width: 18px;
+    background: var(--border); border-radius: 2px; transition: background 0.3s;
+  }
+  .mnemo-pip.active { background: var(--teal); }
+  @media(max-width:600px) {
+    .mnemo-card { padding: 18px 16px; }
+    .mnemo-title { font-size: 0.95rem; }
+  }
+
   .home-screen-footer {
     padding: 18px 40px; border-top: 1px solid var(--border);
     text-align: center; font-size: 0.75rem; color: var(--muted);
@@ -604,6 +671,25 @@
         <div class="stat-item"><div class="stat-num">8</div><div class="stat-lbl">Clinical Domains</div></div>
         <div class="stat-item"><div class="stat-num">NGN</div><div class="stat-lbl">Item Types</div></div>
         <div class="stat-item"><div class="stat-num">AI</div><div class="stat-lbl">Rationales</div></div>
+      </div>
+      <!-- Mnemonics Panel -->
+      <div class="mnemo-wrap">
+        <div class="mnemo-header">
+          <span class="mnemo-header-label">📌 High-Yield Mnemonics &amp; Tips</span>
+          <div class="mnemo-nav">
+            <button class="mnemo-btn" onclick="prevMnemo()">‹</button>
+            <button class="mnemo-btn" onclick="nextMnemo()">›</button>
+          </div>
+        </div>
+        <div class="mnemo-card" id="mnemoCard">
+          <div class="mnemo-top">
+            <span class="mnemo-cat teal" id="mnemoCat">—</span>
+            <span class="mnemo-title" id="mnemoTitle">Loading…</span>
+          </div>
+          <div class="mnemo-body" id="mnemoBody"></div>
+          <div class="mnemo-tip" id="mnemoTip"></div>
+        </div>
+        <div class="mnemo-progress" id="mnemoProgress"></div>
       </div>
       <!-- Nursing Meme Strip -->
       <div class="meme-strip">
@@ -1893,6 +1979,372 @@ function initMemes() {
   window.goMeme = (idx) => { memeIndex = idx; showMeme(idx); };
 }
 
+// ══════════════════════════════════════════════════════════════════
+//  MNEMONICS BANK
+// ══════════════════════════════════════════════════════════════════
+const MNEMONICS = [
+  {
+    cat:'Priority & Safety', color:'red',
+    title:'ABCs — Prioritization Framework',
+    rows:[['A','Airway — always the first priority'],['B','Breathing — is ventilation adequate?'],['C','Circulation — perfusion, hemorrhage, cardiac'],['D','Disability — neuro/LOC (GCS, pupils)'],['E','Exposure — expose/environment/temperature']],
+    tip:'<strong>NCLEX rule:</strong> When in doubt, go ABCs. Airway beats everything. After ABCs apply Maslow\'s: Physiological → Safety → Love → Esteem → Self-actualization.'
+  },
+  {
+    cat:'Priority & Safety', color:'red',
+    title:'RACE — Fire Emergency Response',
+    rows:[['R','Rescue clients in immediate danger first'],['A','Alarm — activate fire alarm / call 911'],['C','Contain — close all doors and windows'],['E','Extinguish — use fire extinguisher if safe']],
+    tip:'<strong>PASS</strong> for extinguisher use: Pull pin → Aim at base of fire → Squeeze handle → Sweep side to side. Horizontal evacuation (same floor) before vertical (stairs — never elevators).'
+  },
+  {
+    cat:'Priority & Safety', color:'red',
+    title:'START Triage — Mass Casualty',
+    rows:[['30','Respirations >30/min = RED (immediate)'],['2','Capillary refill >2 sec = RED (immediate)'],['Can Do','Can follow commands = YELLOW (delayed)'],['Walking','Can walk = GREEN (minor)'],['No resp','No breathing after airway open = BLACK']],
+    tip:'<strong>Tag colors:</strong> RED = immediate/life-threatening but survivable. YELLOW = delayed/stable. GREEN = minor/walking wounded. BLACK = deceased or unsurvivable. Resources go to RED first.'
+  },
+  {
+    cat:'Infection Control', color:'sky',
+    title:'Transmission-Based Precautions',
+    rows:[['A','Airborne — TB, measles, varicella, disseminated zoster → N95 + negative pressure room'],['D','Droplet — flu, meningitis, pertussis, mumps, rubella → surgical mask + private room'],['C','Contact — MRSA, C. diff, scabies, RSV, VRE → gown + gloves + private room']],
+    tip:'<strong>C. diff exception:</strong> Soap and water ONLY — alcohol gel does NOT kill spores. Airborne requires N95 (not a surgical mask). Standard precautions for ALL patients, always.'
+  },
+  {
+    cat:'Infection Control', color:'sky',
+    title:"WHO's 5 Moments of Hand Hygiene",
+    rows:[['1','Before touching a patient'],['2','Before a clean/aseptic procedure'],['3','After body fluid exposure risk'],['4','After touching a patient'],['5','After touching patient surroundings']],
+    tip:'<strong>Most important infection prevention measure:</strong> hand hygiene. Soap & water: C. diff, norovirus, visible soiling, before eating. Alcohol gel: all other situations. Duration: 20–30 sec for alcohol gel, 40–60 sec for soap and water.'
+  },
+  {
+    cat:'Pharmacology', color:'gold',
+    title:'5 Rights of Medication Administration',
+    rows:[['1','Right Patient — two identifiers (name + DOB or MRN)'],['2','Right Drug — verify against MAR'],['3','Right Dose — calculate and double-check'],['4','Right Route — PO, IV, IM, SQ, topical…'],['5','Right Time — scheduled, STAT, or PRN']],
+    tip:'<strong>Extended rights:</strong> Right Documentation (immediately after giving), Right Reason, Right Client Education, Right to Refuse. UAP can NEVER administer medications.'
+  },
+  {
+    cat:'Pharmacology', color:'gold',
+    title:'5 Rights of Delegation',
+    rows:[['1','Right Task — routine, predictable, standard outcome'],['2','Right Circumstance — stable client, appropriate setting'],['3','Right Person — competency matches the task'],['4','Right Direction — clear, complete instructions given'],['5','Right Supervision — RN provides oversight and feedback']],
+    tip:'<strong>RN cannot delegate:</strong> assessment, evaluation, nursing diagnosis, care planning, teaching, unstable patients, or any task requiring clinical judgment. LPN can implement care plans on stable patients.'
+  },
+  {
+    cat:'Pharmacology', color:'gold',
+    title:'VANCOMYCIN Monitoring — RENT',
+    rows:[['R','Renal function — creatinine and BUN (nephrotoxicity)'],['E','Ears — tinnitus and hearing changes (ototoxicity)'],['N','Neck/face flushing — Red Man Syndrome if infused too fast'],['T','Trough/peak levels — ensure therapeutic range']],
+    tip:'<strong>Red Man Syndrome</strong> is NOT an allergic reaction — it\'s rate-related. Slow the infusion (minimum 60 min). Pre-treat with antihistamine if needed. Trough levels drawn 30 min before next dose.'
+  },
+  {
+    cat:'Pharmacology', color:'gold',
+    title:'Insulin Types — Clear Before Cloudy',
+    rows:[['Rapid','Lispro, Aspart, Glulisine — onset 15 min, peak 1h (clear)'],['Short','Regular — onset 30 min, peak 2–4h (clear)'],['Intermediate','NPH — onset 1–2h, peak 4–12h (cloudy)'],['Long','Glargine, Detemir — onset 1–2h, NO peak (clear)']],
+    tip:'<strong>Mixing rule:</strong> Draw Regular (clear) BEFORE NPH (cloudy) — "Clear before cloudy." NEVER mix long-acting insulin (glargine/detemir) with any other insulin. Long-acting = given at same time every day regardless of meals.'
+  },
+  {
+    cat:'Pharmacology', color:'gold',
+    title:'Digoxin — Hold Parameters & Toxicity',
+    rows:[['Hold if','HR <60 bpm adults, <90–110 bpm infants'],['Toxicity early','Nausea, vomiting, anorexia (GI symptoms first)'],['Toxicity late','Bradycardia, dysrhythmias, visual halos (yellow-green)'],['Antidote','Digibind (digoxin immune Fab) for severe toxicity']],
+    tip:'<strong>Hypokalemia increases digoxin toxicity risk</strong> — monitor K+ closely. Therapeutic level: 0.5–2.0 ng/mL. Always take apical pulse for a full minute before giving. Toxicity signs: "dig-toxic" = GI + visual + cardiac.'
+  },
+  {
+    cat:'Pharmacology', color:'gold',
+    title:'Anticoagulant Monitoring Cheat Sheet',
+    rows:[['Heparin (UFH)','Monitor aPTT — therapeutic 60–100 sec (1.5–2.5× normal). Antidote: protamine sulfate'],['Warfarin','Monitor INR — therapeutic 2.0–3.0 (mechanical valve: 2.5–3.5). Antidote: Vitamin K'],['Enoxaparin (LMWH)','Monitor anti-Xa levels. No routine aPTT needed. Antidote: protamine (partial)'],['DOACs','Rivaroxaban, apixaban — no routine monitoring. Andexanet alfa reverses anti-Xa agents']],
+    tip:'<strong>HIT (Heparin-Induced Thrombocytopenia):</strong> Platelet drop >50% on days 5–10 of heparin = STOP all heparin immediately. Use argatroban or bivalirudin. Paradoxically causes clotting, not just bleeding.'
+  },
+  {
+    cat:'Cardiac', color:'teal',
+    title:"Beck's Triad — Cardiac Tamponade",
+    rows:[['1','Hypotension — decreased cardiac output'],['2','Jugular vein distension (JVD) — elevated venous pressure'],['3','Muffled/distant heart sounds — fluid dampens sounds']],
+    tip:'<strong>Also look for:</strong> pulsus paradoxus (SBP drops >10 mmHg with inspiration), electrical alternans on EKG (alternating QRS heights). Treatment: pericardiocentesis STAT. Most common post-cardiac surgery complication.'
+  },
+  {
+    cat:'Cardiac', color:'teal',
+    title:"Cushing's Triad — Increased ICP",
+    rows:[['1','Hypertension — widened pulse pressure'],['2','Bradycardia — reflex slowing of heart rate'],['3','Irregular respirations — Cheyne-Stokes, apneustic, or ataxic']],
+    tip:'<strong>Late and ominous sign</strong> of severe ICP with impending brain herniation. Treat immediately: HOB 30°, hyperventilate (PaCO2 35–40), mannitol IV, emergent neurosurgery consult. Do NOT lower BP rapidly — cerebral perfusion depends on it.'
+  },
+  {
+    cat:'Cardiac', color:'teal',
+    title:'MI Location by EKG Leads',
+    rows:[['Anterior','Leads V1–V4 → Left Anterior Descending (LAD) artery'],['Lateral','Leads I, aVL, V5–V6 → Left Circumflex artery'],['Inferior','Leads II, III, aVF → Right Coronary Artery (RCA)'],['Posterior','Large R wave in V1–V2 (reciprocal change) → RCA or circumflex']],
+    tip:'<strong>STEMI treatment goals:</strong> Door-to-balloon (PCI) <90 min. Door-to-needle (thrombolytics) <30 min. Inferior MI (RCA) → high risk for right ventricular MI, bradycardia, and heart blocks. Avoid nitrates if RV involvement (causes profound hypotension).'
+  },
+  {
+    cat:'Cardiac', color:'teal',
+    title:'Hyperkalemia — C-BIG-K Drop',
+    rows:[['C','Calcium gluconate — cardiac membrane stabilization (first/fastest)'],['B','Bicarbonate (sodium) — shifts K+ intracellularly'],['I','Insulin + dextrose (D50W) — drives K+ into cells'],['G','Glucose (dextrose) — prevents hypoglycemia from insulin'],['K','Kayexalate (sodium polystyrene sulfonate) — removes K+ via GI tract']],
+    tip:'<strong>EKG changes in order:</strong> Peaked T waves (first) → widened QRS → flattened P waves → sine wave pattern → ventricular fibrillation. Dialysis is definitive treatment for life-threatening hyperkalemia unresponsive to other measures.'
+  },
+  {
+    cat:'Neurological', color:'sky',
+    title:'FAST — Stroke Recognition',
+    rows:[['F','Face drooping — ask client to smile (unequal?)'],['A','Arm weakness — ask client to raise both arms (one drift?)'],['S','Speech difficulty — slurred, garbled, or unable to speak'],['T','Time — note time of symptom onset, call 911 IMMEDIATELY']],
+    tip:'<strong>tPA (alteplase) window:</strong> 3–4.5 hours from symptom onset for ischemic stroke. Contraindications: hemorrhage on CT, BP >185/110, recent surgery, anticoagulation. Goal: door-to-needle <60 min. NEVER give tPA for hemorrhagic stroke.'
+  },
+  {
+    cat:'Neurological', color:'sky',
+    title:'Glasgow Coma Scale (GCS)',
+    rows:[['E','Eye opening: 4=spontaneous, 3=to voice, 2=to pain, 1=none'],['V','Verbal: 5=oriented, 4=confused, 3=words, 2=sounds, 1=none'],['M','Motor: 6=obeys, 5=localizes, 4=withdraws, 3=flexion, 2=extension, 1=none']],
+    tip:'<strong>Total score 3–15.</strong> ≤8 = severe brain injury, consider intubation. 9–12 = moderate. 13–15 = mild. "Best" response in each category. Intubation typically at GCS ≤8 ("ate and was late" = intubate).'
+  },
+  {
+    cat:'Neurological', color:'sky',
+    title:'Meningitis Signs',
+    rows:[["Kernig's sign","Flex hip to 90° → patient cannot fully extend knee (pain/resistance) = meningeal irritation"],["Brudzinski's sign","Flex client's neck to chest → involuntary hip and knee flexion = meningeal irritation"],['Nuchal rigidity','Stiff neck — classic triad with fever and severe headache'],['Photophobia','Sensitivity to light; phonophobia = sensitivity to sound']],
+    tip:'<strong>Meningitis triad:</strong> fever + severe headache + nuchal rigidity. Petechial/purpuric rash = meningococcal (Neisseria) — septicemia emergency. Droplet precautions until 24h of antibiotics. Start antibiotics before LP if unstable.'
+  },
+  {
+    cat:'Respiratory', color:'teal',
+    title:'ROME — ABG Interpretation',
+    rows:[['R','Respiratory — Opposite: ↑pH with ↓CO2 = alkalosis; ↓pH with ↑CO2 = acidosis'],['O','(the O stands for Opposite)'],['M','Metabolic — Equal: ↑pH with ↑HCO3 = alkalosis; ↓pH with ↓HCO3 = acidosis'],['E','(the E stands for Equal)']],
+    tip:'<strong>Normal ABG values:</strong> pH 7.35–7.45 | PaCO2 35–45 | HCO3 22–26 | PaO2 80–100 | SaO2 >95%. Steps: 1) Is pH normal? 2) Is CO2 abnormal? 3) Is HCO3 abnormal? 4) Match abnormal to pH. 5) Is the other compensating?'
+  },
+  {
+    cat:'Respiratory', color:'teal',
+    title:'MUDPILES — Metabolic Acidosis (High Anion Gap)',
+    rows:[['M','Methanol poisoning'],['U','Uremia (renal failure)'],['D','Diabetic ketoacidosis (DKA)'],['P','Propylene glycol / Paracetamol (acetaminophen OD)'],['I','Isoniazid / Iron overdose'],['L','Lactic acidosis (shock, sepsis, hypoxia)'],['E','Ethylene glycol (antifreeze)'],['S','Salicylate toxicity (aspirin OD)']],
+    tip:'<strong>Normal anion gap metabolic acidosis (HARDUPS):</strong> Hyperalimentation, Addison\'s disease, Renal tubular acidosis, Diarrhea, Ureteroenterostomy, Pancreatic fistula, Spironolactone. Anion gap = Na − (Cl + HCO3). Normal = 8–12 mEq/L.'
+  },
+  {
+    cat:'Respiratory', color:'teal',
+    title:'Oxygen Delivery Devices — Flow Rates & FiO2',
+    rows:[['Nasal cannula','1–6 L/min → FiO2 24–44% (each L adds ~4%)'],['Simple face mask','6–10 L/min → FiO2 35–50%'],['Non-rebreather mask','10–15 L/min → FiO2 60–80% (highest non-invasive)'],['Venturi mask','Precise FiO2 24–50% → preferred for COPD'],['Bag-valve mask','15 L/min → FiO2 ~100% with oxygen flush']],
+    tip:'<strong>COPD target SpO2:</strong> 88–92% (not 95–100%). Venturi mask delivers exact FiO2. Non-rebreather for highest non-invasive O2 need. Always use minimum O2 to achieve target SpO2 — too much O2 causes oxygen toxicity and can blunt hypoxic drive in COPD.'
+  },
+  {
+    cat:'Endocrine', color:'gold',
+    title:'DKA vs HHNS Comparison',
+    rows:[['Feature','DKA → HHNS'],['Type','Type 1 DM → Type 2 DM (usually)'],['Blood glucose','250–800 mg/dL → 600–2000+ mg/dL'],['Ketones','YES — fruity breath, Kussmaul resp → absent/minimal'],['pH','<7.35 (acidosis) → near normal'],['Treatment','IV insulin drip + fluids + K+ replacement → IV fluids (main) + insulin']],
+    tip:'<strong>DKA treatment K+ rule:</strong> Always replace K+ before or as you start insulin (insulin drives K+ into cells → fatal hypokalemia). If K+ <3.5, hold insulin until K+ replaced. Goal: K+ 3.5–5.0 before starting insulin drip.'
+  },
+  {
+    cat:'Endocrine', color:'gold',
+    title:"Addison's vs Cushing's — Adrenal Disorders",
+    rows:[['','Addison\'s (low cortisol/aldosterone) → Cushing\'s (excess cortisol)'],['Na+','Low (hyponatremia) → High (hypernatremia)'],['K+','High (hyperkalemia) → Low (hypokalemia)'],['Glucose','Low (hypoglycemia) → High (hyperglycemia)'],['BP','Low (hypotension, shock) → High (hypertension)'],['Appearance','Hyperpigmented, thin, weak → Moon face, buffalo hump, truncal obesity']],
+    tip:'<strong>Addisonian crisis triggers:</strong> Infection, surgery, abrupt steroid withdrawal. Treatment: IV hydrocortisone + NS. <strong>Cushing\'s memory:</strong> CUSHINGS — Central obesity, Ulcers, Striae, Hypertension, Infections, Nephrolithiasis, Glucose ↑, Sugar moon face.'
+  },
+  {
+    cat:'Endocrine', color:'gold',
+    title:'SIADH vs Diabetes Insipidus (DI)',
+    rows:[['','SIADH (too much ADH) → DI (too little ADH)'],['Serum Na+','Low (<135) → High (>145)'],['Serum osmolality','Low (<280) → High (>295)'],['Urine','Concentrated, dark (high SG >1.020) → Dilute, pale (low SG <1.005)'],['Urine output','Low (<30 mL/hr) → Very high (4–20 L/day)'],['Treatment','Fluid restriction + hypertonic saline → DDAVP + hypotonic fluids']],
+    tip:'Memory trick: <strong>SIADH = SALTED in</strong> (water retained, salt diluted). <strong>DI = SALTED out</strong> (water poured out, salt concentrated). Both present with altered LOC in severe cases from sodium imbalance.'
+  },
+  {
+    cat:'Renal', color:'sky',
+    title:'Acute Kidney Injury (AKI) — AEIOU Indications for Dialysis',
+    rows:[['A','Acidosis — metabolic, refractory to treatment'],['E','Electrolytes — life-threatening hyperkalemia'],['I','Intoxication — drug/toxin removal (salicylates, methanol, lithium)'],['O','Overload — fluid overload unresponsive to diuretics'],['U','Uremia — uremic symptoms (encephalopathy, pericarditis, bleeding)']],
+    tip:'<strong>AKI staging (KDIGO):</strong> Stage 1: Cr ×1.5 or UO <0.5 mL/kg/hr ×6h. Stage 2: Cr ×2. Stage 3: Cr ×3 or dialysis needed. Oliguria = UO <0.5 mL/kg/hr. Anuria = UO <100 mL/day. Best indicator of fluid resuscitation: urine output 0.5–1 mL/kg/hr.'
+  },
+  {
+    cat:'Renal', color:'sky',
+    title:'CKD Diet Restrictions — The 4 Ks',
+    rows:[['K+','Potassium — avoid bananas, oranges, potatoes, tomatoes'],['K (phosphorus)','Phosphorus — avoid dairy, nuts, dark colas; take phosphate binders WITH meals'],['K (sodium)','Sodium — restrict to prevent fluid retention and hypertension'],['K (fluid)','Fluid restriction — daily output + 500–1000 mL']],
+    tip:'<strong>Phosphate binders</strong> (calcium acetate, sevelamer, lanthanum) MUST be taken WITH meals — not before, not after. They bind dietary phosphorus in the gut. Calcium-based binders should not be used if Ca++ is already elevated. Dialysis patients need moderate protein (1.2 g/kg/day).'
+  },
+  {
+    cat:'Mental Health', color:'green',
+    title:'DABDA — Kübler-Ross Stages of Grief',
+    rows:[['D','Denial — "This can\'t be true. There must be a mistake."'],['A','Anger — "Why me? This isn\'t fair!"'],['B','Bargaining — "If I just do X, maybe things will change."'],['D','Depression — withdrawal, sadness, crying'],['A','Acceptance — "I am ready. I understand what is happening."']],
+    tip:'<strong>Important:</strong> Stages are NOT linear or universal — clients may skip stages, revisit them, or experience them simultaneously. No stage is "wrong." Therapeutic response: validate feelings, be present, avoid rushing toward acceptance. Anticipatory grief can occur before death.'
+  },
+  {
+    cat:'Mental Health', color:'green',
+    title:'Therapeutic vs Non-Therapeutic Communication',
+    rows:[['✅ Therapeutic','Open-ended questions, reflecting feelings, restating, clarifying, offering presence/silence, summarizing'],['✅ Therapeutic','Acknowledging feelings: "It sounds like you\'re feeling overwhelmed."'],['❌ Non-therapeutic','False reassurance: "Everything will be fine."'],['❌ Non-therapeutic','"Why" questions (confrontational), giving advice prematurely, changing subject, minimizing feelings'],['❌ Non-therapeutic','Agreeing/disagreeing with delusions, defending the healthcare system']],
+    tip:'<strong>Best opening:</strong> broad/open-ended ("Tell me more about..."). <strong>For silence:</strong> sit with the client — therapeutic presence is powerful. Never say "I know exactly how you feel" (shifts focus to nurse). NEVER agree with delusions but do NOT directly confront them either.'
+  },
+  {
+    cat:'Mental Health', color:'green',
+    title:'Defense Mechanisms — High-Yield List',
+    rows:[['Denial','Refusing to acknowledge a painful reality ("I don\'t have a drinking problem")'],['Projection','Attributing own feelings to others ("Everyone here hates me")'],['Rationalization','Making excuses to justify behavior ("I only drink because of stress")'],['Displacement','Redirecting emotion to a safer target (yelling at family after a bad shift)'],['Sublimation','Channeling negative impulses into positive activities (exercise for anger)'],['Regression','Returning to earlier developmental behavior (adult becoming childlike under stress)'],['Splitting','BPD — all-good or all-bad thinking, no middle ground']],
+    tip:'<strong>Mature defenses</strong> (healthy): sublimation, humor, altruism, suppression. <strong>Immature defenses</strong>: denial, projection, splitting, regression. Splitting is the hallmark of Borderline Personality Disorder. Nurses should recognize but NOT reinforce immature defense mechanisms.'
+  },
+  {
+    cat:'Mental Health', color:'green',
+    title:'Alcohol Withdrawal — CIWA-Ar Timeline',
+    rows:[['6–12 hrs','Tremors, anxiety, nausea, diaphoresis, elevated VS'],['12–24 hrs','Perceptual disturbances (visual/auditory/tactile hallucinations)'],['24–48 hrs','Seizures (grand mal) — peak risk period'],['48–72 hrs','Delirium Tremens (DTs) — peak severity, most dangerous']],
+    tip:'<strong>DTs presentation:</strong> Autonomic instability (severe HTN, tachycardia, hyperthermia), severe tremors, confusion, hallucinations — life-threatening. Treatment: benzodiazepines (lorazepam, diazepam) per CIWA-Ar protocol. <strong>Always give thiamine BEFORE glucose</strong> to prevent Wernicke\'s encephalopathy.'
+  },
+  {
+    cat:'Mental Health', color:'green',
+    title:'Schizophrenia — Positive vs Negative Symptoms',
+    rows:[['Positive (added)','Hallucinations (auditory most common), delusions, disorganized speech, disorganized behavior, thought broadcasting/insertion'],['Negative (subtracted)','Flat/blunted affect, Alogia (poverty of speech), Avolition (lack of motivation), Anhedonia (no pleasure), Asociality (social withdrawal)'],['Tx: Positive','Typical and atypical antipsychotics both work'],['Tx: Negative','Atypical antipsychotics (clozapine, risperidone) work better']],
+    tip:'<strong>Memory:</strong> Positive = something ADDED (hallucinations, delusions). Negative = something TAKEN AWAY (emotion, speech, motivation). Clozapine = most effective for treatment-resistant schizophrenia but requires weekly WBC monitoring (agranulocytosis risk).'
+  },
+  {
+    cat:'OB / Maternal', color:'red',
+    title:'Placenta Previa vs Abruptio Placentae',
+    rows:[['','Previa → Abruptio'],['Pain','PAINLESS → PAINFUL (sudden, severe)'],['Bleeding','Bright red, external → Dark red; may be concealed'],['Uterus','Soft, non-tender → Board-like rigidity'],['Fetal status','Usually stable initially → Fetal distress early'],['Action','NEVER do vaginal exam → Emergency C-section risk']],
+    tip:'<strong>Previa:</strong> Placenta covers the cervical os. Never do a vaginal exam (triggers massive hemorrhage). Delivery by C-section. <strong>Abruption:</strong> Placenta separates from uterine wall. DIC risk is high. Can be totally concealed (no visible bleeding but client in shock).'
+  },
+  {
+    cat:'OB / Maternal', color:'red',
+    title:'Preeclampsia — HELLP Syndrome',
+    rows:[['H','Hemolysis — elevated LDH, abnormal peripheral smear'],['E','Elevated Liver enzymes — AST, ALT elevated'],['L','Low Platelets — thrombocytopenia (<100,000)'],['L','(also: severe HTN ≥160/110, proteinuria, severe headache, visual changes)'],['P','(also: Pulmonary edema, Oliguria — signs of severe preeclampsia)']],
+    tip:'<strong>Magnesium sulfate</strong> is used for seizure prophylaxis/treatment in preeclampsia. Antidote: calcium gluconate. Monitor: reflexes (loss = toxicity), RR (keep >12), urine output (keep >25 mL/hr). Antihypertensive: labetalol or hydralazine IV for BP ≥160/110.'
+  },
+  {
+    cat:'OB / Maternal', color:'red',
+    title:'APGAR Score — Newborn Assessment',
+    rows:[['A','Appearance (color): 0=blue all, 1=acrocyanosis, 2=all pink'],['P','Pulse: 0=absent, 1=<100 bpm, 2=≥100 bpm'],['G','Grimace (reflex): 0=none, 1=grimace, 2=cry/cough/sneeze'],['A','Activity (tone): 0=limp, 1=some flexion, 2=active motion'],['R','Respirations: 0=absent, 1=weak cry, 2=strong cry']],
+    tip:'<strong>Scoring:</strong> 7–10 = normal. 4–6 = moderate depression, stimulate. 0–3 = severe depression, begin NRP resuscitation immediately. Done at 1 and 5 minutes. Does NOT predict long-term neurological outcome — used for immediate management decisions.'
+  },
+  {
+    cat:'OB / Maternal', color:'red',
+    title:'Postpartum Hemorrhage — 4 Ts',
+    rows:[['T','Tone — uterine atony (most common, 80% of PPH)'],['T','Trauma — lacerations, hematomas, uterine rupture'],['T','Tissue — retained placenta or membranes'],['T','Thrombin — coagulation disorders (DIC)']],
+    tip:'<strong>Uterine atony nursing intervention:</strong> Fundal massage + empty bladder (displaced fundus = full bladder, not hemorrhage). Oxytocin first-line drug. If refractory: methylergonovine, carboprost, misoprostol. Blood loss >500 mL vaginal, >1000 mL C-section = PPH. Assess for uterine displacement (→ right = full bladder).'
+  },
+  {
+    cat:'Pediatrics', color:'green',
+    title:'Croup vs Epiglottitis — Key Differences',
+    rows:[['','Croup → Epiglottitis'],['Onset','Gradual → Sudden'],['Cough','Barking/seal-like → NO cough (too painful)'],['Fever','Low-grade → High (toxic appearance)'],['Position','Any → Tripod (leaning forward, neck extended)'],['Drooling','Absent → YES (cannot swallow)'],['Action','Cool mist, dexamethasone, racemic epi → Airway emergency — do NOT examine throat']],
+    tip:'<strong>Epiglottitis rule:</strong> Do NOT examine the throat with a tongue depressor. Do NOT lay flat. Do NOT upset the child. Keep child calm. Have intubation and tracheostomy tray at bedside. Caused by H. influenzae type b (now rare due to Hib vaccine).'
+  },
+  {
+    cat:'Pediatrics', color:'green',
+    title:'Developmental Milestones — Quick Reference',
+    rows:[['2 months','Social smile, lifts head prone, coos'],['4 months','Laughs, rolls front to back, reaches for objects'],['6 months','Sits with support, babbles, transfers objects hand-to-hand'],['9 months','Crawls, pincer grasp developing, stranger anxiety peaks'],['12 months','Walks with support, 1–3 words, pincer grasp complete, waves bye'],['18 months','Walks independently, 10–15 words, stacks 3–4 blocks'],['24 months','Runs, 2-word phrases, 50+ words, kicks a ball'],['36 months','3-word sentences, rides tricycle, knows name/age/sex']],
+    tip:'<strong>Developmental delay red flags:</strong> No babbling by 12 months, no words by 16 months, no 2-word phrases by 24 months, any regression at any age. Refer immediately. Object permanence develops ~8–9 months (Piaget). Stranger anxiety peaks 9–12 months.'
+  },
+  {
+    cat:'Pediatrics', color:'green',
+    title:"Reye's Syndrome Prevention",
+    rows:[['Rule','NEVER give aspirin (salicylates) to anyone under 18 years old'],['Triggers','Viral illness + aspirin — especially varicella (chickenpox) and influenza'],['Symptoms','Sudden vomiting + altered LOC + liver dysfunction + elevated ammonia'],['Safe alternatives','Acetaminophen (Tylenol) or Ibuprofen for fever and pain in children']],
+    tip:'<strong>This is a priority NCLEX topic:</strong> If a question mentions a child with a viral illness and aspirin use — think Reye\'s syndrome. The association was discovered in the 1980s. Aspirin is also avoided in pregnancy (Category D). Always choose acetaminophen or ibuprofen for pediatric pain/fever.'
+  },
+  {
+    cat:'Wound Care', color:'gold',
+    title:'Pressure Injury Staging',
+    rows:[['Stage I','Non-blanchable redness of intact skin — skin intact, just red'],['Stage II','Partial-thickness skin loss — shallow open ulcer or blister; no slough'],['Stage III','Full-thickness loss with visible subcutaneous fat — slough may be present; no bone/tendon'],['Stage IV','Full-thickness loss with exposed bone, tendon, or muscle'],['Unstageable','Base obscured by slough or eschar — cannot determine depth'],['Deep Tissue','Purple/maroon intact skin or blood-filled blister — from underlying muscle damage']],
+    tip:'<strong>Wound documentation:</strong> SIZE (length × width × depth), COLOR (pink/red/yellow/black), DRAINAGE (amount, color, odor), EDGES, UNDERMINING/TUNNELING. Moist wound healing is evidence-based. Black eschar over heel may be left intact (protective) unless signs of infection.'
+  },
+  {
+    cat:'Wound Care', color:'gold',
+    title:'Wound Drainage Types',
+    rows:[['Serous','Clear, watery — normal in early healing'],['Serosanguineous','Pale pink, thin — normal in healing wounds'],['Sanguineous','Bright red, bloody — fresh bleeding (concern if increasing)'],['Purulent','Thick, opaque, yellow/green — infection indicator'],['Seropurulent','Thin, cloudy with slight odor']],
+    tip:'<strong>Post-op drainage assessment:</strong> Sanguineous is expected early; serosanguineous as healing progresses. Purulent = infection. Bright red arterial bleeding = emergency. Document color, consistency, odor, and amount. Normal JP drain output: <30 mL/8h after 48–72 hours post-op.'
+  },
+  {
+    cat:'Lab Values', color:'sky',
+    title:'Critical Lab Values — Know These Cold',
+    rows:[['Potassium','Critical low: <2.5 | Critical high: >6.5 mEq/L (cardiac arrest risk)'],['Sodium','Critical low: <120 | Critical high: >160 mEq/L (seizures, coma)'],['Glucose','Critical low: <40 | Critical high: >600 mg/dL (DKA/HHNS)'],['pH','Critical low: <7.2 | Critical high: >7.6'],['Platelet','Critical low: <20,000 (spontaneous bleeding risk)'],['Hemoglobin','Critical low: <7 g/dL with symptoms (transfusion threshold)'],['INR','Critical high: >5 with bleeding, >10 = emergency reversal']],
+    tip:'<strong>When you get a critical value:</strong> 1) Verify (repeat if needed), 2) Assess the patient NOW, 3) Notify provider IMMEDIATELY, 4) Document time notified and provider response. Critical values require bedside assessment — never just relay by phone without assessing first.'
+  },
+  {
+    cat:'Lab Values', color:'sky',
+    title:'Electrolyte Normal Ranges & Classic Signs',
+    rows:[['Na+ (136–145)','↓Hypo: confusion, seizures (cerebral edema) | ↑Hyper: thirst, agitation, fever, dry membranes'],['K+ (3.5–5.0)','↓Hypo: muscle weakness, U waves, flat T | ↑Hyper: peaked T waves, bradycardia → cardiac arrest'],['Ca++ (8.5–10.5)','↓Hypo: Chvostek\'s, Trousseau\'s, tetany | ↑Hyper: "Bones, Stones, Groans, Moans" (constipation, kidney stones, confusion, depression)'],['Mg++ (1.5–2.5)','↓Hypo: tremors, seizures, dysrhythmias | ↑Hyper: hyporeflexia, resp. depression (like MgSO4 toxicity)'],['Phos (3.0–4.5)','↓Hypo: refeeding syndrome, weakness, resp failure | ↑Hyper: CKD, hypocalcemia']],
+    tip:'<strong>Chvostek\'s sign:</strong> Tap facial nerve over cheekbone → facial muscle twitch = hypocalcemia. <strong>Trousseau\'s sign:</strong> Inflate BP cuff above SBP for 3 min → carpal spasm = hypocalcemia. Both are signs of neuromuscular excitability from low calcium.'
+  },
+  {
+    cat:'Management', color:'red',
+    title:'SBAR — Structured Communication',
+    rows:[['S','Situation — "I am calling about [client name]. The problem is [specific issue] happening right now."'],['B','Background — Relevant history: admitting diagnosis, key vitals trend, medications, allergies'],['A','Assessment — YOUR clinical judgment: "I think this may be [your interpretation]"'],['R','Recommendation — What you are asking for: "I am requesting [specific action/order]"']],
+    tip:'<strong>SBAR is the gold standard</strong> for clinical handoffs and provider communication. Assessment is the most critical component — it\'s the nurse\'s professional judgment. Always end with a specific request (don\'t leave it open-ended). Document time, provider name, and response.'
+  },
+  {
+    cat:'Management', color:'red',
+    title:'Ethical Principles — BENEFAB',
+    rows:[['B','Beneficence — doing good for the client'],['E','(Non-maleficence — do NO harm)'],['N','Nonmaleficence — avoiding actions that cause harm'],['E','(stands alone — avoid harm)'],['F','Fidelity — keeping promises, honoring commitments'],['A','Autonomy — client\'s right to make own decisions'],['B','(Beneficence) and Justice — fair, equitable care for all']],
+    tip:'<strong>NCLEX ethical scenarios:</strong> Autonomy > beneficence when client is competent. Competent adults can refuse ANY treatment. DNR orders must be honored even if family disagrees. Informed consent requires capacity, disclosure, understanding, voluntariness, and decision. Nurses witness signatures but physicians obtain consent.'
+  },
+  {
+    cat:'Management', color:'red',
+    title:'Maslow\'s Hierarchy — Nursing Priority Application',
+    rows:[['1 (highest)','Physiological needs — airway, breathing, circulation, nutrition, sleep, elimination'],['2','Safety — physical safety, fall prevention, infection control, medication safety'],['3','Love/Belonging — therapeutic relationship, family visitation, support systems'],['4','Esteem — client education, respecting dignity, involving in care decisions'],['5 (lowest)','Self-actualization — achieving personal potential, end-of-life meaning']],
+    tip:'<strong>NCLEX application:</strong> Always address physiological needs before psychosocial ones, UNLESS the physiological needs are all met — then move up the hierarchy. Exception: if a client is suicidal (safety), that takes priority over many physiological concerns. Apply with clinical judgment, not rigidly.'
+  },
+  {
+    cat:'Pharmacology', color:'gold',
+    title:'ACE Inhibitor Side Effects — COUGH',
+    rows:[['C','Cough — dry, persistent, non-productive (most common — bradykinin accumulation)'],['O','Other: angioedema (rare, swelling of tongue/airway — medical emergency)'],['U','Urine output — monitor renal function (can cause AKI in bilateral renal artery stenosis)'],['G','Go-low blood pressure — hypotension especially with first dose'],['H','Hyperkalemia — blocks aldosterone → K+ retained']],
+    tip:'<strong>If cough is intolerable:</strong> switch to ARB (losartan, valsartan) — same benefit without bradykinin accumulation, no cough. <strong>Angioedema</strong> = discontinue immediately, treat with epinephrine. Contraindicated in pregnancy (teratogenic, Category D). Monitor: K+, renal function, BP.'
+  },
+  {
+    cat:'Pharmacology', color:'gold',
+    title:'Beta-Blocker Essentials — Hold Parameters',
+    rows:[['Hold if','HR <60 bpm or SBP <90 mmHg'],['Purpose','Reduce HR, BP, myocardial O2 demand; treat HTN, angina, HF, dysrhythmias'],['Key drugs','Metoprolol (B1-selective), atenolol (B1), carvedilol (B1+B2+alpha), propranolol (non-selective)'],['Side effects','Bradycardia, hypotension, fatigue, depression, sexual dysfunction, bronchoconstriction (B2)'],['Avoid in','Asthma/COPD (non-selective B-blockers — use B1-selective if needed)']],
+    tip:'<strong>NEVER abruptly stop beta-blockers</strong> — rebound tachycardia, hypertension, and MI risk. Taper gradually. Carvedilol is preferred in heart failure. Propranolol used for tremors, migraines, portal hypertension, thyroid storm symptom control (does not treat underlying thyroid disease).'
+  },
+  {
+    cat:'Pharmacology', color:'gold',
+    title:'Opioid Analgesics — Naloxone Protocol',
+    rows:[['Monitor before','Respiratory rate (hold if <12), O2 saturation, sedation level, BP'],['Therapeutic','Morphine, hydromorphone, oxycodone, fentanyl'],['Overdose signs','Respiratory depression (<8 RR), pinpoint pupils, unconsciousness, cyanosis'],['Antidote','Naloxone (Narcan) 0.4–2 mg IV/IM/IN — titrate to adequate respirations'],['Duration issue','Naloxone wears off in 30–90 min — may re-sedate if opioid has longer duration']],
+    tip:'<strong>Naloxone titration goal:</strong> Adequate respirations, not full reversal — fully reversing causes acute withdrawal (pain crisis, hypertension, tachycardia, pulmonary edema). Monitor for 2–3 hours after last naloxone dose. Equianalgesic dosing important when switching opioids.'
+  },
+  {
+    cat:'Cardiac', color:'teal',
+    title:'Heart Failure — Left vs Right Side Comparison',
+    rows:[['Left-sided HF','Pulmonary backup: crackles, orthopnea, PND, dyspnea, pink frothy sputum, S3 gallop, ↓SpO2'],['Right-sided HF','Systemic backup: JVD, dependent edema (ankles/sacrum), ascites, hepatomegaly, weight gain'],['Most common cause of right HF','Left-sided heart failure'],['Key drug','Furosemide (Lasix) for fluid overload — monitor K+, BP, urine output'],['Daily monitoring','Weight — 1 kg = ~1 L fluid. Gain >2 lbs/day = notify provider']],
+    tip:'<strong>Positioning:</strong> High-Fowler\'s (90°) for acute dyspnea/pulmonary edema — maximizes lung expansion. Daily weight is the best home monitoring tool — same scale, same time, same clothes each day. Sodium restriction <2 g/day. Fluid restriction if ordered.'
+  },
+  {
+    cat:'Neurological', color:'sky',
+    title:'Spinal Cord Injury — Level Affects Function',
+    rows:[['C1–C4','Ventilator-dependent, total paralysis/no sensation below'],['C5','Can shrug shoulders, some bicep movement'],['C6','Wrist extension — can use wrist-driven hand orthosis'],['C7','Tricep function — can push self up from wheelchair'],['T1–T6','Paraplegia; may have autonomic dysreflexia risk'],['T10–L1','Paraplegia; bladder/bowel dysfunction'],['L1–S3','Lower extremity weakness/sensory loss']],
+    tip:'<strong>Autonomic Dysreflexia</strong> (T6 and above): Severe HTN + bradycardia + headache + diaphoresis above injury + flushing. Most common trigger: FULL BLADDER. First action: sit upright (lowers BP) → find and remove trigger. Life-threatening if untreated — stroke risk.'
+  },
+  {
+    cat:'OB / Maternal', color:'red',
+    title:'Fetal Heart Rate — Decelerations',
+    rows:[['Early decels','Mirror contractions — head compression (normal, benign, no action needed)'],['Late decels','After contractions — uteroplacental insufficiency (NONREASSURING — intervene!)'],['Variable decels','Abrupt, V-shaped — umbilical cord compression (position change usually resolves)'],['Accelerations','FHR rises with fetal movement — reassuring (reactive NST = good)'],['Baseline FHR','Normal 110–160 bpm; variability 6–25 bpm is reassuring']],
+    tip:'<strong>Late decel intervention:</strong> LION — Left lateral position, IV fluids (NS bolus), O2 (10 L non-rebreather), Notify provider. Discontinue oxytocin if infusing. Variable decels with repetitive pattern or prolonged = escalate. Sinusoidal pattern = severe fetal anemia — emergency.'
+  },
+  {
+    cat:'Infection Control', color:'sky',
+    title:'Surgical Asepsis vs Medical Asepsis',
+    rows:[['Medical (clean) asepsis','Reduces number of microorganisms — handwashing, clean technique, standard precautions'],['Surgical (sterile) asepsis','Eliminates ALL microorganisms — sterile field, sterile gloves, sterile supplies'],['Sterile field rules','Only sterile items touch sterile field; 1-inch border is contaminated; moisture = contamination; out of sight = contaminated; always face the sterile field'],['Sterile glove order','Dominant hand first when gloving; if one becomes contaminated, both must be changed']],
+    tip:'<strong>If in doubt — throw it out.</strong> Any question about sterility = contaminated. A sterile field that has been out of sight, turned away from, or reached over is contaminated. Sterile technique required for: urinary catheterization, wound packing, IV insertion, surgical procedures, intrathecal medications.'
+  },
+  {
+    cat:'Pharmacology', color:'gold',
+    title:'Lithium — Therapeutic Range & Toxicity',
+    rows:[['Therapeutic','0.6–1.2 mEq/L (maintenance); up to 1.5 mEq/L (acute mania)'],['Early toxicity (1.5–2.0)','Nausea, vomiting, diarrhea, fine tremor, polyuria, thirst'],['Moderate toxicity (2.0–2.5)','Coarse tremor, ataxia, confusion, slurred speech, muscle twitching'],['Severe toxicity (>2.5)','Seizures, cardiac dysrhythmias, coma, respiratory failure, death'],['Antidote','No specific antidote — dialysis, supportive care, hydration']],
+    tip:'<strong>Increases lithium toxicity:</strong> Low sodium diet, dehydration, NSAIDs, ACE inhibitors, thiazide diuretics. Monitor: renal function (lithium is renally excreted), thyroid function (causes hypothyroidism long-term), CBC. Take with food/milk. Maintain consistent sodium and fluid intake.'
+  },
+  {
+    cat:'Pharmacology', color:'gold',
+    title:'Corticosteroids — Side Effects SAWED',
+    rows:[['S','Susceptibility to infection — immunosuppression, mask fever'],['A','Adrenal suppression — do NOT stop abruptly (taper!)'],['W','Weight gain, moon face, buffalo hump (Cushingoid appearance)'],['E','Electrolytes — hypernatremia, hypokalemia, hyperglycemia'],['D','Decreased bone density — osteoporosis, avascular necrosis']],
+    tip:'<strong>Never abruptly stop corticosteroids</strong> — adrenal crisis risk. Taper gradually. Adrenal suppression occurs after >2 weeks of use. Take with food (GI irritation, ulcer risk). Monitor: blood glucose (steroid-induced hyperglycemia), BP, weight, bone density with long-term use. Calcium and vitamin D supplementation for long-term users.'
+  },
+];
+
+let mnemoIndex = 0;
+function initMnemonics() {
+  const card = document.getElementById('mnemoCard');
+  const progress = document.getElementById('mnemoProgress');
+  if (!card || !progress) return;
+
+  progress.innerHTML = MNEMONICS.map((_, i) =>
+    `<div class="mnemo-pip${i === 0 ? ' active' : ''}"></div>`
+  ).join('');
+
+  function renderMnemo(idx) {
+    card.classList.add('fade-out');
+    setTimeout(() => {
+      const m = MNEMONICS[idx];
+      document.getElementById('mnemoCat').textContent = m.cat;
+      document.getElementById('mnemoCat').className = `mnemo-cat ${m.color}`;
+      document.getElementById('mnemoTitle').textContent = m.title;
+      document.getElementById('mnemoBody').innerHTML = m.rows.map(([letter, meaning]) =>
+        `<div class="mnemo-row"><span class="mnemo-letter">${letter}</span><span class="mnemo-meaning">${meaning}</span></div>`
+      ).join('');
+      document.getElementById('mnemoTip').innerHTML = `💡 ${m.tip}`;
+      progress.querySelectorAll('.mnemo-pip').forEach((p, i) => p.classList.toggle('active', i === idx));
+      card.classList.remove('fade-out');
+    }, 350);
+  }
+
+  renderMnemo(0);
+  const mnemoTimer = setInterval(() => {
+    mnemoIndex = (mnemoIndex + 1) % MNEMONICS.length;
+    renderMnemo(mnemoIndex);
+  }, 18000);
+
+  window.nextMnemo = () => { clearInterval(mnemoTimer); mnemoIndex = (mnemoIndex + 1) % MNEMONICS.length; renderMnemo(mnemoIndex); };
+  window.prevMnemo = () => { clearInterval(mnemoTimer); mnemoIndex = (mnemoIndex - 1 + MNEMONICS.length) % MNEMONICS.length; renderMnemo(mnemoIndex); };
+}
+
 const MANTRAS = [
   { text: 'Built with passion for science and discovery', color: 'var(--teal)' },
   { text: 'You can just build things', color: 'var(--gold)' },
@@ -1916,7 +2368,7 @@ function initMantra() {
   setInterval(showMantra, 6000);
 }
 
-document.addEventListener('DOMContentLoaded', () => { initMemes(); initMantra(); });
+document.addEventListener('DOMContentLoaded', () => { initMemes(); initMantra(); initMnemonics(); });
 </script>
 </body>
 </html>
