@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth:*)",
+      "Bash(git config:*)",
+      "Bash(git --version)",
+      "Bash(where git:*)",
+      "Bash(echo $GITHUB_TOKEN)",
+      "Bash(curl --version)",
+      "Bash(where gh:*)",
+      "Read(//c/Program Files/GitHub CLI/**)",
+      "Read(//c/Users/mbaff/Downloads/NCLEX simulator/$LOCALAPPDATA/GitHubDesktop/app-*/resources/app/git/cmd/**)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" auth status)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" repo create nclex-simulator --public --source=. --remote=origin --push)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" api repos/mbaffour/nclex-simulator/pages --method POST --field source='{\"\"branch\"\":\"\"master\"\",\"\"path\"\":\"\"/\"\"}')",
+      "Bash(\"/c/Program Files/GitHub:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" api repos/mbaffour/nclex-simulator/pages)"
+    ]
+  }
+}
