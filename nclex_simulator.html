@@ -49,6 +49,114 @@
     pointer-events: none; z-index: 0;
   }
 
+  /* ─── FLOATING MEDICAL SYMBOLS ─── */
+  .med-particles {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  }
+  .med-particle {
+    position: absolute; font-size: 1.4rem; opacity: 0.06;
+    animation: floatUp linear infinite;
+    user-select: none;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(110vh) rotate(0deg);   opacity: 0; }
+    10%  { opacity: 0.07; }
+    90%  { opacity: 0.07; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* ─── EKG LINE ─── */
+  .ekg-bar {
+    width: 100%; height: 36px; overflow: hidden;
+    display: flex; align-items: center;
+    position: relative;
+  }
+  .ekg-svg { width: 100%; height: 36px; }
+  .ekg-path {
+    fill: none; stroke: var(--teal); stroke-width: 1.5;
+    stroke-dasharray: 1200; stroke-dashoffset: 1200;
+    animation: ekgDraw 3.5s ease-in-out infinite;
+    opacity: 0.55;
+  }
+  .ekg-path-red {
+    fill: none; stroke: var(--red); stroke-width: 1.5;
+    stroke-dasharray: 1200; stroke-dashoffset: 1200;
+    animation: ekgDraw 3.5s ease-in-out 1.75s infinite;
+    opacity: 0.35;
+  }
+  @keyframes ekgDraw {
+    0%   { stroke-dashoffset: 1200; opacity: 0; }
+    10%  { opacity: 0.6; }
+    60%  { stroke-dashoffset: 0; opacity: 0.6; }
+    85%  { stroke-dashoffset: 0; opacity: 0; }
+    100% { stroke-dashoffset: 1200; opacity: 0; }
+  }
+
+  /* ─── MEDICAL LOGO ICON ─── */
+  .logo-icon {
+    position: relative;
+  }
+  .logo-cross {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, #e63946, #c1121f);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 14px rgba(230,57,70,0.4);
+    flex-shrink: 0;
+  }
+  .logo-cross svg { width: 22px; height: 22px; fill: white; }
+
+  /* ─── VITALS STRIP ─── */
+  .vitals-strip {
+    display: flex; gap: 24px; align-items: center; flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 48px;
+    animation: fadeUp 0.6s 0.45s ease both;
+  }
+  .vital-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 20px; text-align: center; min-width: 100px;
+    position: relative; overflow: hidden;
+  }
+  .vital-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  }
+  .vital-card.green-vt::before { background: var(--green); }
+  .vital-card.teal-vt::before  { background: var(--teal); }
+  .vital-card.red-vt::before   { background: var(--red); }
+  .vital-card.gold-vt::before  { background: var(--gold); }
+  .vital-card.sky-vt::before   { background: var(--sky); }
+  .vital-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 4px; }
+  .vital-value {
+    font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700;
+  }
+  .vital-card.green-vt .vital-value { color: var(--green); }
+  .vital-card.teal-vt  .vital-value { color: var(--teal); }
+  .vital-card.red-vt   .vital-value { color: var(--red); }
+  .vital-card.gold-vt  .vital-value { color: var(--gold); }
+  .vital-card.sky-vt   .vital-value { color: var(--sky); }
+  .vital-unit { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+  .vital-dot {
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    margin-right: 4px; animation: pulse 1.4s infinite;
+  }
+  .vital-card.green-vt .vital-dot { background: var(--green); }
+  .vital-card.red-vt   .vital-dot { background: var(--red); animation-delay: 0.2s; }
+
+  /* ─── MEDICAL CROSS BADGE ─── */
+  .rx-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(230,57,70,0.1); border: 1px solid rgba(230,57,70,0.25);
+    color: #e63946; padding: 5px 14px; border-radius: 50px;
+    font-size: 0.72rem; letter-spacing: 1.2px; text-transform: uppercase;
+    margin-left: auto;
+  }
+
+  /* ─── HOSPITAL ICON ON MODE CARDS ─── */
+  .mode-card .hosp-icon {
+    position: absolute; top: 16px; right: 16px;
+    font-size: 1.1rem; opacity: 0.12;
+  }
+
   /* ─── LAYOUT ─── */
   #app { position: relative; z-index: 1; }
   .screen { display: none; min-height: 100vh; }
@@ -592,6 +700,7 @@
 <body>
 <div class="bg-grid"></div>
 <div class="bg-glow"></div>
+<div class="med-particles" id="medParticles"></div>
 
 <div id="loading">
   <div class="spinner"></div>
@@ -627,14 +736,27 @@
   <div id="home" class="screen active">
     <header>
       <div class="logo">
-        <div class="logo-icon">N</div>
+        <div class="logo-cross">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-4V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1z"/></svg>
+        </div>
         <div>
           <div class="logo-text">NCLEX Pro</div>
           <div class="logo-sub">Simulator</div>
         </div>
       </div>
-      <div style="font-size:0.8rem;color:var(--muted)">Next Gen NCLEX Ready</div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="rx-badge">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1z"/></svg>
+          Next Gen NCLEX Ready
+        </div>
+      </div>
     </header>
+    <div class="ekg-bar">
+      <svg class="ekg-svg" viewBox="0 0 1200 36" preserveAspectRatio="none">
+        <path class="ekg-path" d="M0,18 L80,18 L95,18 L100,6 L108,30 L114,2 L120,34 L126,18 L140,18 L220,18 L235,18 L240,6 L248,30 L254,2 L260,34 L266,18 L280,18 L360,18 L375,18 L380,6 L388,30 L394,2 L400,34 L406,18 L420,18 L500,18 L515,18 L520,6 L528,30 L534,2 L540,34 L546,18 L560,18 L640,18 L655,18 L660,6 L668,30 L674,2 L680,34 L686,18 L700,18 L780,18 L795,18 L800,6 L808,30 L814,2 L820,34 L826,18 L840,18 L920,18 L935,18 L940,6 L948,30 L954,2 L960,34 L966,18 L980,18 L1060,18 L1075,18 L1080,6 L1088,30 L1094,2 L1100,34 L1106,18 L1120,18 L1200,18"/>
+        <path class="ekg-path-red" d="M0,18 L80,18 L95,18 L100,6 L108,30 L114,2 L120,34 L126,18 L140,18 L220,18 L235,18 L240,6 L248,30 L254,2 L260,34 L266,18 L280,18 L360,18 L375,18 L380,6 L388,30 L394,2 L400,34 L406,18 L420,18 L500,18 L515,18 L520,6 L528,30 L534,2 L540,34 L546,18 L560,18 L640,18 L655,18 L660,6 L668,30 L674,2 L680,34 L686,18 L700,18 L780,18 L795,18 L800,6 L808,30 L814,2 L820,34 L826,18 L840,18 L920,18 L935,18 L940,6 L948,30 L954,2 L960,34 L966,18 L980,18 L1060,18 L1075,18 L1080,6 L1088,30 L1094,2 L1100,34 L1106,18 L1120,18 L1200,18"/>
+      </svg>
+    </div>
     <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:60px 20px;flex-direction:column">
       <div class="dedication-banner">❤️ Made with love for Peyton — Future ICU Nurse &amp; total rockstar 🩺</div>
       <div class="home-badge">✦ AI-Powered NCLEX Preparation</div>
@@ -642,24 +764,28 @@
       <p class="home-desc">The most realistic NCLEX simulation platform. AI-generated questions, Next Generation formats, instant rationales, and adaptive difficulty — designed by nursing educators.</p>
       <div class="mode-grid">
         <div class="mode-card" onclick="startSetup('practice')">
+          <span class="hosp-icon">🩺</span>
           <div class="mode-icon">📖</div>
           <div class="mode-title">Practice Mode</div>
           <div class="mode-desc">Study with instant feedback after each question. Rationales and NCLEX tips shown immediately.</div>
           <span class="mode-tag">Tutor Mode</span>
         </div>
         <div class="mode-card gold-accent" onclick="startSetup('cat')">
+          <span class="hosp-icon">🏥</span>
           <div class="mode-icon">🎯</div>
           <div class="mode-title">CAT Simulation</div>
           <div class="mode-desc">Adaptive testing that mirrors the real NCLEX. 75–145 questions, difficulty adjusts to your performance.</div>
           <span class="mode-tag" style="background:rgba(247,201,72,0.1);color:var(--gold)">Exam Mode</span>
         </div>
         <div class="mode-card sky-accent" onclick="startSetup('ngn')">
+          <span class="hosp-icon">💊</span>
           <div class="mode-icon">🧠</div>
           <div class="mode-title">Next Gen NCLEX</div>
           <div class="mode-desc">Master all NGN item types: Enhanced Hotspot, Matrix, Bow-tie, Drop-down, Extended Drag & Drop.</div>
           <span class="mode-tag" style="background:rgba(100,223,223,0.1);color:var(--sky)">NGN Focused</span>
         </div>
         <div class="mode-card" onclick="startSetup('rapid')">
+          <span class="hosp-icon">💉</span>
           <div class="mode-icon">⚡</div>
           <div class="mode-title">Rapid Review</div>
           <div class="mode-desc">High-yield 25-question sprint. Great for daily warmup or final week review.</div>
@@ -667,10 +793,38 @@
         </div>
       </div>
       <div class="stats-row">
-        <div class="stat-item"><div class="stat-num">1,500+</div><div class="stat-lbl">Questions</div></div>
+        <div class="stat-item"><div class="stat-num">170+</div><div class="stat-lbl">Questions</div></div>
         <div class="stat-item"><div class="stat-num">8</div><div class="stat-lbl">Clinical Domains</div></div>
         <div class="stat-item"><div class="stat-num">NGN</div><div class="stat-lbl">Item Types</div></div>
         <div class="stat-item"><div class="stat-num">AI</div><div class="stat-lbl">Rationales</div></div>
+      </div>
+      <!-- Vitals Strip -->
+      <div class="vitals-strip">
+        <div class="vital-card green-vt">
+          <div class="vital-label"><span class="vital-dot"></span>SpO₂</div>
+          <div class="vital-value" id="vSpO2">98%</div>
+          <div class="vital-unit">oxygen sat</div>
+        </div>
+        <div class="vital-card red-vt">
+          <div class="vital-label"><span class="vital-dot"></span>HR</div>
+          <div class="vital-value" id="vHR">72</div>
+          <div class="vital-unit">bpm</div>
+        </div>
+        <div class="vital-card sky-vt">
+          <div class="vital-label">BP</div>
+          <div class="vital-value">120/80</div>
+          <div class="vital-unit">mmHg</div>
+        </div>
+        <div class="vital-card gold-vt">
+          <div class="vital-label">Temp</div>
+          <div class="vital-value">98.6°</div>
+          <div class="vital-unit">°F oral</div>
+        </div>
+        <div class="vital-card teal-vt">
+          <div class="vital-label">RR</div>
+          <div class="vital-value">16</div>
+          <div class="vital-unit">breaths/min</div>
+        </div>
       </div>
       <!-- Mnemonics Panel -->
       <div class="mnemo-wrap">
@@ -710,7 +864,7 @@
   <div id="setup" class="screen">
     <header>
       <div class="logo">
-        <div class="logo-icon">N</div>
+        <div class="logo-cross"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-4V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1z"/></svg></div>
         <div><div class="logo-text">NCLEX Pro</div></div>
       </div>
       <button class="btn btn-secondary" onclick="showScreen('home')" style="padding:8px 18px;font-size:0.85rem">← Back</button>
@@ -767,7 +921,7 @@
   <div id="exam" class="screen">
     <header>
       <div class="logo">
-        <div class="logo-icon">N</div>
+        <div class="logo-cross"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-4V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1z"/></svg></div>
         <div><div class="logo-text">NCLEX Pro</div></div>
       </div>
       <div class="header-status">
@@ -799,7 +953,7 @@
   <div id="results" class="screen">
     <header>
       <div class="logo">
-        <div class="logo-icon">N</div>
+        <div class="logo-cross"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-4V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1z"/></svg></div>
         <div><div class="logo-text">NCLEX Pro</div></div>
       </div>
     </header>
@@ -1891,6 +2045,45 @@ function typeLabel(t) {
   };
   return labels[t] || t;
 }
+
+// ══════════════════════════════════════════════════════════════════
+//  MEDICAL THEME — PARTICLES + LIVE VITALS
+// ══════════════════════════════════════════════════════════════════
+function initMedTheme() {
+  // Floating background particles
+  const container = document.getElementById('medParticles');
+  if (container) {
+    const symbols = ['🩺','💊','💉','🏥','❤️','🩹','🔬','🧬','⚕️','🫀','🫁','🧪','📋','🩻','⚡','➕'];
+    for (let i = 0; i < 28; i++) {
+      const el = document.createElement('div');
+      el.className = 'med-particle';
+      el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+      el.style.left = (Math.random() * 100) + 'vw';
+      el.style.fontSize = (0.9 + Math.random() * 1.4) + 'rem';
+      el.style.animationDuration = (18 + Math.random() * 22) + 's';
+      el.style.animationDelay = (-Math.random() * 30) + 's';
+      el.style.opacity = (0.04 + Math.random() * 0.06);
+      container.appendChild(el);
+    }
+  }
+
+  // Live-pulsing HR vital
+  const hrEl = document.getElementById('vHR');
+  const spo2El = document.getElementById('vSpO2');
+  if (hrEl) {
+    setInterval(() => {
+      const hr = 68 + Math.floor(Math.random() * 10);
+      hrEl.textContent = hr;
+    }, 2200);
+  }
+  if (spo2El) {
+    setInterval(() => {
+      const sat = 97 + Math.floor(Math.random() * 3);
+      spo2El.textContent = sat + '%';
+    }, 3800);
+  }
+}
+document.addEventListener('DOMContentLoaded', initMedTheme);
 
 // CSS shake animation
 const style = document.createElement('style');
