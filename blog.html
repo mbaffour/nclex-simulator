@@ -193,6 +193,27 @@
     background: rgba(10,22,40,0.6);
   }
   footer .heart { color: var(--red); }
+  .stats-bar {
+    position: relative; z-index: 1;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0;
+    max-width: 860px; margin: 0 auto 0;
+    border: 1px solid var(--border); border-radius: 16px;
+    background: var(--card); overflow: hidden;
+  }
+  .stat-block {
+    flex: 1; min-width: 130px;
+    padding: 28px 20px; text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .stat-block:last-child { border-right: none; }
+  .stat-block .num {
+    font-family: 'Fraunces', serif; font-size: 2.2rem;
+    color: var(--teal); line-height: 1;
+  }
+  .stat-block .lbl {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.2px;
+    color: var(--muted); margin-top: 6px;
+  }
   @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
   .hero { animation: fadeUp 0.7s ease both; }
 </style>
@@ -212,7 +233,7 @@
 <div class="hero">
   <div class="hero-tag">✦ Product Release · March 2026</div>
   <h1 class="hero-title">Introducing <span class="accent">NCLEX Pro Simulator</span> — Study Smarter, Pass Faster</h1>
-  <p class="hero-subtitle">A free, AI-powered NCLEX practice platform with adaptive testing, Next Gen formats, instant AI rationales, and just enough nursing humor to keep you sane during exam prep.</p>
+  <p class="hero-subtitle">A free, AI-powered NCLEX practice platform with <strong style="color:var(--teal)">1,800 practice questions</strong> across all 8 clinical domains — adaptive CAT testing, all 6 Next Gen formats, instant AI rationales, and just enough nursing humor to keep you sane during exam prep.</p>
   <div class="hero-dedication">❤️ Built with love for Peyton — future ICU nurse &amp; total rockstar 🩺</div>
   <div class="cta-group">
     <a class="btn-primary" href="nclex_simulator.html">🚀 Start Practicing Now — It's Free</a>
@@ -220,7 +241,16 @@
   </div>
 </div>
 
-<div class="divider"></div>
+<div class="stats-bar">
+  <div class="stat-block"><div class="num">1,800</div><div class="lbl">Practice Questions</div></div>
+  <div class="stat-block"><div class="num">8</div><div class="lbl">Clinical Domains</div></div>
+  <div class="stat-block"><div class="num">6</div><div class="lbl">NGN Item Types</div></div>
+  <div class="stat-block"><div class="num">4</div><div class="lbl">Study Modes</div></div>
+  <div class="stat-block"><div class="num">CAT</div><div class="lbl">Adaptive Testing</div></div>
+  <div class="stat-block"><div class="num">AI</div><div class="lbl">Powered Rationales</div></div>
+</div>
+
+<div class="divider" style="margin-top:48px;"></div>
 
 <article>
 
@@ -242,39 +272,39 @@
 
   <h2>What It Does</h2>
   <p>
-    NCLEX Pro Simulator is a single HTML file you can open in any browser — no server, no account, no subscription. It covers all 8 official NCLEX clinical domains and supports every question format you'll see on the real exam.
+    NCLEX Pro Simulator is a single HTML file you can open in any browser — no server, no account, no subscription. It packs <strong>1,800 practice questions</strong> across all 8 official NCLEX clinical domains, four distinct study modes, and every question format you'll see on the real exam — including all six Next Generation NCLEX item types introduced in 2023.
   </p>
 
   <div class="feature-grid">
     <div class="feature-item">
       <span class="icon">📖</span>
-      <div class="title">Practice Mode</div>
-      <div class="desc">Tutor-style feedback after every question. Rationale, NCLEX tips, and AI clinical insight shown immediately.</div>
+      <div class="title">Practice Mode — 1,800 Questions</div>
+      <div class="desc">Tutor-style feedback after every question. Filter by domain, include NGN items, set timed mode. Rationale + NCLEX tip + AI clinical insight shown immediately.</div>
     </div>
     <div class="feature-item">
       <span class="icon">🎯</span>
-      <div class="title">CAT Simulation</div>
-      <div class="desc">Adaptive difficulty that mirrors the real NCLEX. 75–145 questions, adjusts to your performance in real time.</div>
+      <div class="title">CAT Simulation — True Adaptive</div>
+      <div class="desc">75–145 questions with real-time difficulty calibration. Mirrors the actual NCLEX algorithm — starts at medium difficulty and adjusts after every answer.</div>
     </div>
     <div class="feature-item">
       <span class="icon">🧠</span>
-      <div class="title">Next Gen NCLEX</div>
-      <div class="desc">Focused practice on NGN formats: Matrix Grid, Bow-tie, Enhanced Hotspot, Drop-down Cloze, and more.</div>
+      <div class="title">Next Gen NCLEX — All 6 Types</div>
+      <div class="desc">Matrix Grid, Bow-tie, Enhanced Hotspot, Drop-down Cloze, Ordered Response, and Extended Drag & Drop — every format the 2023 NCLEX can throw at you.</div>
     </div>
     <div class="feature-item">
       <span class="icon">⚡</span>
-      <div class="title">Rapid Review</div>
-      <div class="desc">25-question sprints for daily warmup or final week cramming. High-yield, fast feedback.</div>
+      <div class="title">Rapid Review — 25 Questions</div>
+      <div class="desc">High-yield sprints across the most-tested NCLEX topics. Ideal for daily warmup, domain targeting, or final-week cramming sessions.</div>
     </div>
     <div class="feature-item">
       <span class="icon">🤖</span>
-      <div class="title">AI Rationales</div>
-      <div class="desc">Claude AI generates a unique clinical insight for each question — mnemonics, key values, what distinguishes wrong answers.</div>
+      <div class="title">AI Rationales (Claude API)</div>
+      <div class="desc">Anthropic's Claude generates a unique clinical insight for each question — bedside mnemonics, critical lab values, and exactly why each wrong answer is wrong.</div>
     </div>
     <div class="feature-item">
       <span class="icon">📊</span>
-      <div class="title">Domain Breakdown</div>
-      <div class="desc">See exactly where you're strong and where you need work — across all 8 NCLEX clinical domains.</div>
+      <div class="title">Domain Performance Breakdown</div>
+      <div class="desc">Live bar charts after every session show your accuracy across all 8 NCLEX clinical domains. Know exactly where to focus next.</div>
     </div>
   </div>
 
@@ -283,7 +313,7 @@
     The National Council Licensure Examination is a high-stakes, adaptive exam that every nursing graduate must pass to become a licensed RN. The passing standard is rigorous — you're not just answering questions, you're demonstrating <strong>clinical judgment</strong> at a safe practice level.
   </p>
   <p>
-    And then in 2023, NCSBN made it harder. The <em>Next Generation NCLEX</em> introduced new question formats that test clinical judgment more deeply: Matrix Grids, Bow-tie items, Enhanced Hotspots. The exam doesn't just want you to know facts — it wants you to think like a nurse.
+    And then in 2023, NCSBN made it harder. The <em>Next Generation NCLEX</em> introduced six new question formats that test clinical judgment more deeply: Matrix Grids, Bow-tie items, Enhanced Hotspots, Drop-down Cloze, Ordered Response, and Extended Drag & Drop. The exam doesn't just want you to know facts — it wants you to think like a nurse at the bedside.
   </p>
 
   <div class="callout">
