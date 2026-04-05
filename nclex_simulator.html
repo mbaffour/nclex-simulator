@@ -735,6 +735,31 @@
   }
   .home-screen-footer .heart { color: var(--red); }
   .home-screen-footer a { color: var(--teal); text-decoration: none; }
+
+  /* ── PROGRESS SCREEN ── */
+  #progress { overflow-y: auto; }
+  .progress-pill {
+    display: none; align-items: center; gap: 8px;
+    background: rgba(0,201,167,0.1); border: 1px solid rgba(0,201,167,0.25);
+    color: var(--teal); padding: 6px 14px; border-radius: 50px;
+    font-size: 0.75rem; font-weight: 500; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .progress-pill:hover { background: rgba(0,201,167,0.18); }
+  .progress-pill.loaded { display: flex; }
+  .progress-action-btns {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .prog-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--card); color: var(--muted);
+    font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+  }
+  .prog-btn:hover { border-color: var(--teal); color: var(--white); }
+  .prog-btn.primary { background: linear-gradient(135deg,var(--teal),var(--sky)); color: var(--navy); border-color: transparent; }
+  .prog-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,201,167,0.3); }
 </style>
 </head>
 <body>
@@ -784,7 +809,13 @@
           <div class="logo-sub">Simulator</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:16px;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span id="progressBadge" class="progress-pill" onclick="showProgressDashboard()">📊 <span id="progressBadgeText">0 answered</span></span>
+        <div class="progress-action-btns">
+          <button class="prog-btn" onclick="showProgressDashboard()" title="View your cumulative progress">📈 My Progress</button>
+          <button class="prog-btn" onclick="triggerImport()" title="Load a saved progress JSON file">📂 Load</button>
+          <button class="prog-btn primary" onclick="exportProgress()" title="Export progress as JSON">💾 Save</button>
+        </div>
         <div class="rx-badge">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1z"/></svg>
           Next Gen NCLEX Ready
@@ -997,8 +1028,21 @@
         <div class="logo-cross"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-4V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1z"/></svg></div>
         <div><div class="logo-text">NCLEX Pro</div></div>
       </div>
+      <button class="prog-btn primary" onclick="exportProgress()" style="margin-left:auto">💾 Save Progress</button>
     </header>
     <div id="resultsContent"></div>
+  </div>
+
+  <!-- ═══════════ PROGRESS SCREEN ═══════════ -->
+  <div id="progress" class="screen">
+    <header>
+      <div class="logo">
+        <div class="logo-cross"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-4V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1z"/></svg></div>
+        <div><div class="logo-text">NCLEX Pro</div><div class="logo-sub">My Progress</div></div>
+      </div>
+      <button class="prog-btn" onclick="showScreen('home')" style="margin-left:auto">← Home</button>
+    </header>
+    <div id="progressContent"></div>
   </div>
 
 </div><!-- #app -->
@@ -3215,7 +3259,7 @@ tags:["CABG","pre-operative","NGN","metformin","hyperglycemia","hypokalemia","ca
 {id:1662,domain:"reduction",type:"mcq",stem:"A nurse is caring for a patient following a total knee replacement. Which complication is the nurse MOST concerned about and should assess for FIRST?",options:["A. Wound infection — monitor for redness and purulent drainage","B. Deep vein thrombosis (DVT) — assess calf pain, swelling, warmth, and Homans' sign; ensure DVT prophylaxis is ordered","C. Pneumonia — auscultate lung sounds hourly","D. Urinary retention — perform bladder scan"],correct:1,rationale:"Post-total knee replacement (TKR) priority complication: DVT is the most common serious complication following total joint replacement (among the highest-risk orthopedic procedures for VTE). Risk: immobility, hypercoagulability (surgery), venous stasis. Assessment: Homan's sign (calf pain with dorsiflexion — low sensitivity/specificity but still assessed), calf tenderness, swelling, warmth, redness. DVT prophylaxis: LMWH, factor Xa inhibitors (rivaroxaban), aspirin, SCDs, early ambulation.",tip:"TKR/THR VTE prophylaxis: LMWH (enoxaparin) or rivaroxaban/apixaban for 10-35 days. SCDs during hospitalization. Early ambulation. DVT signs: unilateral calf swelling, pain, warmth. PE risk: tachycardia, dyspnea, pleuritic chest pain, hypoxia. Also monitor post-TKR: infection (wound drainage, fever), peroneal nerve injury (numbness/weakness dorsiflexion foot), compartment syndrome (pain out of proportion, pressure >30 mmHg).",tags:["total knee replacement","DVT","deep vein thrombosis","VTE prophylaxis","orthopedic surgery","Homans sign","anticoagulation"]},
 {id:1663,domain:"psychosocial",type:"mcq",stem:"A nurse enters a patient's room and finds the patient crying. The nurse asks, 'What's wrong?' and the patient says, 'Everything is wrong.' Which response BEST demonstrates therapeutic communication?",options:["A. 'I'm sure things will get better. Try to look on the bright side.'","B. 'Everything seems overwhelming right now. Can you tell me more about what you're feeling?'","C. 'Would you like me to call the chaplain for you?'","D. 'There's nothing to cry about — many patients have it much worse.'"],correct:1,rationale:"Therapeutic communication: The best response acknowledges the patient's feelings (reflection/empathy) and encourages expression (open-ended statement). 'Everything seems overwhelming' = reflection (restating feelings). 'Can you tell me more' = open-ended encouragement. Blocks to therapeutic communication: false reassurance ('everything will be fine'), premature advice (chaplain without exploring), minimizing feelings ('others have it worse'). Goal: validate feelings, encourage expression, establish trust.",tip:"Therapeutic communication techniques: Reflection (repeating feelings back), Open-ended questions, Active listening, Silence (allows processing), Clarification, Focusing, Summarizing. Non-therapeutic: False reassurance ('don't worry'), Minimizing ('others have it worse'), Closed questions, Changing subject, Giving advice prematurely. Empathy = acknowledging feelings without projection. Sympathy = sharing in feelings (not therapeutic role).",tags:["therapeutic communication","reflection","open-ended questions","empathy","psychiatric nursing","communication","patient-centered care"]},
 {id:1664,domain:"physio",type:"mcq",stem:"A patient with hyperthyroidism is preparing for thyroid surgery. The nurse knows the patient should receive which pre-operative treatment to reduce the risk of thyroid storm during surgery?",options:["A. Levothyroxine to supplement thyroid hormones","B. Antithyroid medications (methimazole or PTU), beta-blockers, and Lugol's solution (potassium iodide) to reduce thyroid vascularity and hormone levels","C. High-dose aspirin to reduce inflammation","D. Corticosteroids to suppress the thyroid directly"],correct:1,rationale:"Pre-operative hyperthyroidism management: Before thyroid surgery, the patient must achieve a euthyroid state to prevent thyroid storm. Protocol: 1) Antithyroid drugs (methimazole or PTU) to block hormone synthesis. 2) Beta-blockers (propranolol) to reduce sympathetic symptoms. 3) Lugol's solution (potassium iodide) 10-14 days pre-op — reduces thyroid vascularity (reduces bleeding risk during surgery) and temporarily inhibits hormone release. Goal: euthyroid state before surgery.",tip:"Thyroid storm triggers: Surgery, infection, iodine contrast, thyroid palpation in untreated hyperthyroidism. Prevention: achieve euthyroid state before surgery. Thyroid storm treatment: PTU (blocks synthesis and peripheral conversion), Beta-blockers (propranolol), Steroids (dexamethasone — block peripheral conversion), Lugol's solution (given after PTU/methimazole — blocks release), Antipyretics (acetaminophen — NOT aspirin, displaces T4 from binding). Supportive: cooling, IV fluids.",tags:["hyperthyroidism","thyroid surgery","Lugol's solution","methimazole","thyroid storm prevention","pre-operative","euthyroid"]},
-{id:1665,domain:"physio",type:"mcq",stem:"A nurse is teaching a patient with rheumatoid arthritis about joint protection. Which statement by the patient indicates correct understanding?",options:["A. 'I should avoid all exercise to protect my joints from further damage.'","B. 'I should use larger joints to perform tasks, take frequent rest breaks, and use assistive devices to reduce joint stress.'","C. 'I should grip objects tightly to maintain hand strength.'","D. 'Performing tasks during peak morning stiffness will help loosen my joints.'],correct:1,rationale:"Joint protection principles in RA: Use larger, stronger joints (e.g., use palm/wrist instead of fingers to carry items). Distribute load over multiple joints. Avoid positions of deformity. Use assistive devices (jar openers, grab bars, elevated toilet seats). Rest during flares but maintain ROM exercises during remission. Activity DURING morning stiffness: warm-up exercises during morning stiffness (not peak activity). Tight gripping = harmful. RA exercise: range of motion and isometric exercises beneficial.",tip:"RA joint protection: Large > small joints for tasks. Spread loads across multiple joints. Rest when fatigued/during flares. Use assistive devices. Avoid: tight gripping, carrying heavy loads with fingers, prolonged static positions. Exercise: ROM exercises maintain joint mobility; strengthening during remission. Warmth/heat (moist heat) helps morning stiffness. Night splints for wrists: reduce deformity. Occupational therapy referral.",tags:["rheumatoid arthritis","joint protection","patient education","assistive devices","large joint use","occupational therapy","RA management"]},
+{id:1665,domain:"physio",type:"mcq",stem:"A nurse is teaching a patient with rheumatoid arthritis about joint protection. Which statement by the patient indicates correct understanding?",options:["A. 'I should avoid all exercise to protect my joints from further damage.'","B. 'I should use larger joints to perform tasks, take frequent rest breaks, and use assistive devices to reduce joint stress.'","C. 'I should grip objects tightly to maintain hand strength.'","D. 'Performing tasks during peak morning stiffness will help loosen my joints.'"],correct:1,rationale:"Joint protection principles in RA: Use larger, stronger joints (e.g., use palm/wrist instead of fingers to carry items). Distribute load over multiple joints. Avoid positions of deformity. Use assistive devices (jar openers, grab bars, elevated toilet seats). Rest during flares but maintain ROM exercises during remission. Activity DURING morning stiffness: warm-up exercises during morning stiffness (not peak activity). Tight gripping = harmful. RA exercise: range of motion and isometric exercises beneficial.",tip:"RA joint protection: Large > small joints for tasks. Spread loads across multiple joints. Rest when fatigued/during flares. Use assistive devices. Avoid: tight gripping, carrying heavy loads with fingers, prolonged static positions. Exercise: ROM exercises maintain joint mobility; strengthening during remission. Warmth/heat (moist heat) helps morning stiffness. Night splints for wrists: reduce deformity. Occupational therapy referral.",tags:["rheumatoid arthritis","joint protection","patient education","assistive devices","large joint use","occupational therapy","RA management"]},
 {id:1666,domain:"management",type:"sata",stem:"A nurse in the medical-surgical unit is responsible for four patients. The nurse must prioritize assessments and care. Rank the following patient situations and select ALL patients who require immediate assessment. Select all that apply.",options:["A. Patient who was admitted 6 hours ago with chest pain and now has a new onset of diaphoresis and jaw pain","B. Patient with chronic back pain who is requesting pain medication at this time","C. Patient recovering from abdominal surgery on post-op day 4 who now has a temperature of 39.2°C and reports chills","D. Patient with stable heart failure who is requesting help to the bathroom","E. Patient who was started on a new blood pressure medication 30 minutes ago and now reports lightheadedness and has BP of 86/52"],correct:[0,2,4],rationale:"Immediate assessment needed: A) Chest pain patient with new diaphoresis and jaw pain = classic signs of acute MI — emergency. C) Post-surgical fever (39.2°C) + chills on day 4 = signs of infection/sepsis — concerning, needs assessment. E) New medication → hypotension (86/52) + dizziness = adverse drug reaction causing hemodynamic instability — needs immediate assessment. Chronic back pain patient requesting pain medication: painful but stable. Stable HF patient requesting bathroom help: routine care, delegate to UAP.",tip:"Priority framework: First — acute changes from baseline (new chest pain diaphoresis), hemodynamic instability (hypotension), potential sepsis. Then — pain management, routine care. Key principle: acute changes from baseline always take priority over chronic stable conditions. Use ABCs, hemodynamic status, and change-from-baseline to triage. Delegate stable, routine tasks to UAP.",tags:["priority nursing","triage","chest pain","sepsis","adverse drug reaction","hypotension","patient safety"]},
 {id:1667,domain:"physio",type:"mcq",stem:"A nurse is assessing a patient on mechanical ventilation. The ventilator alarm is sounding and the nurse notes the patient's SpO2 has dropped from 98% to 82%. The patient appears anxious and is breathing out of synchrony with the ventilator. What is the nurse's FIRST action?",options:["A. Check the ventilator settings and reset the alarm","B. Disconnect the ventilator and manually ventilate the patient with a bag-valve mask while assessing the cause","C. Increase the FiO2 on the ventilator to 100%","D. Administer a sedative to reduce the patient's anxiety"],correct:1,rationale:"Ventilator alarm with acute deterioration: When a patient deteriorates on a ventilator (SpO2 drop to 82%, patient-ventilator dyssynchrony), the FIRST priority is to ensure oxygenation and ventilation. If unable to quickly identify and fix the cause: DISCONNECT ventilator, manually ventilate with 100% O2 via bag-valve mask. This ensures patient gets oxygen while you assess the cause (circuit disconnect, airway obstruction, pneumothorax, mucus plug). DOPES mnemonic: Displacement, Obstruction, Pneumothorax, Equipment failure, Stacking (breath stacking).",tip:"Ventilator emergency (DOPES): Displacement (ET tube), Obstruction (mucus plug, biting tube), Pneumothorax (tension), Equipment failure, Stacking (auto-PEEP). If patient crashes on vent: bag-valve-mask FIRST, identify cause. Check: ET tube position (bilateral breath sounds, EtCO2), suction, CXR if needed. Pneumothorax on vent: immediate needle decompression. Auto-PEEP: disconnect briefly for air to escape.",tags:["mechanical ventilation","ventilator alarm","DOPES","bag-valve mask","oxygen","SpO2","respiratory emergency"]},
 {id:1668,domain:"physio",type:"mcq",stem:"A nurse is providing discharge teaching to a patient who had a permanent pacemaker implanted yesterday. Which patient statement indicates the need for further teaching?",options:["A. 'I should carry my pacemaker identification card at all times.'","B. 'I can have an MRI of my knee when needed — the pacemaker has no effect on MRI.'","C. 'I should avoid placing my cell phone directly over the pacemaker site.'","D. 'I should report any dizziness, fainting, or return of symptoms like before the pacemaker.'"],correct:1,rationale:"Pacemaker patient teaching: MRI statement is INCORRECT — most standard (non-MRI-conditional) pacemakers are contraindicated with MRI. The magnetic field can interfere with pacemaker function. Some newer MRI-conditional pacemakers exist. Patient needs to check with cardiologist. Correct teachings: carry ID card (for medical personnel and airport screening), avoid placing cell phone over device (2-3 inch distance), report symptoms of failure (dizziness, fainting, palpitations, edema, shortness of breath).",tip:"Pacemaker discharge teaching: Carry ID card. Avoid cell phone over device site. Airport metal detectors: inform security, use wand (not over device). MRI: most pacemakers = MRI-conditional or contraindicated — check specifics. AVOID: prolonged exposure to strong magnets (MRI, arc welding, large motors). OK: microwave ovens (modern ones safe), electronic security gates (walk through quickly). Call if: dizziness, SOB, syncope, hiccups (diaphragm pacing), edema.",tags:["pacemaker","pacemaker teaching","MRI contraindication","pacemaker identification card","discharge education","cardiac device","implantable device"]},
@@ -3997,6 +4041,7 @@ function showResults() {
   document.getElementById('resultsContent').innerHTML = html;
   showScreen('results');
   stopExamTimer();
+  saveSessionToProgress(questions, answers, domainResults, correct, answered, pct, examState.mode, timeStr);
 }
 
 function getCorrectLabel(q) {
@@ -4576,7 +4621,249 @@ function initMantra() {
   setInterval(showMantra, 6000);
 }
 
-document.addEventListener('DOMContentLoaded', () => { initMemes(); initMantra(); initMnemonics(); });
+document.addEventListener('DOMContentLoaded', () => { initMemes(); initMantra(); initMnemonics(); initProgress(); });
+
+// ══════════════════════════════════════════════════════════════════
+//  PROGRESS TRACKING
+// ══════════════════════════════════════════════════════════════════
+const _DOMAINS_ALL = ['management','safety','health','psychosocial','basic','pharmacology','reduction','physio'];
+let progressData = null;
+
+function _progressEmpty() {
+  const today = new Date().toISOString().slice(0,10);
+  return {
+    version: '1.0',
+    createdAt: today,
+    lastUpdated: today,
+    totalAnswered: 0,
+    totalCorrect: 0,
+    sessions: [],
+    domainTotals: Object.fromEntries(_DOMAINS_ALL.map(d => [d, {correct:0, total:0}])),
+    questionHistory: {}
+  };
+}
+
+function initProgress() {
+  try {
+    const stored = localStorage.getItem('nclexProgress');
+    if (stored) { progressData = JSON.parse(stored); updateProgressBadge(); }
+  } catch(e) { progressData = null; }
+}
+
+function _autoSaveProgress() {
+  if (!progressData) return;
+  try { localStorage.setItem('nclexProgress', JSON.stringify(progressData)); } catch(e) {}
+}
+
+function updateProgressBadge() {
+  const badge = document.getElementById('progressBadge');
+  const text = document.getElementById('progressBadgeText');
+  if (!badge || !text) return;
+  if (!progressData || progressData.totalAnswered === 0) { badge.style.display = 'none'; return; }
+  const pct = Math.round((progressData.totalCorrect / progressData.totalAnswered) * 100);
+  text.textContent = `${progressData.totalAnswered} answered · ${pct}% overall`;
+  badge.style.display = 'flex';
+}
+
+function saveSessionToProgress(questions, answers, domainResults, correct, answered, pct, mode, timeStr) {
+  if (!progressData) progressData = _progressEmpty();
+  const today = new Date().toISOString().slice(0,10);
+  progressData.lastUpdated = today;
+  progressData.totalAnswered += answered;
+  progressData.totalCorrect += correct;
+
+  Object.entries(domainResults).forEach(([domain, data]) => {
+    if (!progressData.domainTotals[domain]) progressData.domainTotals[domain] = {correct:0, total:0};
+    progressData.domainTotals[domain].correct += data.correct;
+    progressData.domainTotals[domain].total += data.total;
+  });
+
+  questions.forEach((q, i) => {
+    const ans = answers[i];
+    if (ans === undefined) return;
+    const id = String(q.id);
+    if (!progressData.questionHistory[id]) progressData.questionHistory[id] = {seen:0, correct:0, lastSeen:null};
+    progressData.questionHistory[id].seen++;
+    if (checkCorrect(q, ans)) progressData.questionHistory[id].correct++;
+    progressData.questionHistory[id].lastSeen = today;
+  });
+
+  progressData.sessions.push({ date: today, mode, answered, correct, pct, time: timeStr,
+    domains: Object.fromEntries(Object.entries(domainResults).map(([d,v]) => [d,{correct:v.correct,total:v.total}]))
+  });
+
+  _autoSaveProgress();
+  updateProgressBadge();
+}
+
+function exportProgress() {
+  if (!progressData || progressData.totalAnswered === 0) {
+    alert('No progress to export yet. Complete at least one session first!'); return;
+  }
+  progressData.lastUpdated = new Date().toISOString().slice(0,10);
+  const blob = new Blob([JSON.stringify(progressData, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `nclex-progress-${progressData.lastUpdated}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function triggerImport() {
+  document.getElementById('progressFileInput').click();
+}
+
+function importProgressFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const loaded = JSON.parse(e.target.result);
+      if (!loaded.version || !Array.isArray(loaded.sessions)) throw new Error('Invalid format');
+      if (progressData && progressData.totalAnswered > 0) {
+        progressData.totalAnswered += loaded.totalAnswered || 0;
+        progressData.totalCorrect += loaded.totalCorrect || 0;
+        progressData.sessions = [...(loaded.sessions || []), ...progressData.sessions]
+          .sort((a,b) => a.date < b.date ? -1 : 1);
+        Object.entries(loaded.domainTotals || {}).forEach(([d,v]) => {
+          if (!progressData.domainTotals[d]) progressData.domainTotals[d] = {correct:0, total:0};
+          progressData.domainTotals[d].correct += v.correct || 0;
+          progressData.domainTotals[d].total += v.total || 0;
+        });
+        Object.entries(loaded.questionHistory || {}).forEach(([id,v]) => {
+          if (!progressData.questionHistory[id]) progressData.questionHistory[id] = {seen:0, correct:0, lastSeen:null};
+          progressData.questionHistory[id].seen += v.seen || 0;
+          progressData.questionHistory[id].correct += v.correct || 0;
+          progressData.questionHistory[id].lastSeen = v.lastSeen || progressData.questionHistory[id].lastSeen;
+        });
+        progressData.lastUpdated = new Date().toISOString().slice(0,10);
+      } else {
+        progressData = loaded;
+      }
+      _autoSaveProgress();
+      updateProgressBadge();
+      showProgressDashboard();
+    } catch(err) {
+      alert('Could not load progress file. Make sure it\'s a valid NCLEX Pro progress JSON.');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function clearProgress() {
+  if (!confirm('Clear all progress data? This cannot be undone.')) return;
+  progressData = null;
+  localStorage.removeItem('nclexProgress');
+  updateProgressBadge();
+  showScreen('home');
+}
+
+function showProgressDashboard() {
+  const el = document.getElementById('progressContent');
+  if (!progressData || progressData.totalAnswered === 0) {
+    el.innerHTML = `<div style="text-align:center;padding:80px 20px;color:var(--muted)">
+      <div style="font-size:3rem;margin-bottom:16px">📊</div>
+      <h2 style="font-family:'Fraunces',serif;color:var(--white);margin-bottom:12px">No Progress Yet</h2>
+      <p>Complete your first practice session to start tracking your progress.</p>
+      <button class="btn btn-primary" onclick="showScreen('home')" style="margin-top:28px">Start Practicing →</button>
+    </div>`;
+    showScreen('progress'); return;
+  }
+
+  const totalPct = Math.round((progressData.totalCorrect / progressData.totalAnswered) * 100);
+  const sessCount = progressData.sessions.length;
+  const uniqueQ = Object.keys(progressData.questionHistory).length;
+  const pctColor = totalPct >= 65 ? 'var(--teal)' : totalPct >= 50 ? 'var(--gold)' : 'var(--red)';
+
+  const domainArr = Object.entries(progressData.domainTotals)
+    .filter(([,v]) => v.total > 0)
+    .map(([d,v]) => ({domain:d, pct:Math.round((v.correct/v.total)*100), correct:v.correct, total:v.total}))
+    .sort((a,b) => a.pct - b.pct);
+
+  const weakest = domainArr.slice(0, 3);
+
+  const barColor = p => p >= 70 ? 'linear-gradient(90deg,var(--teal),var(--sky))' : p >= 50 ? 'linear-gradient(90deg,var(--gold),#ffaa00)' : 'linear-gradient(90deg,var(--red),#ff9999)';
+  const scoreColor = p => p >= 65 ? 'var(--teal)' : p >= 50 ? 'var(--gold)' : 'var(--red)';
+
+  el.innerHTML = `<div style="max-width:720px;margin:0 auto;padding:40px 20px 80px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
+      <h2 style="font-family:'Fraunces',serif;font-size:1.8rem;color:var(--white)">My Progress</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="prog-btn primary" onclick="exportProgress()">💾 Export JSON</button>
+        <button class="prog-btn" onclick="triggerImport()">📂 Load JSON</button>
+        <button class="prog-btn" onclick="clearProgress()" style="color:var(--red);border-color:rgba(255,107,107,0.3)">🗑 Clear</button>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:28px">
+      ${[
+        {num: progressData.totalAnswered, lbl: 'Total Answered', color: 'var(--teal)'},
+        {num: `${totalPct}%`, lbl: 'Overall Accuracy', color: pctColor},
+        {num: sessCount, lbl: 'Sessions', color: 'var(--sky)'},
+        {num: uniqueQ, lbl: 'Unique Questions', color: 'var(--gold)'},
+      ].map(s => `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center">
+        <div style="font-family:'Fraunces',serif;font-size:2rem;color:${s.color}">${s.num}</div>
+        <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:4px">${s.lbl}</div>
+      </div>`).join('')}
+    </div>
+
+    ${weakest.length > 0 ? `<div style="background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.2);border-radius:12px;padding:20px 24px;margin-bottom:20px">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--red);margin-bottom:14px">⚠ Focus Areas — Weakest Domains</div>
+      ${weakest.map(w => `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <span style="min-width:190px;font-size:0.83rem;color:var(--white)">${domainLabel(w.domain)}</span>
+        <div style="flex:1;height:6px;background:var(--navy-mid);border-radius:3px">
+          <div style="height:100%;width:${w.pct}%;background:${barColor(w.pct)};border-radius:3px"></div>
+        </div>
+        <span style="font-size:0.8rem;color:var(--muted);min-width:72px;text-align:right">${w.pct}% (${w.correct}/${w.total})</span>
+      </div>`).join('')}
+    </div>` : ''}
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--teal);margin-bottom:16px">All Domains — Cumulative Performance</div>
+      ${domainArr.map(w => `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <span style="min-width:190px;font-size:0.83rem;color:var(--white)">${domainLabel(w.domain)}</span>
+        <div style="flex:1;height:8px;background:var(--navy-mid);border-radius:4px">
+          <div style="height:100%;width:${w.pct}%;background:${barColor(w.pct)};border-radius:4px;transition:width 0.8s ease"></div>
+        </div>
+        <span style="font-size:0.8rem;color:var(--muted);min-width:80px;text-align:right">${w.pct}% (${w.correct}/${w.total})</span>
+      </div>`).join('')}
+    </div>
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:28px">
+      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--teal);margin-bottom:16px">Session History (${sessCount})</div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:0.82rem">
+          <thead><tr style="color:var(--muted);font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border)">
+            <th style="padding:8px 6px;text-align:left">Date</th>
+            <th style="padding:8px 6px;text-align:left">Mode</th>
+            <th style="padding:8px 6px;text-align:center">Answered</th>
+            <th style="padding:8px 6px;text-align:center">Score</th>
+            <th style="padding:8px 6px;text-align:right">Time</th>
+          </tr></thead>
+          <tbody>${[...progressData.sessions].reverse().map(s => `
+            <tr style="border-bottom:1px solid rgba(100,180,255,0.06)">
+              <td style="padding:10px 6px;color:var(--muted)">${s.date}</td>
+              <td style="padding:10px 6px;color:var(--white);text-transform:capitalize">${s.mode}</td>
+              <td style="padding:10px 6px;text-align:center;color:var(--white)">${s.answered}</td>
+              <td style="padding:10px 6px;text-align:center"><strong style="color:${scoreColor(s.pct)}">${s.pct}%</strong></td>
+              <td style="padding:10px 6px;text-align:right;color:var(--muted)">${s.time}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="showScreen('home')">← Back to Home</button>
+      <button class="btn btn-secondary" onclick="startSetup('practice')">Continue Practicing →</button>
+    </div>
+  </div>`;
+
+  showScreen('progress');
+}
 </script>
+<input type="file" id="progressFileInput" accept=".json" style="display:none" onchange="importProgressFile(event)">
 </body>
 </html>
