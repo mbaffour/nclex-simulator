@@ -620,20 +620,31 @@
   }
 
   @media(max-width:480px) {
-    header { padding: 12px 14px; }
+    header { padding: 12px 14px; flex-wrap: wrap; gap: 8px; }
+    header > div:last-child { width: 100%; justify-content: flex-start; flex-wrap: wrap; gap: 6px; }
+    .progress-action-btns { flex-wrap: wrap; gap: 6px; }
+    .prog-btn { padding: 6px 10px; font-size: 0.72rem; }
+    #progressBadge { display: none !important; }
     .logo-text { font-size: 1rem; }
     .logo-sub { display: none; }
-    .home-title { font-size: clamp(2rem, 9vw, 3rem); }
-    .home-desc { font-size: 0.95rem; }
-    .mode-grid { grid-template-columns: 1fr; }
-    .stats-row { gap: 16px; }
-    .stat-num { font-size: 1.6rem; }
+    .home-title { font-size: clamp(1.8rem, 8vw, 2.6rem); }
+    .home-desc { font-size: 0.92rem; max-width: 100%; width: 100%; box-sizing: border-box; }
+    .dedication-banner { max-width: calc(100vw - 32px); white-space: normal; text-align: center; justify-content: center; font-size: 0.78rem; padding: 8px 14px; }
+    .home-badge { max-width: calc(100vw - 32px); white-space: normal; text-align: center; font-size: 0.7rem; padding: 5px 14px; }
+    .mode-grid { grid-template-columns: 1fr; width: 100%; max-width: 100%; }
+    .mode-card { padding: 16px 14px; }
+    .stats-row { gap: 12px; flex-wrap: wrap; justify-content: center; width: 100%; }
+    .stat-item { min-width: 70px; }
+    .stat-num { font-size: 1.5rem; }
     .domain-name { min-width: 100px; font-size: 0.73rem; }
     .ekg-bar { height: 28px; }
     .results-score-ring { width: 140px; height: 140px; }
-    .vitals-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .vitals-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; }
     .vital-card { min-width: unset; width: 100%; padding: 10px 8px; }
     .vital-value { font-size: 1rem; }
+    .meme-strip { max-width: 100%; }
+    .mnemo-wrap { max-width: 100%; }
+    .home-screen-footer { padding: 14px; font-size: 0.7rem; }
   }
 
   /* ─── DEDICATION & NURSING MEMES ─── */
@@ -828,7 +839,7 @@
         <path class="ekg-path-red" d="M0,18 L80,18 L95,18 L100,6 L108,30 L114,2 L120,34 L126,18 L140,18 L220,18 L235,18 L240,6 L248,30 L254,2 L260,34 L266,18 L280,18 L360,18 L375,18 L380,6 L388,30 L394,2 L400,34 L406,18 L420,18 L500,18 L515,18 L520,6 L528,30 L534,2 L540,34 L546,18 L560,18 L640,18 L655,18 L660,6 L668,30 L674,2 L680,34 L686,18 L700,18 L780,18 L795,18 L800,6 L808,30 L814,2 L820,34 L826,18 L840,18 L920,18 L935,18 L940,6 L948,30 L954,2 L960,34 L966,18 L980,18 L1060,18 L1075,18 L1080,6 L1088,30 L1094,2 L1100,34 L1106,18 L1120,18 L1200,18"/>
       </svg>
     </div>
-    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:60px 20px;flex-direction:column">
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:60px 20px;flex-direction:column;width:100%;box-sizing:border-box;overflow-x:hidden">
       <div class="dedication-banner">❤️ Made with love for Peyton — Future ICU Nurse &amp; total rockstar 🩺</div>
       <div class="home-badge">✦ 1,800-Question AI-Powered NCLEX Preparation</div>
       <h1 class="home-title">Pass the <span>NCLEX</span><br>on your first try.</h1>
