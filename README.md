@@ -4,7 +4,7 @@
 
 An AI-powered, Next Gen NCLEX practice simulator built with love for nursing students preparing for licensure. Features adaptive testing, instant AI rationales, all 8 clinical domains, and every NGN question format.
 
-**Built for Peyton — soon-to-be ICU nurse extraordinaire. You've got this. 💙**
+**Built for every nursing student preparing for the NCLEX. You've got this. 💙**
 
 ---
 
@@ -114,7 +114,7 @@ This is an **unofficial** practice tool created for educational purposes. NCLEX�
 
 This was built by someone who watched a nursing student grind through clinicals, pharmacology, care plans, and enough pathophysiology to make anyone's head spin — and still show up with a smile.
 
-Peyton, you are going to be an **incredible** ICU nurse. The patients who get you are lucky. Now go pass that NCLEX. 🏥
+You are going to be an **incredible** nurse. The patients who get you are lucky. Now go pass that NCLEX. 🏥
 
 ---
 
