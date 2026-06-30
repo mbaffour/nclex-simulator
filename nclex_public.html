@@ -4606,10 +4606,7 @@ function initMnemonics() {
   window.prevMnemo = () => { clearInterval(mnemoTimer); mnemoIndex = (mnemoIndex - 1 + MNEMONICS.length) % MNEMONICS.length; renderMnemo(mnemoIndex); };
 }
 
-const MANTRAS = [
-  { text: 'Built with passion for science and discovery', color: 'var(--teal)' },
-  { text: 'You can just build things', color: 'var(--gold)' },
-];
+const MANTRAS = [];
 let mantraIndex = 0;
 function initMantra() {
   const el = document.getElementById('mantraDisplay');
