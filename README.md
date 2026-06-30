@@ -2,9 +2,7 @@
 
 > *"Nurses don't get coffee breaks. Coffee gets nurse breaks."*
 
-An AI-powered, Next Gen NCLEX practice simulator built with love for nursing students preparing for licensure. Features adaptive testing, instant AI rationales, all 8 clinical domains, and every NGN question format.
-
-**Built for every nursing student preparing for the NCLEX. You've got this. 💙**
+An AI-powered, Next Gen NCLEX practice simulator to help nursing students prepare for licensure. Features adaptive testing, instant AI rationales, all 8 clinical domains, and every NGN question format.
 
 ---
 
@@ -109,12 +107,6 @@ Want to add more questions? The question bank lives in the `QUESTIONS` array in 
 This is an **unofficial** practice tool created for educational purposes. NCLEX® is a registered trademark of NCSBN. This simulator is not affiliated with, endorsed by, or sponsored by NCSBN. Always supplement with official NCSBN practice materials.
 
 ---
-
-## 💙 A Note
-
-This was built by someone who watched a nursing student grind through clinicals, pharmacology, care plans, and enough pathophysiology to make anyone's head spin — and still show up with a smile.
-
-You are going to be an **incredible** nurse. The patients who get you are lucky. Now go pass that NCLEX. 🏥
 
 ---
 
