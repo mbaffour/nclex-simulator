@@ -1,0 +1,3 @@
+# Local Claude Code tooling config (machine-specific, not for the repo)
+.claude/
+.claude/settings.local.json

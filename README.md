@@ -2,7 +2,7 @@
 
 > *"Nurses don't get coffee breaks. Coffee gets nurse breaks."*
 
-An AI-powered, Next Gen NCLEX practice simulator built with love for nursing students preparing for licensure. Features adaptive testing, instant AI rationales, all 8 clinical domains, and every NGN question format.
+A Next Gen NCLEX practice simulator built with love for nursing students preparing for licensure. Features adaptive testing, instant built-in rationales, all 8 clinical domains, and every NGN question format.
 
 **Built for Peyton — soon-to-be ICU nurse extraordinaire. You've got this. 💙**
 
@@ -15,7 +15,7 @@ An AI-powered, Next Gen NCLEX practice simulator built with love for nursing stu
 | **Practice Modes** | Practice (tutor), CAT Simulation, Next Gen NCLEX, Rapid Review |
 | **Question Types** | MCQ, SATA, NGN Matrix, NGN Bow-tie, Drop-down, Ordered Response |
 | **Clinical Domains** | All 8 NCLEX domains covered |
-| **AI Rationales** | Claude AI generates real-time clinical insights per question |
+| **Clinical Rationales** | Built-in expert rationale and clinical insight per question |
 | **Adaptive CAT** | Mirrors real NCLEX adaptive difficulty (75–145 Qs) |
 | **Timed Mode** | 1 minute per question to simulate exam pressure |
 | **Score Breakdown** | Domain-level performance tracking with visual charts |
@@ -55,7 +55,7 @@ No installation. No login. Just click and go.
 ## 🧠 Study Modes
 
 ### 📖 Practice Mode
-Study with instant feedback after each question. Rationale, NCLEX tip, and AI clinical insight shown immediately. Best for learning new material.
+Study with instant feedback after each question. Rationale, NCLEX tip, and built-in clinical insight shown immediately. Best for learning new material.
 
 ### 🎯 CAT Simulation
 Mirrors the real NCLEX Computerized Adaptive Test. Difficulty adjusts to your performance across 75–145 questions. Closest thing to the real deal.
@@ -77,7 +77,7 @@ This simulator includes rotating nursing humor because if you're not laughing, y
 ## 🛠️ Tech Stack
 
 - **Vanilla HTML/CSS/JS** — zero dependencies, zero build step
-- **Anthropic Claude API** — AI-generated clinical insights
+- **Built-in clinical rationales** — curated insight bundled with each question
 - **Google Fonts** — Fraunces + DM Sans
 - **CSS Grid & Flexbox** — responsive layout
 - **CSS Custom Properties** — full theming system
