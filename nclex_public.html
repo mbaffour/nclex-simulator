@@ -843,7 +843,7 @@
       <div class="dedication-banner">🩺 Free &amp; open-source NCLEX prep — built for every nursing student who needs it</div>
       <div class="home-badge">✦ 1,800-Question AI-Powered NCLEX Preparation</div>
       <h1 class="home-title">Pass the <span>NCLEX</span><br>on your first try.</h1>
-      <p class="home-desc">The most comprehensive NCLEX simulation platform. 1,800 practice questions across all 8 clinical domains — including Next Generation NCLEX formats, adaptive CAT testing, AI-powered rationales, and real-time performance tracking.</p>
+      <p class="home-desc">The most comprehensive NCLEX simulation platform. 1,800 practice questions across all 8 clinical domains — including Next Generation NCLEX formats, adaptive CAT testing, built-in clinical rationales, and real-time performance tracking.</p>
       <div class="mode-grid">
         <div class="mode-card" onclick="startSetup('practice')">
           <span class="hosp-icon">🩺</span>
@@ -3577,7 +3577,7 @@ function renderQuestion() {
   }
 
   // Stem
-  html += `<div class="q-stem">${q.stem}</div>`;
+  html += `<div class="q-stem">${escapeHtml(q.stem)}</div>`;
 
   // Question body by type
   if (q.type === 'mcq') html += renderMCQ(q, idx, answered);
@@ -3593,7 +3593,7 @@ function renderQuestion() {
 
   // AI Insight placeholder
   html += `<div class="ai-insight" id="aiInsight">
-    <div class="ai-insight-header">✦ AI Clinical Insight</div>
+    <div class="ai-insight-header">✦ Clinical Insight</div>
     <div class="ai-insight-body" id="aiInsightBody"><div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div></div>
   </div>`;
 
@@ -3631,7 +3631,7 @@ function renderCaseExhibit(data) {
   });
   html += `</div>`;
   tabs.forEach((k,i) => {
-    html += `<div class="exhibit-content ${i===0?'active':''}">${data[k]}</div>`;
+    html += `<div class="exhibit-content ${i===0?'active':''}">${escapeHtml(data[k])}</div>`;
   });
   html += `</div>`;
   return html;
@@ -3650,7 +3650,7 @@ function renderMCQ(q, idx, answered) {
     const onClick = answered === undefined ? `onclick="selectMCQ(${i})"` : '';
     html += `<li class="option-item ${cls}" ${onClick}>
       <div class="option-letter">${letters[i]}</div>
-      <div class="option-text">${opt}</div>
+      <div class="option-text">${escapeHtml(opt)}</div>
       <div class="option-check">${checkIcon}</div>
     </li>`;
   });
@@ -3676,7 +3676,7 @@ function renderSATA(q, idx, answered) {
     const onClick = answered === undefined ? `onclick="toggleSATA(${i})"` : '';
     html += `<li class="option-item ${cls}" ${onClick}>
       <div class="option-letter">${letters[i]}</div>
-      <div class="option-text">${opt}</div>
+      <div class="option-text">${escapeHtml(opt)}</div>
       <div class="option-check">${checkIcon}</div>
     </li>`;
   });
@@ -3690,7 +3690,7 @@ function renderMatrix(q, idx, answered) {
   m.cols.forEach(c => html += `<th>${c}</th>`);
   html += `</tr></thead><tbody>`;
   m.rows.forEach((row, ri) => {
-    html += `<tr><td>${row}</td>`;
+    html += `<tr><td>${escapeHtml(row)}</td>`;
     m.cols.forEach((col, ci) => {
       const isSelected = answered && answered[ri] === ci;
       const isCorrect = m.correct[ri] === ci;
@@ -3735,7 +3735,7 @@ function renderBowtie(q, idx, answered) {
       } else if (isSelected) cls = 'selected';
       const onClick = answered === undefined ? `onclick="toggleBowtie('${sec.key}', ${i})"` : '';
       html += `<div class="option-item ${cls}" style="padding:10px 14px;margin-bottom:8px;gap:10px" ${onClick}>
-        <div style="font-size:0.85rem;line-height:1.5">${item}</div>
+        <div style="font-size:0.85rem;line-height:1.5">${escapeHtml(item)}</div>
       </div>`;
     });
     html += `</div>`;
@@ -3754,8 +3754,8 @@ function renderFeedback(q, answered) {
     <div class="fb-header ${headerCls}">${icon} ${label}</div>
     <div class="fb-body">
       <div class="rationale-title">Rationale:</div>
-      <p>${q.rationale}</p>
-      ${q.tip ? `<div class="nclex-tip"><strong>NCLEX Tip:</strong> ${q.tip}</div>` : ''}
+      <p>${escapeHtml(q.rationale)}</p>
+      ${q.tip ? `<div class="nclex-tip"><strong>NCLEX Tip:</strong> ${escapeHtml(q.tip)}</div>` : ''}
     </div>
   </div>`;
 }
@@ -4033,9 +4033,9 @@ function showResults() {
           <span class="q-category-badge" style="font-size:0.7rem;padding:2px 8px">${domainLabel(q.domain)}</span>
           <span style="font-size:0.78rem;color:${isCorrect?'var(--green)':'var(--red)'};margin-left:auto">${statusLabel}</span>
         </div>
-        <div class="review-q-text">${q.stem.substring(0, 120)}${q.stem.length > 120 ? '…' : ''}</div>
+        <div class="review-q-text">${escapeHtml(q.stem.substring(0, 120))}${q.stem.length > 120 ? '…' : ''}</div>
         ${!isCorrect && ans !== undefined ? `<div class="review-answer">
-          <span class="correct-ans">✓ Correct: ${getCorrectLabel(q)}</span>
+          <span class="correct-ans">✓ Correct: ${escapeHtml(getCorrectLabel(q))}</span>
         </div>` : ''}
       </div>`;
     }).join('')}
@@ -4070,34 +4070,30 @@ function reviewItem(i) {
 // ══════════════════════════════════════════════════════════════════
 //  AI INSIGHT
 // ══════════════════════════════════════════════════════════════════
-async function loadAIInsight(q) {
+// Renders the built-in clinical rationale (q.tip) for the current question.
+// Insights are static, curated rationales bundled with each question — no
+// network call is made (a browser-side API key would be exposed publicly).
+function loadAIInsight(q) {
   const panel = document.getElementById('aiInsight');
   const body = document.getElementById('aiInsightBody');
   if (!panel || !body) return;
   panel.classList.add('visible');
-
-  try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: "You are an expert NCLEX nursing educator. Provide a concise (3-4 sentences), clinically rich insight about the nursing concept tested in the question. Focus on: key clinical reasoning, mnemonics, related drugs/labs/values, priority considerations, and what distinguishes wrong answers. Be direct and clinical. No intro phrases.",
-        messages: [{ role: "user", content: `NCLEX Question domain: ${q.domain}. Stem: ${q.stem} Correct answer rationale: ${q.rationale}. Provide a clinical insight to help a nursing student deeply understand and remember this concept.` }]
-      })
-    });
-    const data = await response.json();
-    const text = data.content?.find(b => b.type === 'text')?.text || '';
-    if (text && body) body.innerHTML = text;
-  } catch(e) {
-    if (body) body.innerHTML = q.tip || 'Review the rationale and key concepts above.';
-  }
+  body.textContent = q.tip || 'Review the rationale and key concepts above.';
 }
 
 // ══════════════════════════════════════════════════════════════════
 //  HELPERS
 // ══════════════════════════════════════════════════════════════════
+// Escape dynamic text before interpolating it into innerHTML.
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function domainLabel(d) {
   const labels = {
     management: 'Management of Care', safety: 'Safety & Infection Control',
