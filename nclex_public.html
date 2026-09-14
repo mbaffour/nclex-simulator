@@ -771,6 +771,121 @@
   .prog-btn:hover { border-color: var(--teal); color: var(--white); }
   .prog-btn.primary { background: linear-gradient(135deg,var(--teal),var(--sky)); color: var(--navy); border-color: transparent; }
   .prog-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,201,167,0.3); }
+  /* ─── GAMIFICATION: RANKS, STREAKS, BADGES ─── */
+  .rank-pill {
+    display: none; align-items: center; gap: 8px;
+    background: rgba(247,201,72,0.12); border: 1px solid rgba(247,201,72,0.35);
+    color: var(--gold); padding: 6px 12px; border-radius: 999px;
+    font-size: 0.76rem; font-weight: 600; cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .rank-pill:hover { background: rgba(247,201,72,0.2); }
+  .rank-pill .streak-flame { color: var(--red); }
+  .rank-pill .rank-sep { color: var(--border); }
+
+  .xp-track {
+    height: 10px; background: var(--navy-mid); border-radius: 999px;
+    overflow: hidden; border: 1px solid var(--border);
+  }
+  .xp-fill {
+    height: 100%; border-radius: 999px;
+    background: linear-gradient(90deg, var(--gold), #ffaa00);
+    transition: width 0.9s cubic-bezier(0.2,0.8,0.2,1);
+  }
+
+  .rank-card {
+    background: linear-gradient(135deg, rgba(247,201,72,0.10), rgba(0,201,167,0.08));
+    border: 1px solid rgba(247,201,72,0.3); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 24px;
+  }
+  .rank-card-top {
+    display: flex; align-items: center; gap: 14px;
+    margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .rank-emblem {
+    font-size: 2rem; line-height: 1;
+    width: 54px; height: 54px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--navy-mid); border: 1px solid rgba(247,201,72,0.35);
+    border-radius: 50%;
+  }
+  .rank-name {
+    font-family: 'Fraunces', serif; font-size: 1.25rem;
+    color: var(--white); line-height: 1.2;
+  }
+  .rank-sub { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .rank-xp { margin-left: auto; text-align: right; }
+  .rank-xp-num { font-size: 1.3rem; font-weight: 700; color: var(--gold); }
+  .rank-xp-lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .rank-next { font-size: 0.75rem; color: var(--muted); margin-top: 8px; }
+
+  .streak-row {
+    display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px;
+  }
+  .streak-chip {
+    flex: 1; min-width: 120px;
+    background: var(--navy-mid); border: 1px solid var(--border);
+    border-radius: 10px; padding: 10px 12px;
+  }
+  .streak-chip-num { font-size: 1.15rem; font-weight: 700; color: var(--white); }
+  .streak-chip-lbl { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+  .badge-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  .badge-tile {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px; text-align: center;
+    opacity: 0.38; filter: grayscale(1);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .badge-tile.earned {
+    opacity: 1; filter: none;
+    border-color: rgba(247,201,72,0.4);
+    background: linear-gradient(160deg, rgba(247,201,72,0.10), var(--card));
+  }
+  .badge-tile.earned:hover { transform: translateY(-2px); }
+  .badge-icon { font-size: 1.5rem; line-height: 1; }
+  .badge-name { font-size: 0.76rem; font-weight: 600; color: var(--white); margin-top: 6px; }
+  .badge-desc { font-size: 0.68rem; color: var(--muted); margin-top: 3px; line-height: 1.35; }
+
+  .unlock-banner {
+    background: linear-gradient(135deg, rgba(247,201,72,0.16), rgba(0,201,167,0.10));
+    border: 1px solid rgba(247,201,72,0.4); border-radius: var(--radius);
+    padding: 18px; margin-bottom: 22px;
+  }
+  .unlock-title {
+    font-family: 'Fraunces', serif; font-size: 1.05rem; color: var(--gold);
+    margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .unlock-list { display: flex; gap: 10px; flex-wrap: wrap; }
+  .unlock-item {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--navy-mid); border: 1px solid rgba(247,201,72,0.3);
+    border-radius: 999px; padding: 7px 14px; font-size: 0.78rem; color: var(--white);
+    animation: unlockPop 0.5s cubic-bezier(0.2,1.4,0.4,1) backwards;
+  }
+  @keyframes unlockPop {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .xp-earned-row {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    justify-content: center; margin: 0 auto 24px; max-width: 560px;
+  }
+  .xp-earned-chip {
+    background: var(--card); border: 1px solid rgba(247,201,72,0.3);
+    border-radius: 999px; padding: 8px 16px;
+    font-size: 0.8rem; color: var(--white);
+  }
+  .xp-earned-chip strong { color: var(--gold); }
+
+  @media (max-width: 640px) {
+    .rank-xp { margin-left: 0; text-align: left; width: 100%; }
+    .badge-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); }
+  }
 </style>
 </head>
 <body>
@@ -821,6 +936,7 @@
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span id="rankPill" class="rank-pill" onclick="showProgressDashboard()" title="Your rank, streak and badges"></span>
         <span id="progressBadge" class="progress-pill" onclick="showProgressDashboard()">📊 <span id="progressBadgeText">0 answered</span></span>
         <div class="progress-action-btns">
           <button class="prog-btn" onclick="showProgressDashboard()" title="View your cumulative progress">📈 My Progress</button>
@@ -3944,6 +4060,7 @@ function endExam() {
 }
 
 function showResults() {
+  const _gameBefore = gameSnapshot(progressData);
   const questions = examState.questions;
   const answers = examState.answers;
   let correct = 0, total = questions.length, answered = 0;
@@ -4001,6 +4118,8 @@ function showResults() {
     <div class="score-card time"><div class="score-card-num">${timeStr}</div><div class="score-card-lbl">Time Used</div></div>
   </div>
 
+  <div id="sessionRewards"></div>
+
   <div class="ncsbn-bar">
     <div class="ncsbn-icon">ℹ️</div>
     <div class="ncsbn-text">The real NCLEX uses the <strong>NCSBN Next Gen NCLEX (NGN)</strong> computerized adaptive testing (CAT) model. You need to demonstrate clinical judgment above the passing standard. A score of <strong>≥65%</strong> in practice generally indicates readiness. Focus on domains below 60%.</div>
@@ -4053,6 +4172,9 @@ function showResults() {
   showScreen('results');
   stopExamTimer();
   saveSessionToProgress(questions, answers, domainResults, correct, answered, pct, examState.mode, timeStr);
+
+  const _rewards = document.getElementById('sessionRewards');
+  if (_rewards) _rewards.innerHTML = renderSessionRewards(_gameBefore, gameSnapshot(progressData));
 }
 
 function getCorrectLabel(q) {
@@ -4665,6 +4787,7 @@ function _autoSaveProgress() {
 function updateProgressBadge() {
   const badge = document.getElementById('progressBadge');
   const text = document.getElementById('progressBadgeText');
+  updateRankPill();
   if (!badge || !text) return;
   if (!progressData || progressData.totalAnswered === 0) { badge.style.display = 'none'; return; }
   const pct = Math.round((progressData.totalCorrect / progressData.totalAnswered) * 100);
@@ -4779,6 +4902,7 @@ function showProgressDashboard() {
     showScreen('progress'); return;
   }
 
+  const _snap = gameSnapshot(progressData);
   const totalPct = Math.round((progressData.totalCorrect / progressData.totalAnswered) * 100);
   const sessCount = progressData.sessions.length;
   const uniqueQ = Object.keys(progressData.questionHistory).length;
@@ -4804,6 +4928,8 @@ function showProgressDashboard() {
       </div>
     </div>
 
+    ${renderRankCard(_snap)}
+
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:28px">
       ${[
         {num: progressData.totalAnswered, lbl: 'Total Answered', color: 'var(--teal)'},
@@ -4826,6 +4952,10 @@ function showProgressDashboard() {
         <span style="font-size:0.8rem;color:var(--muted);min-width:72px;text-align:right">${w.pct}% (${w.correct}/${w.total})</span>
       </div>`).join('')}
     </div>` : ''}
+
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px">
+      ${renderBadgeCase(_snap)}
+    </div>
 
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px">
       <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--teal);margin-bottom:16px">All Domains — Cumulative Performance</div>
@@ -4869,6 +4999,251 @@ function showProgressDashboard() {
   </div>`;
 
   showScreen('progress');
+}
+// ══════════════════════════════════════════════════════════════════
+//  GAMIFICATION — RANKS, STREAKS, BADGES
+// ══════════════════════════════════════════════════════════════════
+// Everything here is DERIVED from progressData. Nothing new is stored, so
+// a progress JSON exported before this feature existed still produces a
+// correct rank, streak and badge set when it is imported.
+
+const RANKS = [
+  { xp:     0, emblem: '📖', name: 'Pre-Nursing',        blurb: 'Every expert started here.' },
+  { xp:   250, emblem: '🩹', name: 'Nursing Student',    blurb: 'Care plans and caffeine.' },
+  { xp:   750, emblem: '💉', name: 'Clinical Rotation',  blurb: 'First real patients.' },
+  { xp:  1750, emblem: '🩺', name: 'Senior Student',     blurb: 'Preceptor says you have good instincts.' },
+  { xp:  3500, emblem: '🎓', name: 'NCLEX Candidate',    blurb: 'ATT in hand.' },
+  { xp:  6000, emblem: '🏅', name: 'Newly Licensed RN',  blurb: 'You passed. Now the real learning starts.' },
+  { xp:  9500, emblem: '🏥', name: 'Med-Surg RN',        blurb: 'Six patients, one brain, zero panic.' },
+  { xp: 14000, emblem: '🚑', name: 'ICU RN',             blurb: 'Titrating drips in your sleep.' },
+  { xp: 20000, emblem: '⭐', name: 'Charge Nurse',       blurb: 'The one everybody asks.' },
+  { xp: 28000, emblem: '👑', name: 'Nurse Preceptor',    blurb: 'You make other nurses better.' },
+];
+
+// Each badge is a pure predicate over a stats object — add new ones freely.
+const BADGES = [
+  { id:'first_steps',   icon:'👣', name:'First Steps',      desc:'Finish your first session',
+    test: s => s.sessions >= 1 },
+  { id:'century',       icon:'💯', name:'Century Club',     desc:'Answer 100 questions',
+    test: s => s.answered >= 100 },
+  { id:'five_hundred',  icon:'🗂️', name:'Deep Bank',        desc:'Answer 500 questions',
+    test: s => s.answered >= 500 },
+  { id:'thousand',      icon:'🏔️', name:'Four Digits',      desc:'Answer 1,000 questions',
+    test: s => s.answered >= 1000 },
+  { id:'explorer',      icon:'🧭', name:'Full Sweep',       desc:'Practice all 8 clinical domains',
+    test: s => s.domainsTouched >= 8 },
+  { id:'perfect',       icon:'🎯', name:'Flawless',         desc:'Score 100% on a session of 10+',
+    test: s => s.bestPerfect },
+  { id:'passing',       icon:'✅', name:'Above the Line',   desc:'Hold 65%+ overall after 100 questions',
+    test: s => s.answered >= 100 && s.overallPct >= 65 },
+  { id:'sharp',         icon:'🔬', name:'Sharp Practice',   desc:'Hold 80%+ overall after 200 questions',
+    test: s => s.answered >= 200 && s.overallPct >= 80 },
+  { id:'streak3',       icon:'🔥', name:'On a Roll',        desc:'Study 3 days in a row',
+    test: s => s.bestStreak >= 3 },
+  { id:'streak7',       icon:'📅', name:'Full Week',        desc:'Study 7 days in a row',
+    test: s => s.bestStreak >= 7 },
+  { id:'streak30',      icon:'🗓️', name:'Thirty Days',      desc:'Study 30 days in a row',
+    test: s => s.bestStreak >= 30 },
+  { id:'specialist',    icon:'🧠', name:'Domain Specialist', desc:'80%+ in a domain with 25+ answered',
+    test: s => s.masteredDomains >= 1 },
+  { id:'polymath',      icon:'🌐', name:'Polymath',         desc:'Master 4 different domains',
+    test: s => s.masteredDomains >= 4 },
+  { id:'marathon',      icon:'⏱️', name:'Marathoner',       desc:'Complete a 75+ question session',
+    test: s => s.longestSession >= 75 },
+  { id:'dedicated',     icon:'🌱', name:'Dedicated',        desc:'Complete 25 sessions',
+    test: s => s.sessions >= 25 },
+  { id:'comeback',      icon:'📈', name:'Comeback',         desc:'Follow a sub-50% session with an 80%+ one',
+    test: s => s.comeback },
+];
+
+const _DOMAIN_MASTERY_MIN = 25;
+const _DOMAIN_MASTERY_PCT = 80;
+
+function gameStats(data) {
+  const empty = { answered:0, correct:0, overallPct:0, sessions:0, uniqueQuestions:0,
+                  currentStreak:0, bestStreak:0, domainsTouched:0, masteredDomains:0,
+                  longestSession:0, bestPerfect:false, comeback:false, studyDays:0 };
+  if (!data || !data.totalAnswered) return empty;
+
+  const sessions = Array.isArray(data.sessions) ? data.sessions : [];
+  const domains = Object.values(data.domainTotals || {});
+  const dates = [...new Set(sessions.map(s => s.date).filter(Boolean))].sort();
+
+  let bestStreak = 0, run = 0, prev = null;
+  dates.forEach(d => {
+    run = (prev && _dayGap(prev, d) === 1) ? run + 1 : 1;
+    bestStreak = Math.max(bestStreak, run);
+    prev = d;
+  });
+
+  // The current streak only counts if the last study day was today or yesterday.
+  const today = new Date().toISOString().slice(0, 10);
+  let currentStreak = 0;
+  if (dates.length) {
+    const gapToNow = _dayGap(dates[dates.length - 1], today);
+    if (gapToNow <= 1) {
+      currentStreak = 1;
+      for (let i = dates.length - 1; i > 0; i--) {
+        if (_dayGap(dates[i - 1], dates[i]) === 1) currentStreak++; else break;
+      }
+    }
+  }
+
+  let comeback = false;
+  for (let i = 1; i < sessions.length; i++) {
+    if (sessions[i - 1].pct < 50 && sessions[i].pct >= 80) { comeback = true; break; }
+  }
+
+  return {
+    answered: data.totalAnswered,
+    correct: data.totalCorrect,
+    overallPct: Math.round((data.totalCorrect / data.totalAnswered) * 100),
+    sessions: sessions.length,
+    uniqueQuestions: Object.keys(data.questionHistory || {}).length,
+    currentStreak, bestStreak, studyDays: dates.length,
+    domainsTouched: domains.filter(d => d.total > 0).length,
+    masteredDomains: domains.filter(d =>
+      d.total >= _DOMAIN_MASTERY_MIN && (d.correct / d.total) * 100 >= _DOMAIN_MASTERY_PCT).length,
+    longestSession: sessions.reduce((m, s) => Math.max(m, s.answered || 0), 0),
+    bestPerfect: sessions.some(s => s.pct === 100 && s.answered >= 10),
+    comeback,
+  };
+}
+
+function _dayGap(a, b) {
+  return Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000);
+}
+
+// XP rewards showing up (2/question) but rewards getting it right far more (10).
+// Badges and streak days are worth real XP so consistency beats cramming.
+function gameXP(stats) {
+  if (!stats.answered) return 0;
+  return stats.correct * 10
+       + stats.answered * 2
+       + earnedBadges(stats).length * 150
+       + stats.studyDays * 25;
+}
+
+function earnedBadges(stats) {
+  return BADGES.filter(b => b.test(stats));
+}
+
+function rankFor(xp) {
+  let idx = 0;
+  RANKS.forEach((r, i) => { if (xp >= r.xp) idx = i; });
+  const rank = RANKS[idx];
+  const next = RANKS[idx + 1] || null;
+  const span = next ? next.xp - rank.xp : 1;
+  return {
+    ...rank, index: idx, next,
+    pctToNext: next ? Math.min(100, Math.round(((xp - rank.xp) / span) * 100)) : 100,
+    xpToNext: next ? next.xp - xp : 0,
+  };
+}
+
+function gameSnapshot(data) {
+  const stats = gameStats(data);
+  const xp = gameXP(stats);
+  return { stats, xp, rank: rankFor(xp), badges: earnedBadges(stats) };
+}
+
+// ─── Header pill ──────────────────────────────────────────────────
+function updateRankPill() {
+  const pill = document.getElementById('rankPill');
+  if (!pill) return;
+  if (!progressData || !progressData.totalAnswered) { pill.style.display = 'none'; return; }
+  const { stats, rank, badges } = gameSnapshot(progressData);
+  pill.innerHTML = `<span>${rank.emblem}</span><span>${escapeHtml(rank.name)}</span>`
+    + (stats.currentStreak > 0
+        ? `<span class="rank-sep">|</span><span class="streak-flame">🔥 ${stats.currentStreak}d</span>` : '')
+    + `<span class="rank-sep">|</span><span>🏅 ${badges.length}/${BADGES.length}</span>`;
+  pill.title = `${rank.name} — ${rank.blurb}`;
+  pill.style.display = 'flex';
+}
+
+// ─── Results screen: XP earned + newly unlocked badges ────────────
+function renderSessionRewards(before, after) {
+  const gained = after.xp - before.xp;
+  const fresh = after.badges.filter(b => !before.badges.some(p => p.id === b.id));
+  const levelUp = after.rank.index > before.rank.index;
+
+  let html = `<div class="xp-earned-row">
+    <div class="xp-earned-chip">⚡ <strong>+${gained.toLocaleString()}</strong> XP this session</div>
+    <div class="xp-earned-chip">${after.rank.emblem} <strong>${escapeHtml(after.rank.name)}</strong></div>`;
+  if (after.stats.currentStreak > 0) {
+    html += `<div class="xp-earned-chip">🔥 <strong>${after.stats.currentStreak}</strong>-day streak</div>`;
+  }
+  html += `</div>`;
+
+  if (levelUp || fresh.length) {
+    html += `<div class="unlock-banner">
+      <div class="unlock-title">🎊 ${levelUp ? 'Rank up!' : 'New badges unlocked!'}</div>
+      <div class="unlock-list">`;
+    if (levelUp) {
+      html += `<div class="unlock-item" style="animation-delay:0s">${after.rank.emblem}
+        <span>${escapeHtml(after.rank.name)} — ${escapeHtml(after.rank.blurb)}</span></div>`;
+    }
+    fresh.forEach((b, i) => {
+      html += `<div class="unlock-item" style="animation-delay:${(levelUp ? i + 1 : i) * 0.12}s">${b.icon}
+        <span>${escapeHtml(b.name)} — ${escapeHtml(b.desc)}</span></div>`;
+    });
+    html += `</div></div>`;
+  }
+  return html;
+}
+
+// ─── Dashboard: rank card + badge case ────────────────────────────
+function renderRankCard(snap) {
+  const { stats, xp, rank } = snap;
+  return `<div class="rank-card">
+    <div class="rank-card-top">
+      <div class="rank-emblem">${rank.emblem}</div>
+      <div>
+        <div class="rank-name">${escapeHtml(rank.name)}</div>
+        <div class="rank-sub">${escapeHtml(rank.blurb)}</div>
+      </div>
+      <div class="rank-xp">
+        <div class="rank-xp-num">${xp.toLocaleString()}</div>
+        <div class="rank-xp-lbl">Total XP</div>
+      </div>
+    </div>
+    <div class="xp-track"><div class="xp-fill" style="width:${rank.pctToNext}%"></div></div>
+    <div class="rank-next">${rank.next
+      ? `${rank.xpToNext.toLocaleString()} XP to <strong style="color:var(--white)">${escapeHtml(rank.next.name)}</strong>`
+      : 'Top rank reached. Go teach somebody. 💙'}</div>
+    <div class="streak-row">
+      <div class="streak-chip">
+        <div class="streak-chip-num">🔥 ${stats.currentStreak}</div>
+        <div class="streak-chip-lbl">Day Streak</div>
+      </div>
+      <div class="streak-chip">
+        <div class="streak-chip-num">🏆 ${stats.bestStreak}</div>
+        <div class="streak-chip-lbl">Best Streak</div>
+      </div>
+      <div class="streak-chip">
+        <div class="streak-chip-num">📆 ${stats.studyDays}</div>
+        <div class="streak-chip-lbl">Study Days</div>
+      </div>
+      <div class="streak-chip">
+        <div class="streak-chip-num">🧠 ${stats.masteredDomains}/8</div>
+        <div class="streak-chip-lbl">Domains Mastered</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderBadgeCase(snap) {
+  const earned = new Set(snap.badges.map(b => b.id));
+  return `<div class="domain-title" style="margin-bottom:12px">
+      Badges <span style="color:var(--muted);font-weight:400">— ${earned.size} of ${BADGES.length} earned</span>
+    </div>
+    <div class="badge-grid">${BADGES.map(b => `
+      <div class="badge-tile${earned.has(b.id) ? ' earned' : ''}" title="${escapeHtml(b.desc)}">
+        <div class="badge-icon">${b.icon}</div>
+        <div class="badge-name">${escapeHtml(b.name)}</div>
+        <div class="badge-desc">${escapeHtml(b.desc)}</div>
+      </div>`).join('')}
+    </div>`;
 }
 </script>
 <input type="file" id="progressFileInput" accept=".json" style="display:none" onchange="importProgressFile(event)">
