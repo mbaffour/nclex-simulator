@@ -57,6 +57,29 @@ The simulator is hosted live at:
 
 No installation. No login. Just click and go.
 
+**Option 3 — Install it as an app:**
+
+The simulator is a Progressive Web App, so you can put it on your phone's home
+screen and it will **work with no signal at all** — a service worker caches the
+whole thing on first load. Useful on a commute, or in a hospital with dead spots.
+
+| Platform | How |
+|---|---|
+| **iPhone / iPad** | Open the link in **Safari** → tap **Share** (□↑) → **Add to Home Screen**. It must be Safari; Chrome on iOS can't install web apps. |
+| **Android** | Open in Chrome → menu (⋮) → **Install app** / **Add to Home Screen**. |
+| **Desktop** | Chrome or Edge → the install icon (⊕) in the address bar. |
+
+It launches full-screen with its own icon, no browser chrome, and your progress
+keeps working exactly as before.
+
+> **One thing worth knowing on iOS:** progress is stored in `localStorage`, and
+> iOS clears script-writeable storage for *websites* that go unused for 7 days.
+> Apple exempts installed home-screen apps from that, which is a good reason to
+> install rather than bookmark — but the exemption isn't a cast-iron guarantee,
+> and iOS treats the installed app and Safari as separate storage. **Use the
+> `💾 Save` button to export your progress JSON now and then.** That file is
+> yours, it survives anything, and `📂 Load` brings it straight back.
+
 ---
 
 ## 🧠 Study Modes
@@ -144,6 +167,7 @@ This simulator includes rotating nursing humor because if you're not laughing, y
 ## 🛠️ Tech Stack
 
 - **Vanilla HTML/CSS/JS** — zero dependencies, zero build step
+- **Progressive Web App** — installable, works fully offline via a service worker
 - **Built-in clinical rationales** — curated insight bundled with each question
 - **Google Fonts** — Fraunces + DM Sans
 - **CSS Grid & Flexbox** — responsive layout

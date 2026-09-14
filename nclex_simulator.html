@@ -2,7 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<!-- Installable app. On iOS: Share -> Add to Home Screen. -->
+<link rel="manifest" href="app.webmanifest">
+<meta name="theme-color" content="#0a1628">
+<meta name="description" content="Next Gen NCLEX practice simulator - 1,800 questions, all 8 clinical domains, works offline.">
+
+<!-- iOS ignores most of the manifest before 16.4, so these stay alongside it. -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="NCLEX Pro">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <title>NCLEX Pro Simulator — Powered by AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -979,6 +991,27 @@
     .combo-pill.bump, .float-chip { animation: none; }
     .float-chip { opacity: 1; }
   }
+  /* ─── INSTALLED-APP (PWA) SAFE AREAS AND INSTALL HINT ─── */
+  /* Launched from the iOS home screen the page runs full-bleed, so the sticky
+     exam nav would sit under the home indicator. Pad by the safe-area inset —
+     the fallback is 0px in a normal browser, so nothing changes there. */
+  .exam-nav { padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)); }
+  body { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
+  .float-toast { bottom: calc(108px + env(safe-area-inset-bottom, 0px)); }
+
+  .install-hint {
+    position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 980; display: flex; align-items: center; gap: 12px;
+    background: var(--card); border: 1px solid rgba(0,201,167,0.35);
+    border-radius: 12px; padding: 12px 14px; box-shadow: var(--shadow);
+    font-size: 0.8rem; line-height: 1.45; color: var(--white);
+  }
+  .install-hint strong { color: var(--teal); }
+  .install-hint-x {
+    background: none; border: none; color: var(--muted); font-size: 1rem;
+    cursor: pointer; padding: 4px 6px; flex-shrink: 0;
+  }
+  .install-hint-x:hover { color: var(--white); }
 </style>
 </head>
 <body>
@@ -4938,7 +4971,7 @@ function initMantra() {
   setInterval(showMantra, 6000);
 }
 
-document.addEventListener('DOMContentLoaded', () => { initMemes(); initMantra(); initMnemonics(); initProgress(); initHaptics(); });
+document.addEventListener('DOMContentLoaded', () => { initMemes(); initMantra(); initMnemonics(); initProgress(); initHaptics(); initServiceWorker(); initInstallHint(); });
 
 // ══════════════════════════════════════════════════════════════════
 //  PROGRESS TRACKING
@@ -5676,6 +5709,62 @@ function practiceDomain(domain) {
   showScreen('setup');
   window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
   floatToast(`🎯 Focused on ${domainLabel(domain)}`, 'good');
+}
+// ══════════════════════════════════════════════════════════════════
+//  INSTALLABLE APP (PWA)
+// ══════════════════════════════════════════════════════════════════
+// Registering a service worker makes the simulator work with no signal at
+// all, which is the point: nursing students study on commutes and in
+// hospitals with dead spots. Progress keeps using localStorage exactly as
+// before — the worker only caches the app itself.
+
+function isStandalone() {
+  return (typeof matchMedia === 'function' && matchMedia('(display-mode: standalone)').matches)
+      || navigator.standalone === true;   // iOS home-screen launch
+}
+
+function initServiceWorker() {
+  // Service workers require http(s). Opening the file directly with
+  // file:// still works — it just has no offline layer to add.
+  if (!('serviceWorker' in navigator)) return;
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
+
+  navigator.serviceWorker.register('sw.js').then(() => {
+    // Precache this page and its icons now, so the very first offline launch
+    // works even if the user adds it to the home screen straight away.
+    if (!('caches' in window)) return;
+    return caches.open('nclex-pro-v1').then(cache => cache.addAll([
+      location.pathname,
+      'icons/icon-180.png',
+      'icons/icon-192.png',
+    ]).catch(() => {}));
+  }).catch(() => {
+    // A failed registration must never break the app.
+  });
+}
+
+// ── One-time "add to home screen" hint, iOS only ────────────────────
+// iOS gives no install prompt of its own and hides Add to Home Screen in the
+// Share sheet, so most people never discover it. Shown once, dismissible,
+// and never shown again or when already installed.
+function initInstallHint() {
+  if (isStandalone()) return;
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPad|iPhone|iPod/.test(ua)
+             || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!isIOS) return;
+  try { if (localStorage.getItem('nclexInstallHint') === 'dismissed') return; } catch (e) {}
+
+  const bar = document.createElement('div');
+  bar.className = 'install-hint';
+  bar.innerHTML = `<span>\u{1F4F2} Install this: tap <strong>Share</strong>, then
+      <strong>Add to Home Screen</strong> — it then works offline.</span>
+    <button class="install-hint-x" aria-label="Dismiss">✕</button>`;
+  bar.querySelector('.install-hint-x').onclick = () => {
+    bar.remove();
+    try { localStorage.setItem('nclexInstallHint', 'dismissed'); } catch (e) {}
+  };
+  document.body.appendChild(bar);
 }
 </script>
 <input type="file" id="progressFileInput" accept=".json" style="display:none" onchange="importProgressFile(event)">

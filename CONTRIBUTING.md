@@ -29,14 +29,19 @@ Everything below exists to keep that from happening.
 | `nclex_public.html` | Identical app with the personal dedications removed. |
 | `blog.html` / `blog_public.html` | Project write-up, same personal/public split. |
 | `tools/validate-questions.mjs` | Question-bank validator. Run before every commit. |
+| `sw.js` | Service worker. Caches the app so it works offline. |
+| `app.webmanifest` / `app-public.webmanifest` | PWA manifests — one per HTML file, differing only in `start_url`. |
+| `icons/` | App icons (180/192/512 + maskable), generated from the header logo. |
 | `CLINICAL_REVIEW.md` | Log of guideline-driven answer changes, with sources. |
 | `FEATURE_IDEAS.md` | Proposed enhancements, scoped to the single-file architecture. |
 
 ### Keeping the two HTML files in sync
 
 `nclex_public.html` is not generated — it is a maintained copy. The two files
-differ **only** in the personal dedication lines and two CSS rules. Any change to
-the question bank or the app must be applied to both.
+differ **only** in the personal dedication lines, two CSS rules, and the
+`<link rel="manifest">` target (each file points at its own manifest so the
+installed app opens the right page). Any change to the question bank or the app
+must be applied to both.
 
 The quickest way to confirm you haven't drifted:
 
@@ -345,3 +350,27 @@ study — not to farm engagement.
 - **Prefer derived state.** Ranks, streaks and badges are computed from
   `progressData`, which is why old exports still work. `bestCombo` on a session
   record is the only field the reward layer adds, and it degrades to `0`.
+
+---
+
+## The offline / installable layer
+
+The simulator is a PWA. Three rules keep it from becoming a maintenance problem:
+
+- **`file://` must keep working.** "Download it and double-click" is the
+  project's promise. `initServiceWorker()` bails out unless the page is on
+  `https:` or `localhost`, and a failed registration is swallowed — the app must
+  never depend on the worker existing.
+- **Bump `CACHE` in `sw.js` when you change cached assets.** The name
+  (`nclex-pro-v1`) is the cache-busting key; the `activate` handler deletes every
+  cache that doesn't match. `initServiceWorker()` precaches against the same
+  literal name, so the two must be changed together.
+- **The fetch strategy is stale-while-revalidate.** Users get the cached copy
+  instantly and the update lands on their *next* launch. That is the right
+  trade-off for a 2.8 MB file on a bad connection, but it does mean a fix ships
+  one launch late. Don't switch it to network-first without thinking about
+  someone opening the app on hospital wifi.
+
+Safe-area insets (`env(safe-area-inset-*)`) are applied to the body and the
+sticky exam nav so content clears the notch and the home indicator when launched
+from an iOS home screen. They resolve to `0px` in a normal browser tab.
