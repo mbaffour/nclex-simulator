@@ -21,7 +21,11 @@ A Next Gen NCLEX practice simulator built with love for nursing students prepari
 | **Score Breakdown** | Domain-level performance tracking with visual charts |
 | **Ranks & XP** | 10 nursing-career ranks, earned by answering — accuracy counts for more than volume |
 | **Study Streaks** | Consecutive-day tracking, so showing up daily is worth something |
-| **Badges** | 16 unlockable badges for volume, accuracy, streaks, and domain mastery |
+| **Badges** | 17 unlockable badges, with progress bars showing how close you are |
+| **Live Combos** | Consecutive-correct counter during a session, with milestone feedback |
+| **Haptics** | Vibration feedback for answers, milestones and unlocks (Android; toggleable) |
+| **Daily Goal** | A 20-question target that keeps your streak alive |
+| **Focus Practice** | Tap your weakest domain to start a session in it |
 | **Zero Setup** | Single HTML file — open in any browser, no install needed |
 
 ---
@@ -90,7 +94,28 @@ actually pass.
 dashboard, and the flame shows in the header. Study today or yesterday and the
 streak lives; skip two days and it resets. (Your best streak is kept forever.)
 
-**16 badges** to collect, including:
+**Live streaks while you study.** Answer correctly and a combo counter appears in
+the exam header — ⚡ at 3, 🔥 from 10 up — with milestone messages as you climb.
+It counts *consecutive correct answers only*, never speed; nothing here is timed,
+because rushing to protect a combo is exactly the habit you don't want going into
+the exam. Break the streak and it tells you plainly to go read the rationale.
+
+**Haptics.** Distinct vibration patterns for a correct answer, a wrong one, a
+combo milestone, a badge unlock and a rank-up, so the feedback registers without
+you looking. Toggle it from the header (`📳 Haptics on`); the setting sticks.
+Web vibration works on Android browsers — iOS Safari doesn't implement it at all,
+and the button says so honestly rather than pretending. Haptics are never the
+only feedback for anything.
+
+**A daily goal.** 20 questions — roughly a fifteen-minute sitting, small enough to
+manage on a clinical day. The ring at the top of your dashboard shows where you
+are, and hitting it is what keeps the streak alive.
+
+**Tap your weakest domain to practise it.** The *Focus Areas* panel already knew
+where you were struggling; now each row is a button that starts a session in that
+domain. That's the part that actually moves your score.
+
+**17 badges** to collect, including:
 
 | | | |
 |---|---|---|
@@ -98,6 +123,9 @@ streak lives; skip two days and it resets. (Your best streak is kept forever.)
 | 🧭 **Full Sweep** — practice all 8 domains | 🎯 **Flawless** — 100% on a session of 10+ | 🔬 **Sharp Practice** — hold 80%+ over 200 questions |
 | 🔥 **On a Roll** — 3 days running | 🗓️ **Thirty Days** — 30 days running | 🧠 **Domain Specialist** — 80%+ in a domain |
 | 🌐 **Polymath** — master 4 domains | ⏱️ **Marathoner** — a 75+ question session | 📈 **Comeback** — follow a rough session with an 80%+ one |
+| ⚡ **Combo Master** — 15 correct in a row | | |
+
+Locked badges show how close you are — `225 / 500` beats a grey square.
 
 After every session you'll see the XP you earned and anything you just unlocked.
 

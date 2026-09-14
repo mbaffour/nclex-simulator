@@ -321,3 +321,27 @@ of those changes — add an entry there too.
 Clinical review contributions are credited in
 [`ACKNOWLEDGMENTS.md`](ACKNOWLEDGMENTS.md). If your report or fix improves a
 question, your name belongs there.
+
+---
+
+## Gamification and accessibility
+
+The reward layer has rules of its own, because the point is to help someone
+study — not to farm engagement.
+
+- **Never reward speed.** The combo counter tracks consecutive *correct* answers
+  and nothing is timed. A student who learns to rush in order to protect a streak
+  has been taught the wrong habit for a clinical judgment exam.
+- **Haptics are always optional and never load-bearing.** `buzz()` is a no-op
+  where the Vibration API is unsupported (iOS Safari implements none of it), and
+  the toggle persists in `localStorage` under `nclexHaptics`. Every haptic cue
+  must have a visual equivalent — nothing should be communicable only by
+  vibration.
+- **Respect `prefers-reduced-motion`.** Confetti is suppressed entirely and the
+  combo/toast animations are disabled. Check `prefersReducedMotion()` before
+  adding anything that moves.
+- **Losing a streak should point at the learning, not scold.** The message when a
+  combo breaks tells the student to read the rationale. Keep that tone.
+- **Prefer derived state.** Ranks, streaks and badges are computed from
+  `progressData`, which is why old exports still work. `bestCombo` on a session
+  record is the only field the reward layer adds, and it degrades to `0`.

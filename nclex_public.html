@@ -886,6 +886,99 @@
     .rank-xp { margin-left: 0; text-align: left; width: 100%; }
     .badge-grid { grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); }
   }
+  /* ─── GAMIFICATION: HAPTICS, COMBO, DAILY GOAL, CELEBRATION ─── */
+  .haptic-btn.off { opacity: 0.45; }
+
+  /* Live answer-streak pill in the exam header */
+  .combo-pill {
+    display: none; align-items: center; gap: 6px;
+    background: rgba(247,201,72,0.14); border: 1px solid rgba(247,201,72,0.4);
+    color: var(--gold); padding: 5px 12px; border-radius: 999px;
+    font-size: 0.78rem; font-weight: 700; white-space: nowrap;
+  }
+  .combo-pill.live { display: flex; }
+  .combo-pill.hot {
+    background: rgba(255,107,107,0.16); border-color: rgba(255,107,107,0.5); color: var(--red);
+  }
+  .combo-pill.bump { animation: comboBump 0.45s cubic-bezier(0.2,1.5,0.4,1); }
+  @keyframes comboBump {
+    0% { transform: scale(1); } 45% { transform: scale(1.28); } 100% { transform: scale(1); }
+  }
+
+  /* Floating "+10 XP" / milestone toast above the submit bar */
+  .float-toast {
+    position: fixed; left: 50%; bottom: 108px; transform: translateX(-50%);
+    z-index: 900; pointer-events: none;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .float-chip {
+    background: var(--card); border: 1px solid rgba(247,201,72,0.45);
+    border-radius: 999px; padding: 9px 18px; font-size: 0.85rem; font-weight: 600;
+    color: var(--white); box-shadow: var(--shadow); white-space: nowrap;
+    animation: floatUp 1.6s ease-out forwards;
+  }
+  .float-chip.good { border-color: rgba(67,233,123,0.5); }
+  .float-chip.bad  { border-color: rgba(255,107,107,0.45); }
+  @keyframes floatUp {
+    0%   { opacity: 0; transform: translateY(16px) scale(0.9); }
+    18%  { opacity: 1; transform: translateY(0) scale(1); }
+    72%  { opacity: 1; transform: translateY(-10px); }
+    100% { opacity: 0; transform: translateY(-34px); }
+  }
+
+  /* Daily goal ring */
+  .daily-card {
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px 20px; margin-bottom: 20px;
+  }
+  .daily-ring { position: relative; width: 78px; height: 78px; flex-shrink: 0; }
+  .daily-ring svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+  .daily-ring-inner {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 700;
+  }
+  .daily-copy { flex: 1; min-width: 180px; }
+  .daily-title { font-family: 'Fraunces', serif; font-size: 1.05rem; color: var(--white); }
+  .daily-sub { font-size: 0.8rem; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+  /* Clickable weakest-domain rows */
+  .focus-row {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+    background: transparent; border: 1px solid transparent; border-radius: 8px;
+    padding: 6px 8px; cursor: pointer; width: 100%; text-align: left;
+    font: inherit; color: inherit; transition: background 0.15s, border-color 0.15s;
+  }
+  .focus-row:hover, .focus-row:focus-visible {
+    background: rgba(255,107,107,0.08); border-color: rgba(255,107,107,0.3);
+  }
+  .focus-go { font-size: 0.72rem; color: var(--red); white-space: nowrap; opacity: 0; transition: opacity 0.15s; }
+  .focus-row:hover .focus-go, .focus-row:focus-visible .focus-go { opacity: 1; }
+
+  /* Badge progress bar on locked tiles */
+  .badge-prog {
+    height: 4px; background: var(--navy-mid); border-radius: 2px;
+    overflow: hidden; margin-top: 8px;
+  }
+  .badge-prog-fill { height: 100%; background: linear-gradient(90deg,var(--gold),#ffaa00); border-radius: 2px; }
+  .badge-prog-lbl { font-size: 0.64rem; color: var(--muted); margin-top: 4px; }
+  .badge-tile.close { opacity: 0.72; filter: grayscale(0.45); border-color: rgba(247,201,72,0.25); }
+
+  /* Rank-up confetti */
+  .confetti-layer { position: fixed; inset: 0; pointer-events: none; z-index: 950; overflow: hidden; }
+  .confetti-bit {
+    position: absolute; top: -14px; width: 9px; height: 14px; border-radius: 2px;
+    animation: confettiFall linear forwards;
+  }
+  @keyframes confettiFall {
+    0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+    100% { opacity: 0.15; transform: translateY(105vh) rotate(620deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .confetti-layer { display: none; }
+    .combo-pill.bump, .float-chip { animation: none; }
+    .float-chip { opacity: 1; }
+  }
 </style>
 </head>
 <body>
@@ -940,6 +1033,7 @@
         <span id="progressBadge" class="progress-pill" onclick="showProgressDashboard()">📊 <span id="progressBadgeText">0 answered</span></span>
         <div class="progress-action-btns">
           <button class="prog-btn" onclick="showProgressDashboard()" title="View your cumulative progress">📈 My Progress</button>
+          <button class="prog-btn haptic-btn" id="hapticBtn" onclick="toggleHaptics()">📳 Haptics on</button>
           <button class="prog-btn" onclick="triggerImport()" title="Load a saved progress JSON file">📂 Load</button>
           <button class="prog-btn primary" onclick="exportProgress()" title="Export progress as JSON">💾 Save</button>
         </div>
@@ -1125,6 +1219,7 @@
       </div>
       <div class="header-status">
         <span class="q-counter" id="qCounter">Q 1 / 25</span>
+        <span class="combo-pill" id="comboPill" aria-live="polite"></span>
         <div class="timer-display" id="timerDisplay">00:00</div>
         <button class="q-palette-toggle" onclick="togglePalette()">📋 Navigator</button>
         <button class="btn-end-exam" style="padding:8px 18px;font-size:0.82rem" onclick="openEndModal()">End Exam</button>
@@ -3636,6 +3731,8 @@ function buildExam() {
   examState.startTime = Date.now();
   examState.submitted = false;
   examState.questionElapsed = {};
+  examState.combo = 0;
+  examState.bestCombo = 0;
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -3987,6 +4084,7 @@ let pendingMatrix = {};
 let pendingBowtie = { causes: [], actions: [], outcomes: [] };
 
 function selectMCQ(i) {
+  buzz('tap');
   if (examState.answers[examState.currentIndex] !== undefined) return;
   pendingAnswer = i;
   document.querySelectorAll('.option-item').forEach((el, idx) => {
@@ -3996,6 +4094,7 @@ function selectMCQ(i) {
 }
 
 function toggleSATA(i) {
+  buzz('tap');
   if (examState.answers[examState.currentIndex] !== undefined) return;
   const pos = pendingSATA.indexOf(i);
   if (pos > -1) pendingSATA.splice(pos, 1);
@@ -4006,6 +4105,7 @@ function toggleSATA(i) {
 }
 
 function selectMatrix(ri, ci) {
+  buzz('tap');
   if (examState.answers[examState.currentIndex] !== undefined) return;
   pendingMatrix[ri] = ci;
   document.querySelectorAll('.matrix-radio').forEach(r => r.classList.remove('selected'));
@@ -4021,6 +4121,7 @@ function selectMatrix(ri, ci) {
 }
 
 function toggleBowtie(key, i) {
+  buzz('tap');
   if (examState.answers[examState.currentIndex] !== undefined) return;
   const arr = pendingBowtie[key];
   const pos = arr.indexOf(i);
@@ -4055,6 +4156,8 @@ function submitAnswer() {
   }
 
   examState.answers[examState.currentIndex] = answer;
+  const _wasCorrect = checkCorrect(q, answer);
+  registerAnswerFeedback(_wasCorrect, _wasCorrect ? 12 : 2);
   pendingAnswer = null; pendingSATA = []; pendingMatrix = {}; pendingBowtie = {causes:[],actions:[],outcomes:[]};
 
   renderQuestion();
@@ -4251,8 +4354,14 @@ function showResults() {
   stopExamTimer();
   saveSessionToProgress(questions, answers, domainResults, correct, answered, pct, examState.mode, timeStr);
 
+  const _gameAfter = gameSnapshot(progressData);
   const _rewards = document.getElementById('sessionRewards');
-  if (_rewards) _rewards.innerHTML = renderSessionRewards(_gameBefore, gameSnapshot(progressData));
+  if (_rewards) _rewards.innerHTML = renderSessionRewards(_gameBefore, _gameAfter);
+  const _rankedUp = _gameAfter.rank.index > _gameBefore.rank.index;
+  const _newBadges = _gameAfter.badges.length - _gameBefore.badges.length;
+  if (_rankedUp) { buzz('rankup'); celebrate('big'); }
+  else if (_newBadges > 0) { buzz('unlock'); celebrate('small'); }
+  else if (dailyProgress(progressData).met) { buzz('goal'); }
 }
 
 function getCorrectLabel(q) {
@@ -4829,7 +4938,7 @@ function initMantra() {
   setInterval(showMantra, 6000);
 }
 
-document.addEventListener('DOMContentLoaded', () => { initMemes(); initMantra(); initMnemonics(); initProgress(); });
+document.addEventListener('DOMContentLoaded', () => { initMemes(); initMantra(); initMnemonics(); initProgress(); initHaptics(); });
 
 // ══════════════════════════════════════════════════════════════════
 //  PROGRESS TRACKING
@@ -4898,6 +5007,7 @@ function saveSessionToProgress(questions, answers, domainResults, correct, answe
   });
 
   progressData.sessions.push({ date: today, mode, answered, correct, pct, time: timeStr,
+    bestCombo: (typeof examState !== 'undefined' && examState.bestCombo) || 0,
     domains: Object.fromEntries(Object.entries(domainResults).map(([d,v]) => [d,{correct:v.correct,total:v.total}]))
   });
 
@@ -5007,6 +5117,8 @@ function showProgressDashboard() {
       </div>
     </div>
 
+    ${renderDailyCard(progressData)}
+
     ${renderRankCard(_snap)}
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:28px">
@@ -5023,13 +5135,15 @@ function showProgressDashboard() {
 
     ${weakest.length > 0 ? `<div style="background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.2);border-radius:12px;padding:20px 24px;margin-bottom:20px">
       <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--red);margin-bottom:14px">⚠ Focus Areas — Weakest Domains</div>
-      ${weakest.map(w => `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-        <span style="min-width:190px;font-size:0.83rem;color:var(--white)">${domainLabel(w.domain)}</span>
-        <div style="flex:1;height:6px;background:var(--navy-mid);border-radius:3px">
+      <div style="font-size:0.75rem;color:var(--muted);margin:-6px 0 12px">Tap a domain to practise it right now.</div>
+      ${weakest.map(w => `<button class="focus-row" onclick="practiceDomain('${w.domain}')">
+        <span style="min-width:150px;font-size:0.83rem;color:var(--white)">${domainLabel(w.domain)}</span>
+        <div style="flex:1;min-width:0;height:6px;background:var(--navy-mid);border-radius:3px">
           <div style="height:100%;width:${w.pct}%;background:${barColor(w.pct)};border-radius:3px"></div>
         </div>
         <span style="font-size:0.8rem;color:var(--muted);min-width:72px;text-align:right">${w.pct}% (${w.correct}/${w.total})</span>
-      </div>`).join('')}
+        <span class="focus-go">Practise →</span>
+      </button>`).join('')}
     </div>` : ''}
 
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px">
@@ -5099,38 +5213,41 @@ const RANKS = [
   { xp: 28000, emblem: '👑', name: 'Nurse Preceptor',    blurb: 'You make other nurses better.' },
 ];
 
-// Each badge is a pure predicate over a stats object — add new ones freely.
+// Each badge is a pure predicate over a stats object. `progress` drives the
+// bar on a locked tile — "62 / 100" is motivating in a way a grey square is not.
 const BADGES = [
   { id:'first_steps',   icon:'👣', name:'First Steps',      desc:'Finish your first session',
-    test: s => s.sessions >= 1 },
+    test: s => s.sessions >= 1,            progress: s => [s.sessions, 1] },
   { id:'century',       icon:'💯', name:'Century Club',     desc:'Answer 100 questions',
-    test: s => s.answered >= 100 },
+    test: s => s.answered >= 100,          progress: s => [s.answered, 100] },
   { id:'five_hundred',  icon:'🗂️', name:'Deep Bank',        desc:'Answer 500 questions',
-    test: s => s.answered >= 500 },
+    test: s => s.answered >= 500,          progress: s => [s.answered, 500] },
   { id:'thousand',      icon:'🏔️', name:'Four Digits',      desc:'Answer 1,000 questions',
-    test: s => s.answered >= 1000 },
+    test: s => s.answered >= 1000,         progress: s => [s.answered, 1000] },
   { id:'explorer',      icon:'🧭', name:'Full Sweep',       desc:'Practice all 8 clinical domains',
-    test: s => s.domainsTouched >= 8 },
+    test: s => s.domainsTouched >= 8,      progress: s => [s.domainsTouched, 8] },
   { id:'perfect',       icon:'🎯', name:'Flawless',         desc:'Score 100% on a session of 10+',
     test: s => s.bestPerfect },
   { id:'passing',       icon:'✅', name:'Above the Line',   desc:'Hold 65%+ overall after 100 questions',
-    test: s => s.answered >= 100 && s.overallPct >= 65 },
+    test: s => s.answered >= 100 && s.overallPct >= 65,  progress: s => [Math.min(s.answered, 100), 100] },
   { id:'sharp',         icon:'🔬', name:'Sharp Practice',   desc:'Hold 80%+ overall after 200 questions',
-    test: s => s.answered >= 200 && s.overallPct >= 80 },
+    test: s => s.answered >= 200 && s.overallPct >= 80,  progress: s => [Math.min(s.answered, 200), 200] },
+  { id:'combo15',       icon:'⚡', name:'Combo Master',     desc:'15 correct in a row in one session',
+    test: s => s.bestCombo >= 15,          progress: s => [s.bestCombo, 15] },
   { id:'streak3',       icon:'🔥', name:'On a Roll',        desc:'Study 3 days in a row',
-    test: s => s.bestStreak >= 3 },
+    test: s => s.bestStreak >= 3,          progress: s => [s.bestStreak, 3] },
   { id:'streak7',       icon:'📅', name:'Full Week',        desc:'Study 7 days in a row',
-    test: s => s.bestStreak >= 7 },
+    test: s => s.bestStreak >= 7,          progress: s => [s.bestStreak, 7] },
   { id:'streak30',      icon:'🗓️', name:'Thirty Days',      desc:'Study 30 days in a row',
-    test: s => s.bestStreak >= 30 },
+    test: s => s.bestStreak >= 30,         progress: s => [s.bestStreak, 30] },
   { id:'specialist',    icon:'🧠', name:'Domain Specialist', desc:'80%+ in a domain with 25+ answered',
-    test: s => s.masteredDomains >= 1 },
+    test: s => s.masteredDomains >= 1,     progress: s => [s.masteredDomains, 1] },
   { id:'polymath',      icon:'🌐', name:'Polymath',         desc:'Master 4 different domains',
-    test: s => s.masteredDomains >= 4 },
+    test: s => s.masteredDomains >= 4,     progress: s => [s.masteredDomains, 4] },
   { id:'marathon',      icon:'⏱️', name:'Marathoner',       desc:'Complete a 75+ question session',
-    test: s => s.longestSession >= 75 },
+    test: s => s.longestSession >= 75,     progress: s => [s.longestSession, 75] },
   { id:'dedicated',     icon:'🌱', name:'Dedicated',        desc:'Complete 25 sessions',
-    test: s => s.sessions >= 25 },
+    test: s => s.sessions >= 25,           progress: s => [s.sessions, 25] },
   { id:'comeback',      icon:'📈', name:'Comeback',         desc:'Follow a sub-50% session with an 80%+ one',
     test: s => s.comeback },
 ];
@@ -5141,7 +5258,7 @@ const _DOMAIN_MASTERY_PCT = 80;
 function gameStats(data) {
   const empty = { answered:0, correct:0, overallPct:0, sessions:0, uniqueQuestions:0,
                   currentStreak:0, bestStreak:0, domainsTouched:0, masteredDomains:0,
-                  longestSession:0, bestPerfect:false, comeback:false, studyDays:0 };
+                  longestSession:0, bestCombo:0, bestPerfect:false, comeback:false, studyDays:0 };
   if (!data || !data.totalAnswered) return empty;
 
   const sessions = Array.isArray(data.sessions) ? data.sessions : [];
@@ -5184,6 +5301,7 @@ function gameStats(data) {
     masteredDomains: domains.filter(d =>
       d.total >= _DOMAIN_MASTERY_MIN && (d.correct / d.total) * 100 >= _DOMAIN_MASTERY_PCT).length,
     longestSession: sessions.reduce((m, s) => Math.max(m, s.answered || 0), 0),
+    bestCombo: sessions.reduce((m, s) => Math.max(m, s.bestCombo || 0), 0),
     bestPerfect: sessions.some(s => s.pct === 100 && s.answered >= 10),
     comeback,
   };
@@ -5252,6 +5370,11 @@ function renderSessionRewards(before, after) {
   if (after.stats.currentStreak > 0) {
     html += `<div class="xp-earned-chip">🔥 <strong>${after.stats.currentStreak}</strong>-day streak</div>`;
   }
+  if (typeof examState !== 'undefined' && examState.bestCombo >= 3) {
+    html += `<div class="xp-earned-chip">⚡ best run of <strong>${examState.bestCombo}</strong> in a row</div>`;
+  }
+  const _daily = dailyProgress(progressData);
+  html += `<div class="xp-earned-chip">${_daily.met ? '✅' : '🎯'} <strong>${_daily.answered}</strong>/${_daily.goal} today</div>`;
   html += `</div>`;
 
   if (levelUp || fresh.length) {
@@ -5316,13 +5439,243 @@ function renderBadgeCase(snap) {
   return `<div class="domain-title" style="margin-bottom:12px">
       Badges <span style="color:var(--muted);font-weight:400">— ${earned.size} of ${BADGES.length} earned</span>
     </div>
-    <div class="badge-grid">${BADGES.map(b => `
-      <div class="badge-tile${earned.has(b.id) ? ' earned' : ''}" title="${escapeHtml(b.desc)}">
+    <div class="badge-grid">${BADGES.map(b => {
+      const has = earned.has(b.id);
+      let bar = '', close = false;
+      if (!has && b.progress) {
+        const [cur, target] = b.progress(snap.stats);
+        const pct = Math.min(100, Math.round((cur / target) * 100));
+        close = pct >= 60;
+        bar = `<div class="badge-prog"><div class="badge-prog-fill" style="width:${pct}%"></div></div>
+               <div class="badge-prog-lbl">${cur.toLocaleString()} / ${target.toLocaleString()}</div>`;
+      }
+      return `<div class="badge-tile${has ? ' earned' : (close ? ' close' : '')}" title="${escapeHtml(b.desc)}">
         <div class="badge-icon">${b.icon}</div>
         <div class="badge-name">${escapeHtml(b.name)}</div>
         <div class="badge-desc">${escapeHtml(b.desc)}</div>
-      </div>`).join('')}
+        ${bar}
+      </div>`;
+    }).join('')}
     </div>`;
+}
+// ══════════════════════════════════════════════════════════════════
+//  HAPTICS
+// ══════════════════════════════════════════════════════════════════
+// The Vibration API is supported on Android (Chrome, Firefox, Samsung
+// Internet) and not on iOS Safari, which exposes no web vibration at all.
+// Everything below is a no-op where it is unsupported, so nothing depends
+// on it — haptics are a bonus layer, never the only feedback for anything.
+
+const HAPTIC_PATTERNS = {
+  tap:      12,                       // option tapped
+  correct:  [18],                     // right answer
+  wrong:    [34, 70, 34],             // wrong answer — deliberately unmistakable
+  combo:    [12, 45, 12],             // combo milestone
+  unlock:   [18, 50, 18, 50, 40],     // badge earned
+  rankup:   [26, 55, 26, 55, 26, 55, 90],
+  goal:     [20, 40, 20, 40, 60],     // daily goal met
+};
+
+let hapticsEnabled = true;
+
+function hapticsSupported() {
+  return typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
+}
+
+function buzz(name) {
+  if (!hapticsEnabled || !hapticsSupported()) return;
+  // Vibration is blocked until the page has had a user gesture, and throws in
+  // some embedded webviews. Never let it break the answer flow.
+  try { navigator.vibrate(HAPTIC_PATTERNS[name] ?? 12); } catch (e) {}
+}
+
+function initHaptics() {
+  try {
+    const stored = localStorage.getItem('nclexHaptics');
+    if (stored !== null) hapticsEnabled = stored === '1';
+  } catch (e) {}
+  renderHapticBtn();
+}
+
+function toggleHaptics() {
+  hapticsEnabled = !hapticsEnabled;
+  try { localStorage.setItem('nclexHaptics', hapticsEnabled ? '1' : '0'); } catch (e) {}
+  renderHapticBtn();
+  if (hapticsEnabled) buzz('combo');
+}
+
+function renderHapticBtn() {
+  const btn = document.getElementById('hapticBtn');
+  if (!btn) return;
+  if (!hapticsSupported()) {
+    // Be honest rather than showing a control that silently does nothing.
+    btn.classList.add('off');
+    btn.textContent = '📳 Haptics n/a';
+    btn.title = 'This device or browser has no web vibration support (iOS Safari does not implement it).';
+    btn.disabled = true;
+    return;
+  }
+  btn.classList.toggle('off', !hapticsEnabled);
+  btn.textContent = hapticsEnabled ? '📳 Haptics on' : '📴 Haptics off';
+  btn.title = hapticsEnabled
+    ? 'Vibration feedback is on — tap to turn it off'
+    : 'Vibration feedback is off — tap to turn it on';
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  IN-SESSION FEEDBACK — COMBO STREAK AND FLOATING TOASTS
+// ══════════════════════════════════════════════════════════════════
+// Rewards consecutive CORRECT answers, never speed. Rushing to protect a
+// combo is the failure mode to avoid, so nothing here is timed.
+
+const COMBO_MILESTONES = {
+  3:  { msg: '3 in a row — warming up',        haptic: 'combo' },
+  5:  { msg: '5 straight! Clinical judgment is clicking', haptic: 'combo' },
+  10: { msg: '10 in a row — that is NCLEX pace', haptic: 'rankup' },
+  15: { msg: '15 straight. Genuinely impressive.', haptic: 'rankup' },
+  20: { msg: '20 in a row — you are ready for this', haptic: 'rankup' },
+  25: { msg: '25 straight. Go teach somebody.',  haptic: 'rankup' },
+};
+
+function prefersReducedMotion() {
+  return typeof matchMedia === 'function'
+    && matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function updateComboPill() {
+  const pill = document.getElementById('comboPill');
+  if (!pill) return;
+  const c = examState.combo || 0;
+  if (c < 2) { pill.classList.remove('live', 'hot'); pill.textContent = ''; return; }
+  pill.classList.add('live');
+  pill.classList.toggle('hot', c >= 10);
+  pill.textContent = `${c >= 10 ? '🔥' : '⚡'} ${c} in a row`;
+}
+
+function bumpComboPill() {
+  const pill = document.getElementById('comboPill');
+  if (!pill || prefersReducedMotion()) return;
+  pill.classList.remove('bump');
+  void pill.offsetWidth;          // restart the animation
+  pill.classList.add('bump');
+}
+
+// Records the result of one answer and fires the matching feedback.
+function registerAnswerFeedback(isCorrect, xpGained) {
+  if (isCorrect) {
+    examState.combo = (examState.combo || 0) + 1;
+    examState.bestCombo = Math.max(examState.bestCombo || 0, examState.combo);
+    const milestone = COMBO_MILESTONES[examState.combo];
+    if (milestone) {
+      buzz(milestone.haptic);
+      floatToast(`${examState.combo >= 10 ? '🔥' : '⚡'} ${milestone.msg}`, 'good');
+    } else {
+      buzz('correct');
+      floatToast(`✓ +${xpGained} XP`, 'good');
+    }
+  } else {
+    const lost = examState.combo || 0;
+    examState.combo = 0;
+    buzz('wrong');
+    // Losing a long combo is worth naming; losing a 1 is not worth a nag.
+    if (lost >= 3) floatToast(`Streak of ${lost} ended — read the rationale`, 'bad');
+  }
+  updateComboPill();
+  if (isCorrect) bumpComboPill();
+}
+
+let _toastTimer = null;
+function floatToast(text, kind) {
+  let layer = document.getElementById('floatToast');
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.id = 'floatToast';
+    layer.className = 'float-toast';
+    layer.setAttribute('aria-live', 'polite');
+    document.body.appendChild(layer);
+  }
+  // Only ever show the newest message — answering quickly used to stack chips.
+  layer.innerHTML = '';
+  const chip = document.createElement('div');
+  chip.className = `float-chip ${kind || ''}`;
+  chip.textContent = text;
+  layer.appendChild(chip);
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { layer.innerHTML = ''; }, prefersReducedMotion() ? 2200 : 1700);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  CELEBRATION
+// ══════════════════════════════════════════════════════════════════
+function celebrate(intensity) {
+  if (prefersReducedMotion()) return;
+  const colors = ['#00c9a7', '#f7c948', '#64dfdf', '#43e97b', '#ff6b6b'];
+  const layer = document.createElement('div');
+  layer.className = 'confetti-layer';
+  const n = intensity === 'big' ? 70 : 34;
+  for (let i = 0; i < n; i++) {
+    const bit = document.createElement('div');
+    bit.className = 'confetti-bit';
+    bit.style.left = `${Math.random() * 100}%`;
+    bit.style.background = colors[i % colors.length];
+    bit.style.animationDuration = `${1.8 + Math.random() * 1.6}s`;
+    bit.style.animationDelay = `${Math.random() * 0.5}s`;
+    layer.appendChild(bit);
+  }
+  document.body.appendChild(layer);
+  setTimeout(() => layer.remove(), 4200);
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  DAILY GOAL
+// ══════════════════════════════════════════════════════════════════
+// The streak counts days, but "a day" needed a concrete target. 20 questions
+// is roughly a 15-minute sitting — small enough to do on a clinical day.
+const DAILY_GOAL = 20;
+
+function dailyProgress(data) {
+  const today = new Date().toISOString().slice(0, 10);
+  const answered = ((data && data.sessions) || [])
+    .filter(s => s.date === today)
+    .reduce((a, s) => a + (s.answered || 0), 0);
+  return { answered, goal: DAILY_GOAL, pct: Math.min(100, Math.round((answered / DAILY_GOAL) * 100)),
+           met: answered >= DAILY_GOAL };
+}
+
+function renderDailyCard(data) {
+  const d = dailyProgress(data);
+  const r = 32, circ = 2 * Math.PI * r;
+  const colour = d.met ? 'var(--green)' : 'var(--teal)';
+  return `<div class="daily-card">
+    <div class="daily-ring">
+      <svg viewBox="0 0 78 78" aria-hidden="true">
+        <circle cx="39" cy="39" r="${r}" fill="none" stroke="var(--navy-mid)" stroke-width="7"/>
+        <circle cx="39" cy="39" r="${r}" fill="none" stroke="${colour}" stroke-width="7"
+          stroke-linecap="round" stroke-dasharray="${(d.pct / 100) * circ} ${circ}"/>
+      </svg>
+      <div class="daily-ring-inner" style="color:${colour}">${d.met ? '✓' : d.answered}</div>
+    </div>
+    <div class="daily-copy">
+      <div class="daily-title">${d.met ? "Today's goal met 🎉" : "Today's goal"}</div>
+      <div class="daily-sub">${d.met
+        ? `${d.answered} questions today. Your streak is safe — anything more is a bonus.`
+        : `${d.answered} of ${DAILY_GOAL} questions. ${DAILY_GOAL - d.answered} more keeps the streak alive.`}</div>
+    </div>
+    <button class="btn btn-primary" style="padding:10px 18px;font-size:0.82rem"
+      onclick="startSetup('rapid')">${d.met ? 'Another round' : 'Practice now'} →</button>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  FOCUS PRACTICE — the weakest-domain rows are actionable
+// ══════════════════════════════════════════════════════════════════
+function practiceDomain(domain) {
+  startSetup('practice');
+  document.querySelectorAll('#domainChips .chip').forEach(c =>
+    c.classList.toggle('selected', c.dataset.domain === domain));
+  showScreen('setup');
+  window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  floatToast(`🎯 Focused on ${domainLabel(domain)}`, 'good');
 }
 </script>
 <input type="file" id="progressFileInput" accept=".json" style="display:none" onchange="importProgressFile(event)">
