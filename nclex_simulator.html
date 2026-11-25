@@ -7,7 +7,7 @@
 <!-- Installable app. On iOS: Share -> Add to Home Screen. -->
 <link rel="manifest" href="app.webmanifest">
 <meta name="theme-color" content="#0a1628">
-<meta name="description" content="Next Gen NCLEX practice simulator - 1,800 questions, all 8 clinical domains, works offline.">
+<meta name="description" content="Next Gen NCLEX practice simulator - 1,800+ questions, all 8 clinical domains, daily challenges, spaced review, works offline.">
 
 <!-- iOS ignores most of the manifest before 16.4, so these stay alongside it. -->
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="NCLEX Pro">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-<title>NCLEX Pro Simulator — Powered by AI</title>
+<title>NCLEX Pro Simulator</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -1012,6 +1012,178 @@
     cursor: pointer; padding: 4px 6px; flex-shrink: 0;
   }
   .install-hint-x:hover { color: var(--white); }
+
+  /* ─── STUDY HUB (home) ─── */
+  .study-hub { width: 100%; max-width: 900px; margin: 8px 0 36px; animation: fadeUp 0.6s 0.15s ease both; }
+  .resume-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap;
+    background: rgba(247,201,72,0.08); border: 1px solid rgba(247,201,72,0.35);
+    border-radius: var(--radius); padding: 14px 18px; margin-bottom: 14px; text-align: left;
+  }
+  .resume-bar strong { color: var(--gold); display: block; font-size: 0.95rem; }
+  .resume-bar span { color: var(--muted); font-size: 0.8rem; }
+  .resume-actions { display: flex; gap: 8px; align-items: center; }
+  .resume-actions .btn { padding: 9px 18px; font-size: 0.85rem; }
+  .hub-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; text-align: left; }
+  .hub-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; min-width: 0;
+  }
+  .hub-card.hub-daily { border-color: rgba(247,201,72,0.35); background: linear-gradient(135deg, rgba(247,201,72,0.07), var(--card) 60%); }
+  .hub-card.hub-daily.done { border-color: rgba(67,233,123,0.3); background: linear-gradient(135deg, rgba(67,233,123,0.06), var(--card) 60%); }
+  .hub-top { display: flex; align-items: center; gap: 10px; }
+  .hub-icon { font-size: 1.3rem; }
+  .hub-title { font-family: 'Fraunces', serif; font-size: 1.05rem; color: var(--white); }
+  .hub-pill {
+    margin-left: auto; font-size: 0.72rem; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+    background: rgba(0,201,167,0.12); color: var(--teal); white-space: nowrap;
+  }
+  .hub-pill.hot { background: rgba(255,107,107,0.14); color: var(--red); }
+  .hub-pill.ok { background: rgba(67,233,123,0.14); color: var(--green); }
+  .hub-desc { font-size: 0.84rem; color: var(--muted); line-height: 1.55; }
+  .hub-desc strong { color: var(--white); }
+  .hub-btn { align-self: flex-start; padding: 9px 18px; font-size: 0.84rem; margin-top: auto; }
+  .btn:disabled, .prog-btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+  .hub-bar { height: 6px; background: var(--navy-mid); border-radius: 3px; overflow: hidden; }
+  .hub-bar-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--green)); border-radius: 3px; transition: width 0.6s ease; }
+  .hub-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: auto; }
+
+  /* Quests */
+  .quest-list { display: flex; flex-direction: column; gap: 10px; }
+  .quest { display: flex; align-items: center; gap: 12px; }
+  .quest-icon { font-size: 1.1rem; width: 26px; text-align: center; flex-shrink: 0; }
+  .quest-body { flex: 1; min-width: 0; }
+  .quest-name { font-size: 0.82rem; color: var(--white); font-weight: 600; }
+  .quest-desc { font-size: 0.74rem; color: var(--muted); margin: 1px 0 5px; }
+  .quest-bar { height: 4px; background: var(--navy-mid); border-radius: 2px; overflow: hidden; }
+  .quest-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #ffaa00); border-radius: 2px; transition: width 0.6s ease; }
+  .quest.done .quest-fill { background: var(--green); }
+  .quest.done .quest-name { color: var(--green); }
+  .quest-num { font-size: 0.74rem; color: var(--muted); min-width: 40px; text-align: right; font-variant-numeric: tabular-nums; }
+  .quest-meta { color: var(--muted); text-transform: none; letter-spacing: 0; font-size: 0.72rem; margin-left: 6px; }
+  .quest-nudge { font-size: 0.84rem; color: var(--muted); text-align: center; margin: -8px 0 24px; }
+  .quest-nudge strong { color: var(--gold); }
+
+  /* ─── EXAM ADDITIONS ─── */
+  .q-meta { flex-wrap: wrap; row-gap: 8px; }
+  .bm-btn {
+    margin-left: auto; background: transparent; border: 1px solid var(--border); color: var(--muted);
+    font-family: 'DM Sans', sans-serif; font-size: 0.76rem; padding: 4px 12px; border-radius: 999px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .bm-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .bm-btn.on { border-color: rgba(247,201,72,0.5); background: rgba(247,201,72,0.12); color: var(--gold); }
+  .option-item.locked { pointer-events: none; }
+  .option-item.selected.locked { border-color: var(--sky); background: rgba(100,223,223,0.08); }
+  .locked-note { margin-top: 18px; font-size: 0.85rem; color: var(--muted); text-align: center; }
+  .kbd-hint { margin-top: 22px; font-size: 0.74rem; color: var(--muted); text-align: center; opacity: 0.8; }
+  .kbd-hint kbd {
+    display: inline-block; padding: 1px 6px; border-radius: 4px; border: 1px solid var(--border);
+    background: var(--navy-mid); font-family: inherit; font-size: 0.7rem; color: var(--white);
+  }
+  .timer-display.behind { color: var(--gold) !important; }
+  .palette-q.answered.right { background: rgba(67,233,123,0.15); border-color: var(--green); color: var(--green); }
+  .palette-q.answered.wrong { background: rgba(255,107,107,0.14); border-color: var(--red); color: var(--red); }
+  .feedback-box.partial-fb { border-color: rgba(247,201,72,0.35); background: rgba(247,201,72,0.05); }
+  .fb-header { flex-wrap: wrap; }
+  .fb-header.partial { color: var(--gold); }
+  .credit-chip {
+    font-size: 0.72rem; font-weight: 500; color: var(--muted); padding: 2px 10px; border-radius: 999px;
+    background: var(--navy-mid); border: 1px solid var(--border);
+  }
+  .q-source { margin-top: 12px; font-size: 0.78rem; color: var(--muted); }
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .tag-chip { font-size: 0.7rem; color: var(--sky); background: rgba(100,223,223,0.08); border: 1px solid rgba(100,223,223,0.2); padding: 2px 9px; border-radius: 999px; }
+  .matrix-scroll { overflow-x: auto; margin-bottom: 20px; }
+  .matrix-scroll .matrix-table { margin-bottom: 0; min-width: 420px; }
+  .matrix-note { font-size: 0.76rem; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+  .bowtie-condition {
+    background: var(--navy-mid); border: 1px solid rgba(0,201,167,0.35); border-radius: 10px;
+    padding: 14px 18px; margin-bottom: 16px; text-align: center;
+  }
+  .bowtie-condition-lbl { font-size: 0.7rem; color: var(--teal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .bowtie-condition-txt { font-size: 0.95rem; color: var(--white); font-weight: 600; }
+  .bowtie-grid { display: grid; grid-template-columns: repeat(var(--bt-cols, 3), minmax(0, 1fr)); gap: 16px; margin-bottom: 20px; }
+  .bowtie-col { background: var(--navy-mid); border: 1px solid var(--border); border-radius: 10px; padding: 16px; min-width: 0; }
+  .bowtie-col-title { font-size: 0.78rem; color: var(--teal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  .option-item.bowtie-item { padding: 10px 14px; margin-bottom: 8px; gap: 10px; }
+  .bowtie-item-txt { font-size: 0.85rem; line-height: 1.5; }
+
+  /* Ordered response */
+  .order-chosen { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; padding: 0; }
+  .order-slot {
+    border: 1.5px dashed var(--border); border-radius: 12px; padding: 13px 20px;
+    color: var(--muted); font-size: 0.8rem; opacity: 0.7;
+  }
+  .order-pool-lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 10px; }
+  .order-answer { margin-top: 16px; padding: 14px 18px; border-radius: 10px; background: rgba(67,233,123,0.05); border: 1px solid rgba(67,233,123,0.25); font-size: 0.88rem; color: #b8cce0; }
+  .order-answer ol { padding-left: 20px; line-height: 1.7; }
+
+  /* Drop-down cloze */
+  .cloze-text { font-size: 1.02rem; line-height: 2.4; color: var(--white); background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 22px; }
+  .cloze-select {
+    background: var(--navy-mid); border: 1.5px solid var(--teal); color: var(--white);
+    padding: 5px 10px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    max-width: 100%; cursor: pointer; margin: 0 2px; vertical-align: middle;
+  }
+  .cloze-select.filled { background: rgba(0,201,167,0.12); }
+  .cloze-select.correct { border-color: var(--green); background: rgba(67,233,123,0.12); opacity: 1; }
+  .cloze-select.incorrect { border-color: var(--red); background: rgba(255,107,107,0.12); opacity: 1; }
+  .cloze-select:disabled { cursor: default; color: var(--white); }
+  .cloze-fix { font-size: 0.82rem; color: var(--green); margin: 0 6px; white-space: normal; }
+
+  /* ─── RESULTS ADDITIONS ─── */
+  .results-mode { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 2px; color: var(--teal); margin-bottom: 8px; }
+  .retry-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 4px 0 28px; }
+  .review-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .review-filter { display: flex; gap: 6px; flex-wrap: wrap; }
+  .review-filter .chip { font-family: 'DM Sans', sans-serif; padding: 5px 14px; font-size: 0.78rem; cursor: pointer; }
+
+  /* ─── DASHBOARD ADDITIONS ─── */
+  .dash-wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
+  .dash-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 20px; }
+  .dash-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--teal); margin-bottom: 16px; }
+  .dash-sub { font-size: 0.8rem; color: var(--muted); margin-top: 12px; line-height: 1.6; }
+  .dash-empty { font-size: 0.84rem; color: var(--muted); }
+  .stat-tile { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
+  .dash-domain-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .dash-domain-name { width: 190px; flex-shrink: 0; font-size: 0.83rem; color: var(--white); }
+  .hm-wrap { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+  .hm-days { display: grid; grid-template-rows: repeat(7, 13px); gap: 3px; font-size: 0.6rem; color: var(--muted); line-height: 13px; }
+  .hm-grid { display: flex; gap: 3px; }
+  .hm-col { display: grid; grid-template-rows: repeat(7, 13px); gap: 3px; }
+  .hm-cell { width: 13px; height: 13px; border-radius: 3px; display: inline-block; background: var(--navy-mid); }
+  .hm-cell.hm-1 { background: rgba(0,201,167,0.3); }
+  .hm-cell.hm-2 { background: rgba(0,201,167,0.55); }
+  .hm-cell.hm-3 { background: rgba(0,201,167,0.8); }
+  .hm-cell.hm-4 { background: var(--green); }
+  .hm-cell.hm-f { background: transparent; }
+  .hm-cell.hm-today { outline: 1.5px solid var(--gold); outline-offset: 1px; }
+  .hm-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 10px; font-size: 0.74rem; color: var(--muted); }
+  .hm-legend { display: inline-flex; align-items: center; gap: 3px; }
+  .hm-legend .hm-cell { width: 10px; height: 10px; }
+  .trend-svg { width: 100%; height: auto; display: block; }
+  .trend-line { fill: none; stroke: var(--teal); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+  .trend-dot { fill: var(--navy); stroke: var(--teal); stroke-width: 2; }
+  .trend-pass { stroke: var(--gold); stroke-width: 1; stroke-dasharray: 5 5; opacity: 0.7; }
+  .trend-lbl { fill: var(--muted); font-size: 11px; font-family: 'DM Sans', sans-serif; }
+  .cov-bar { display: flex; height: 12px; background: var(--navy-mid); border-radius: 6px; overflow: hidden; }
+  .cov-seg { height: 100%; }
+  .cov-mastered { background: var(--green); }
+  .cov-ok { background: var(--teal); }
+  .cov-learning { background: var(--gold); }
+  .cov-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 10px; font-size: 0.76rem; color: var(--muted); }
+  .cov-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; background: var(--navy-light); vertical-align: middle; }
+  .cov-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .sound-btn.off { opacity: 0.75; }
+
+  @media(max-width:768px) {
+    .hub-grid { grid-template-columns: 1fr; }
+    .bowtie-grid { grid-template-columns: 1fr; }
+    .dash-domain-name { width: 120px; font-size: 0.76rem; }
+    .dash-card { padding: 18px 16px; }
+    .cloze-text { padding: 14px 16px; font-size: 0.95rem; }
+  }
 </style>
 </head>
 <body>
@@ -1067,6 +1239,7 @@
         <div class="progress-action-btns">
           <button class="prog-btn" onclick="showProgressDashboard()" title="View your cumulative progress">📈 My Progress</button>
           <button class="prog-btn haptic-btn" id="hapticBtn" onclick="toggleHaptics()">📳 Haptics on</button>
+          <button class="prog-btn sound-btn off" id="soundBtn" onclick="toggleSound()" title="Sound effects">🔈 Sound off</button>
           <button class="prog-btn" onclick="triggerImport()" title="Load a saved progress JSON file">📂 Load</button>
           <button class="prog-btn primary" onclick="exportProgress()" title="Export progress as JSON">💾 Save</button>
         </div>
@@ -1084,45 +1257,46 @@
     </div>
     <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:60px 20px;flex-direction:column;width:100%;box-sizing:border-box;overflow-x:hidden">
       <div class="dedication-banner">❤️ Made with love for Peyton — Future ICU Nurse &amp; total rockstar 🩺</div>
-      <div class="home-badge">✦ 1,800-Question AI-Powered NCLEX Preparation</div>
+      <div class="home-badge">✦ 1,800+ questions · built-in rationales · works offline</div>
       <h1 class="home-title">Pass the <span>NCLEX</span><br>on your first try.</h1>
-      <p class="home-desc">The most comprehensive NCLEX simulation platform. 1,800 practice questions across all 8 clinical domains — including Next Generation NCLEX formats, adaptive CAT testing, built-in clinical rationales, and real-time performance tracking.</p>
+      <p class="home-desc">Over 1,800 practice questions across all 8 clinical domains — Next Generation NCLEX formats, a CAT-style exam simulation, a daily challenge, spaced review of your misses, and a rationale for every question.</p>
+      <div id="studyHub" class="study-hub"></div>
       <div class="mode-grid">
         <div class="mode-card" onclick="startSetup('practice')">
           <span class="hosp-icon">🩺</span>
           <div class="mode-icon">📖</div>
           <div class="mode-title">Practice Mode</div>
-          <div class="mode-desc">1,800 questions with instant AI rationales, NCLEX tips, and domain filtering. Choose your topic and go deep.</div>
+          <div class="mode-desc">Instant rationales and NCLEX tips, domain filtering, and unseen questions first so you cover the whole bank.</div>
           <span class="mode-tag">Tutor Mode</span>
         </div>
         <div class="mode-card gold-accent" onclick="startSetup('cat')">
           <span class="hosp-icon">🏥</span>
           <div class="mode-icon">🎯</div>
           <div class="mode-title">CAT Simulation</div>
-          <div class="mode-desc">True adaptive testing — 75–145 questions, difficulty calibrated in real time to mirror the actual NCLEX experience.</div>
+          <div class="mode-desc">Exam conditions: 85–150 questions, no feedback until the end, and the real NCLEX 95%-confidence stopping rule.</div>
           <span class="mode-tag" style="background:rgba(247,201,72,0.1);color:var(--gold)">Exam Mode</span>
         </div>
         <div class="mode-card sky-accent" onclick="startSetup('ngn')">
           <span class="hosp-icon">💊</span>
           <div class="mode-icon">🧠</div>
           <div class="mode-title">Next Gen NCLEX</div>
-          <div class="mode-desc">NGN clinical judgment items: Matrix Grid and Bow-tie, built on unfolding client-chart case data.</div>
+          <div class="mode-desc">Only NGN clinical judgment items: Matrix Grid, Bow-tie and Drop-down Cloze, built on client chart data.</div>
           <span class="mode-tag" style="background:rgba(100,223,223,0.1);color:var(--sky)">NGN Focused</span>
         </div>
         <div class="mode-card" onclick="startSetup('rapid')">
           <span class="hosp-icon">💉</span>
           <div class="mode-icon">⚡</div>
           <div class="mode-title">Rapid Review</div>
-          <div class="mode-desc">High-yield 25-question sprint across the most-tested NCLEX topics. Perfect daily warmup or final week prep.</div>
+          <div class="mode-desc">A quick 25-question mixed sprint across every domain. A good warm-up on a busy day.</div>
           <span class="mode-tag">25 Questions</span>
         </div>
       </div>
       <div class="stats-row">
-        <div class="stat-item"><div class="stat-num">1,800</div><div class="stat-lbl">Questions</div></div>
+        <div class="stat-item"><div class="stat-num" data-bank-count>1,819</div><div class="stat-lbl">Questions</div></div>
         <div class="stat-item"><div class="stat-num">8</div><div class="stat-lbl">Clinical Domains</div></div>
-        <div class="stat-item"><div class="stat-num">6</div><div class="stat-lbl">NGN Item Types</div></div>
+        <div class="stat-item"><div class="stat-num">6</div><div class="stat-lbl">Item Formats</div></div>
         <div class="stat-item"><div class="stat-num">CAT</div><div class="stat-lbl">Adaptive Testing</div></div>
-        <div class="stat-item"><div class="stat-num">AI</div><div class="stat-lbl">Rationales</div></div>
+        <div class="stat-item"><div class="stat-num">100%</div><div class="stat-lbl">Offline</div></div>
       </div>
       <!-- Vitals Strip -->
       <div class="vitals-strip">
@@ -1255,7 +1429,7 @@
         <span class="combo-pill" id="comboPill" aria-live="polite"></span>
         <div class="timer-display" id="timerDisplay">00:00</div>
         <button class="q-palette-toggle" onclick="togglePalette()">📋 Navigator</button>
-        <button class="btn-end-exam" style="padding:8px 18px;font-size:0.82rem" onclick="openEndModal()">End Exam</button>
+        <button class="btn-end-exam" id="btnEnd" style="padding:8px 18px;font-size:0.82rem" onclick="openEndModal()">End Exam</button>
       </div>
     </header>
     <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
@@ -3652,30 +3826,60 @@ tags:["CABG","pre-operative","NGN","metformin","hyperglycemia","hypokalemia","ca
 {id:1798,domain:"physio",type:"mcq",stem:"A nurse is caring for a patient with right-sided heart failure. Which assessment finding is MOST consistent with right-sided heart failure?",options:["A. Pink frothy sputum and crackles in the lungs","B. Jugular venous distension (JVD), hepatomegaly, dependent edema, and ascites — signs of systemic venous congestion","C. Orthopnea and paroxysmal nocturnal dyspnea","D. Sudden severe dyspnea with acute pulmonary edema"],correct:1,rationale:"Right-sided heart failure (RHF): Right ventricle fails to pump blood forward → blood backs up into systemic venous circulation. Signs of systemic venous congestion: JVD (elevated CVP), hepatomegaly (hepatic congestion → liver enlargement, right upper quadrant pain, hepatojugular reflux), peripheral edema (dependent: feet/ankles while ambulatory, sacrum/buttocks if bedbound), ascites. Left-sided HF: pulmonary congestion → crackles, orthopnea, PND, pink frothy sputum, acute pulmonary edema.",tip:"Heart failure comparison: Left-sided (LHF): Pulmonary congestion — crackles, dyspnea on exertion, orthopnea, PND, pink frothy sputum, pulmonary edema. Right-sided (RHF): Systemic congestion — JVD, peripheral edema, hepatomegaly, hepatojugular reflux, ascites, weight gain. Most common cause of RHF: left-sided HF. Other causes: pulmonary hypertension (cor pulmonale = RHF from lung disease), right-sided MI, tricuspid valve disease.",tags:["right-sided heart failure","JVD","hepatomegaly","systemic venous congestion","peripheral edema","heart failure","cor pulmonale"]},
 {id:1799,domain:"physio",type:"mcq",stem:"A nurse is caring for a 10-month-old infant who has ingested an unknown substance. Which medication is contraindicated when treating pediatric poisoning?",options:["A. Activated charcoal for certain ingestions","B. Ipecac syrup — no longer recommended; increases risk of aspiration and is not superior to other decontamination methods","C. Polyethylene glycol whole bowel irrigation","D. IV N-acetylcysteine for acetaminophen overdose"],correct:1,rationale:"Ipecac syrup in pediatric poisoning: Syrup of ipecac (induces vomiting) is NO LONGER RECOMMENDED by the American Academy of Pediatrics (AAP) or Poison Control Centers. Reasons: Doesn't significantly reduce drug absorption, Aspiration risk when emesis occurs, May delay or prevent activated charcoal administration, Home use contraindicated. Current recommendations: Call Poison Control 1-800-222-1222, Activated charcoal (in appropriate cases by medical provider), Whole bowel irrigation (specific cases). NEVER give ipecac at home or in most hospital scenarios.",tip:"Pediatric poisoning management: First action: Call Poison Control (1-800-222-1222). Activated charcoal: within 1 hour, not for all substances (ineffective for iron, lithium, alcohols, caustics). NO IPECAC. Whole bowel irrigation: iron, lithium, sustained-release medications. Specific antidotes: NAC (acetaminophen), flumazenil (benzos), naloxone (opioids), atropine (organophosphates), fomepizole (methanol/ethylene glycol). Prevention: childproof containers, medication lock boxes.",tags:["ipecac","pediatric poisoning","no longer recommended","decontamination","activated charcoal","poison control","aspiration risk"]},
 {id:1800,domain:"physio",type:"mcq",stem:"A patient with a tension pneumothorax has been treated with needle decompression and now requires a chest tube. After chest tube insertion, the nurse observes constant bubbling in the water seal chamber. What does this indicate?",options:["A. This is normal and indicates the tube is working correctly","B. Continuous bubbling in the water seal = air leak — may indicate persistent lung air leak, connection loose, or tube position issue — assess and notify physician","C. The system needs to be replaced immediately","D. The patient is breathing too rapidly — slow the respiratory rate"],correct:1,rationale:"Chest tube water seal assessment: The water seal chamber normally shows TIDALING (water level fluctuates with breathing — rises with inspiration, falls with expiration in spontaneous breathing). Intermittent bubbling during initial drainage: expected (trapped air escaping). CONTINUOUS bubbling = PERSISTENT AIR LEAK. Causes: 1) Continuing lung air leak (pneumothorax not fully sealed). 2) Air leak in the system (loose connection, drainage holes outside chest). Assessment: check all connections, observe where air leak is from, notify physician.",tip:"Chest tube water seal: Tidaling: normal (fluctuates with breathing). Continuous bubbling: air leak — assess system integrity. Intermittent bubbling: expected initially. Cessation of tidaling: obstruction (clot/kink) OR full lung re-expansion (check CXR). Drainage: note amount, color each hour. Suction chamber: active bubbling = suction working. Never clamp without order. If chest tube dislodges from chest: cover with sterile occlusive dressing taped on 3 sides (flutter valve — allows air out, not in).",tags:["chest tube","water seal","air leak","continuous bubbling","tidaling","pneumothorax","drainage system"]},
+// ── ORDERED RESPONSE & NGN DROP-DOWN CLOZE / MATRIX (ids 1801+) ──
+// Each item names its source. Ordered-response `items` are listed in the
+// CORRECT order; the app shuffles them for display.
+{id:1801,domain:"safety",type:"ordering",stem:"A nurse is entering the room of a client on contact and droplet precautions. Place the steps for putting on personal protective equipment in the correct order.",items:["Put on the gown","Put on the mask","Put on goggles or a face shield","Put on gloves, extending them over the gown cuffs"],rationale:"CDC sequence for donning PPE: gown first, then mask or respirator, then goggles or face shield, then gloves. Gloves go on last so they can be pulled over the cuffs of the gown and are not contaminated while the rest of the equipment is adjusted.",tip:"Donning runs top-to-bottom ending with gloves: Gown, Mask, Goggles, Gloves. Hand hygiene comes before all of it.",tags:["PPE","donning","infection control","CDC"],source:"CDC — Sequence for Putting On Personal Protective Equipment"},
+{id:1802,domain:"safety",type:"ordering",stem:"A nurse is leaving the room of a client on contact and droplet precautions. Place the steps for removing personal protective equipment in the correct order.",items:["Remove gloves","Remove goggles or face shield","Remove the gown","Remove the mask","Perform hand hygiene"],rationale:"CDC sequence for doffing PPE (example 1): gloves first because they are the most contaminated item, then goggles or face shield, then gown, then mask or respirator, then hand hygiene immediately after all PPE is removed. A respirator is removed after leaving the room and closing the door.",tip:"Doffing removes the dirtiest items first: Gloves, Goggles, Gown, Mask — then wash. The mask comes off last because touching the front of it is the highest-risk step.",tags:["PPE","doffing","infection control","CDC"],source:"CDC — How to Safely Remove Personal Protective Equipment"},
+{id:1803,domain:"pharmacology",type:"ordering",stem:"A nurse is preparing regular insulin and NPH insulin in the same syringe. Place the steps in the correct order.",items:["Gently roll the NPH vial between the palms to mix it","Inject air equal to the NPH dose into the NPH vial without withdrawing insulin","Inject air equal to the regular insulin dose into the regular insulin vial","Withdraw the regular insulin dose","Withdraw the NPH insulin dose"],rationale:"Air is injected into the NPH (cloudy) vial first, then into the regular (clear) vial. The regular insulin is then withdrawn first so the clear vial is never contaminated with NPH, followed by the NPH dose. NPH is rolled, not shaken, to resuspend it without creating bubbles.",tip:"'Clear before cloudy' for withdrawing — but air goes into the cloudy vial first. Never contaminate the clear vial.",tags:["insulin","mixing insulin","NPH","regular insulin"],source:"Potter & Perry, Fundamentals of Nursing — Mixing two kinds of insulin in one syringe"},
+{id:1804,domain:"physio",type:"ordering",stem:"A nurse finds an adult collapsed in a hospital corridor. Place the nurse's actions in the correct order according to the BLS algorithm for healthcare providers.",items:["Verify that the scene is safe","Check the person for responsiveness","Shout for help, activate the emergency response system, and get an AED","Check for breathing and a pulse at the same time, for no more than 10 seconds","Begin cycles of 30 chest compressions and 2 breaths"],rationale:"AHA adult BLS algorithm for healthcare providers: verify scene safety, check responsiveness, shout for nearby help and activate the emergency response system and get an AED (or send someone), then check breathing and pulse simultaneously for no more than 10 seconds. If there is no normal breathing and no definite pulse, begin CPR starting with compressions (30:2) and use the AED as soon as it arrives.",tip:"Safety → Responsive? → Call & AED → Breathing + pulse ≤10 s → Compressions. CPR is C-A-B: compressions come before airway and breathing.",tags:["BLS","CPR","AHA","cardiac arrest"],source:"AHA Adult BLS Algorithm for Healthcare Providers (2020 Guidelines)"},
+{id:1805,domain:"safety",type:"ordering",stem:"A nurse discovers a fire in a client's room. Place the nurse's actions in the correct order.",items:["Rescue the client from immediate danger","Activate the fire alarm","Contain the fire by closing doors","Extinguish the fire if it is small and safe to do so"],rationale:"RACE: Rescue anyone in immediate danger, Alarm (pull the alarm and call the facility emergency number), Contain the fire by closing doors and windows, then Extinguish if the fire is small, or evacuate. Client safety comes before property.",tip:"RACE for the response, PASS for the extinguisher (Pull, Aim, Squeeze, Sweep).",tags:["fire safety","RACE","emergency response"],source:"The Joint Commission / NFPA 101 Life Safety Code — standard RACE response taught in nursing fundamentals"},
+{id:1806,domain:"safety",type:"ordering",stem:"A nurse has determined that a small wastebasket fire can be safely extinguished. Place the steps for using a fire extinguisher in the correct order.",items:["Pull the pin","Aim the nozzle at the base of the fire","Squeeze the handle","Sweep the nozzle from side to side"],rationale:"PASS: Pull the pin, Aim low at the base of the fire (not the flames), Squeeze the handle to discharge the agent, and Sweep from side to side until the fire is out. Aiming at the flames does not extinguish the fuel source.",tip:"Aim at the BASE of the fire — the fuel — not at the flames.",tags:["fire safety","PASS","fire extinguisher"],source:"NFPA / OSHA portable fire extinguisher guidance — PASS technique"},
+{id:1807,domain:"safety",type:"ordering",stem:"A nurse's hands are visibly soiled after a dressing change. Place the steps of hand hygiene in the correct order.",items:["Wet hands with clean running water","Apply soap","Lather and scrub all surfaces of the hands for at least 20 seconds","Rinse hands under clean running water","Dry hands with a clean towel and use it to turn off the faucet"],rationale:"Visibly soiled hands require soap and water rather than alcohol-based rub. CDC steps: wet, apply soap, lather and scrub all surfaces (backs of hands, between fingers, under nails) for at least 20 seconds, rinse, and dry with a clean towel. In healthcare settings the towel is used to turn off the faucet so clean hands are not recontaminated.",tip:"Visibly soiled, C. difficile, or norovirus = soap and water. Otherwise alcohol-based hand rub is preferred.",tags:["hand hygiene","infection control","CDC"],source:"CDC — Hand Hygiene in Healthcare Settings"},
+{id:1808,domain:"reduction",type:"ordering",stem:"A nurse is inserting a nasogastric tube in an alert adult client. Place the steps in the correct order.",items:["Measure the tube from the tip of the nose to the earlobe to the xiphoid process","Lubricate the tip of the tube with water-soluble lubricant","Insert the tube through the naris with the client's head slightly extended","Ask the client to flex the head toward the chest and swallow as the tube is advanced","Confirm placement with an x-ray before the first feeding or medication"],rationale:"The tube is measured first (nose–earlobe–xiphoid, NEX) to estimate insertion length, then lubricated with water-soluble lubricant. It is inserted with the head slightly extended; once past the nasopharynx the client flexes the chin to the chest and swallows, which closes the trachea and opens the esophagus. Radiographic confirmation is the most reliable method of verifying placement before first use.",tip:"Chin to chest and swallow when the tube reaches the back of the throat. X-ray is the gold standard for initial placement.",tags:["nasogastric tube","NG tube","procedures"],source:"Potter & Perry, Fundamentals of Nursing — Inserting a nasogastric tube"},
+{id:1809,domain:"pharmacology",type:"ordering",stem:"A nurse is teaching a client to use a metered-dose inhaler without a spacer. Place the steps in the correct order.",items:["Shake the inhaler well","Breathe out fully, away from the inhaler","Seal the lips around the mouthpiece","Press down on the canister while breathing in slowly and deeply","Hold the breath for about 10 seconds, then exhale slowly"],rationale:"The inhaler is shaken to mix the medication, the client exhales fully so the next breath can be deep, seals the lips around the mouthpiece, and presses the canister at the start of a slow, deep inhalation. Holding the breath for about 10 seconds lets the medication settle in the airways. About one minute is allowed between puffs.",tip:"Slow, deep breath in with the puff, then hold for 10. A spacer improves delivery for most clients, especially children and older adults.",tags:["metered-dose inhaler","MDI","client teaching","asthma"],source:"NIH NAEPP Asthma Guidelines; Lewis, Medical-Surgical Nursing — inhaler technique"},
+{id:1810,domain:"physio",type:"cloze",ngn:true,stem:"A nurse is caring for a client in the emergency department. Review the client information and complete the sentences below.",caseData:{history:"A 24-year-old client with type 1 diabetes reports 2 days of vomiting and abdominal pain and has not been taking insulin. The client is drowsy and has deep, rapid respirations with a fruity odor to the breath.",vitals:"BP 96/58, HR 122, RR 30 (deep), T 37.4 °C (99.3 °F), SpO2 98% on room air.",labs:"Glucose 520 mg/dL. Arterial pH 7.18. HCO3 12 mEq/L. Serum ketones positive. Potassium 4.6 mEq/L."},cloze:{template:"The client's findings are most consistent with {0}. The deep, rapid respirations are the body's attempt to {1}. The nurse should anticipate the first prescription to be {2}.",blanks:[{options:["diabetic ketoacidosis","hyperosmolar hyperglycemic state","hypoglycemia","lactic acidosis from sepsis"],correct:0},{options:["compensate for metabolic acidosis by exhaling carbon dioxide","correct hypoxemia","compensate for metabolic alkalosis","lower the blood glucose"],correct:0},{options:["IV 0.9% sodium chloride","IV 5% dextrose in water","subcutaneous insulin glargine","IV sodium bicarbonate"],correct:0}]},rationale:"Hyperglycemia, ketones, a low pH and low bicarbonate in a client with type 1 diabetes who has missed insulin are diabetic ketoacidosis. Kussmaul respirations are respiratory compensation: blowing off CO2 raises the pH. Initial management is volume replacement with isotonic saline; the insulin infusion follows once potassium is confirmed to be at least 3.3 mEq/L, because insulin drives potassium into cells. Bicarbonate is not routine at this pH.",tip:"DKA order of operations: fluids first, check potassium, then IV regular insulin. Add dextrose to the fluids once glucose falls to about 250 mg/dL.",tags:["DKA","diabetic ketoacidosis","Kussmaul respirations","acid-base"],source:"ADA — Hyperglycemic Crises in Adult Patients With Diabetes (consensus report)"},
+{id:1811,domain:"physio",type:"cloze",ngn:true,stem:"A nurse is reviewing laboratory results for a client with chronic kidney disease. Complete the sentences below.",caseData:{history:"A 66-year-old client with stage 4 chronic kidney disease reports generalized muscle weakness and palpitations.",labs:"Potassium 6.8 mEq/L. Sodium 138 mEq/L. Creatinine 4.1 mg/dL. BUN 62 mg/dL.",vitals:"BP 148/90, HR 58 and irregular, RR 18, SpO2 97%."},cloze:{template:"The electrocardiogram change the nurse would most expect is {0}. To protect the heart while other treatments lower the potassium, the nurse should anticipate a prescription for {1}.",blanks:[{options:["tall, peaked T waves","prominent U waves","ST-segment depression with a flattened T wave","a shortened QT interval"],correct:0},{options:["IV calcium gluconate","oral potassium chloride","IV furosemide alone","IV 5% dextrose in water alone"],correct:0}]},rationale:"Hyperkalemia classically produces tall, peaked T waves, then a widened QRS, and can progress to ventricular fibrillation or asystole. U waves and ST depression with flattened T waves are signs of hypokalemia. IV calcium gluconate stabilizes the cardiac cell membrane within minutes but does not lower potassium; regular insulin with dextrose, beta-agonists and binders are used to shift or remove potassium.",tip:"Peaked T = high K. U wave = low K. Calcium protects the heart; insulin + glucose moves K into cells.",tags:["hyperkalemia","potassium","ECG","calcium gluconate","CKD"],source:"Lewis, Medical-Surgical Nursing — Fluid, electrolyte and acid-base imbalances"},
+{id:1812,domain:"pharmacology",type:"cloze",ngn:true,stem:"A nurse is caring for a client with preeclampsia with severe features who is receiving IV magnesium sulfate. Complete the sentences below.",caseData:{vitals:"BP 150/96, HR 88, RR 10, SpO2 95%.",history:"The client is difficult to rouse. Patellar reflexes are absent. Urine output over the last 4 hours was 80 mL.",labs:"Serum magnesium 9.8 mg/dL."},cloze:{template:"These findings indicate {0}. The nurse's first action is to {1}, and the nurse should have {2} available as the antidote.",blanks:[{options:["magnesium toxicity","the expected therapeutic effect","worsening preeclampsia that needs a higher magnesium dose","eclampsia"],correct:0},{options:["stop the magnesium sulfate infusion","increase the infusion rate","administer the next scheduled antihypertensive","reassess reflexes in 1 hour"],correct:0},{options:["calcium gluconate","naloxone","protamine sulfate","flumazenil"],correct:0}]},rationale:"Respirations below 12, absent deep tendon reflexes, decreased level of consciousness, oliguria and a magnesium level well above the therapeutic range (about 4.8–8.4 mg/dL) indicate magnesium toxicity. The infusion is stopped immediately and the provider notified. Calcium gluconate is the antidote. Because magnesium is excreted by the kidneys, the low urine output contributes to accumulation.",tip:"On magnesium: check RR, DTRs, LOC and urine output every hour. RR <12 or absent reflexes = stop the drip and get calcium gluconate.",tags:["magnesium sulfate","preeclampsia","magnesium toxicity","obstetrics"],source:"ACOG Practice Bulletin 222 — Gestational Hypertension and Preeclampsia"},
+{id:1813,domain:"physio",type:"cloze",ngn:true,stem:"A nurse is caring for a client 8 hours after the application of a long-leg cast for a tibial fracture. Complete the sentences below.",caseData:{history:"The client reports severe, increasing pain in the casted leg that has not improved after two doses of IV morphine. The pain worsens when the nurse passively flexes the client's toes. The toes are pale and cool, and the client reports tingling.",vitals:"BP 132/80, HR 104, RR 20, T 37.0 °C (98.6 °F)."},cloze:{template:"The nurse recognizes these findings as signs of {0}. The earliest and most reliable of these findings is {1}. While notifying the provider, the nurse should position the extremity {2}.",blanks:[{options:["acute compartment syndrome","deep vein thrombosis","fat embolism syndrome","expected post-fracture pain"],correct:0},{options:["pain out of proportion to the injury, worse with passive stretch","absent pedal pulses","paralysis of the toes","a warm, red calf"],correct:0},{options:["at the level of the heart","elevated above the level of the heart","in a dependent position below the heart","with ice packs applied directly to the toes"],correct:0}]},rationale:"Pain out of proportion to the injury that is unrelieved by opioids and increased by passive stretch, with paresthesia and pallor, indicates acute compartment syndrome. Pain is the earliest sign; pulselessness and paralysis are late findings that signal irreversible damage. The limb is kept at heart level: elevating it further reduces arterial perfusion into the compartment. The provider is notified immediately because the cast may need to be bivalved and fasciotomy may be required.",tip:"Compartment syndrome: don't elevate above the heart and don't apply ice. Waiting for a lost pulse is waiting too long.",tags:["compartment syndrome","cast care","6 Ps","musculoskeletal"],source:"Lewis, Medical-Surgical Nursing — Musculoskeletal trauma: complications of fractures"},
+{id:1814,domain:"pharmacology",type:"cloze",ngn:true,stem:"A nurse is caring for a client who takes lithium carbonate for bipolar disorder. Complete the sentences below.",caseData:{history:"The client has had vomiting and diarrhea for 3 days and has been eating and drinking very little. The client has a coarse hand tremor, slurred speech and an unsteady gait.",labs:"Serum lithium 2.1 mEq/L. Sodium 131 mEq/L. Creatinine 1.6 mg/dL (baseline 0.9)."},cloze:{template:"The client's lithium level is {0}. A factor that most likely contributed to this level is {1}. The nurse should {2}.",blanks:[{options:["in the toxic range","within the therapeutic range","below the therapeutic range","expected during the first week of therapy"],correct:0},{options:["dehydration and low sodium from vomiting and diarrhea","a high-sodium diet","drinking 2 to 3 liters of fluid a day","taking the dose with food"],correct:0},{options:["withhold the next dose and notify the provider","give the next dose with a full glass of water","encourage the client to restrict salt","administer an antidiarrheal and recheck in 1 week"],correct:0}]},rationale:"The usual maintenance therapeutic range for lithium is about 0.6–1.2 mEq/L; 2.1 mEq/L with coarse tremor, slurred speech and ataxia is toxicity. Lithium is handled by the kidneys like sodium, so when sodium and fluid are lost the kidneys retain lithium. Rising creatinine shows reduced clearance. The dose is held and the provider notified; severe toxicity may need hemodialysis.",tip:"Lithium teaching: steady salt intake, 2–3 L of fluid daily, and report vomiting, diarrhea or heavy sweating. Fine tremor is expected; coarse tremor is not.",tags:["lithium","lithium toxicity","bipolar disorder","sodium"],source:"Lehne's Pharmacology for Nursing Care — Lithium"},
+{id:1815,domain:"pharmacology",type:"cloze",ngn:true,stem:"A nurse is preparing to administer morning medications to a client with heart failure. Complete the sentences below.",caseData:{history:"The client reports nausea, loss of appetite and seeing yellow-green halos around lights.",meds:"Digoxin 0.25 mg PO daily. Furosemide 40 mg PO daily.",vitals:"Apical pulse 52 and irregular. BP 108/64.",labs:"Potassium 3.1 mEq/L. Digoxin level 2.6 ng/mL."},cloze:{template:"The client's findings are most consistent with {0}. The potassium level {1} the risk of this problem. The nurse should {2}.",blanks:[{options:["digoxin toxicity","an expected therapeutic response to digoxin","acute kidney injury","hyperkalemia"],correct:0},{options:["increases","decreases","has no effect on"],correct:0},{options:["hold the digoxin and notify the provider","give the digoxin and recheck the pulse in 1 hour","give the furosemide first, then the digoxin","hold the furosemide and give the digoxin"],correct:0}]},rationale:"GI symptoms, visual disturbances such as yellow-green halos, bradycardia and a level above the therapeutic range indicate digoxin toxicity. Hypokalemia increases the risk because digoxin and potassium compete for the same binding site; low potassium lets more digoxin bind. Loop diuretics such as furosemide cause potassium loss. The nurse holds the digoxin, notifies the provider and anticipates potassium replacement; digoxin immune Fab is the antidote for severe toxicity.",tip:"Hold digoxin for an apical pulse under 60 in adults and report nausea or vision changes. Low K + digoxin = toxicity risk.",tags:["digoxin","digoxin toxicity","hypokalemia","heart failure"],source:"Lehne's Pharmacology for Nursing Care — Cardiac glycosides"},
+{id:1816,domain:"reduction",type:"cloze",ngn:true,stem:"A nurse is reviewing arterial blood gas results for a client who received opioids after surgery and is now very drowsy. Complete the sentences below.",caseData:{labs:"pH 7.30. PaCO2 54 mm Hg. HCO3 25 mEq/L. PaO2 78 mm Hg.",vitals:"RR 8 and shallow. SpO2 91% on 2 L/min nasal cannula."},cloze:{template:"These results show {0} that is {1}. The most likely cause is {2}.",blanks:[{options:["respiratory acidosis","respiratory alkalosis","metabolic acidosis","metabolic alkalosis"],correct:0},{options:["uncompensated","partially compensated","fully compensated"],correct:0},{options:["hypoventilation from opioid-induced respiratory depression","hyperventilation from pain","vomiting","diarrhea"],correct:0}]},rationale:"The pH is below 7.35 (acidosis) and the PaCO2 is above 45 mm Hg, which matches the direction of the pH, so the cause is respiratory. The bicarbonate is normal (22–26 mEq/L), so the kidneys have not yet compensated: uncompensated respiratory acidosis. Opioids depress the respiratory drive, causing CO2 retention.",tip:"ROME: Respiratory Opposite (pH and CO2 move in opposite directions), Metabolic Equal. A normal HCO3 with a respiratory problem means no compensation yet.",tags:["ABG","acid-base","respiratory acidosis","opioids"],source:"Lewis, Medical-Surgical Nursing — Acid-base imbalances"},
+{id:1817,domain:"physio",type:"cloze",ngn:true,stem:"A nurse is caring for a client with type 1 diabetes who reports feeling shaky and sweaty. Complete the sentences below.",caseData:{history:"The client is alert, able to swallow and follow instructions. The client took insulin before lunch but ate only a few bites.",labs:"Fingerstick glucose 58 mg/dL."},cloze:{template:"The nurse should first give {0}. The nurse should recheck the blood glucose in {1}.",blanks:[{options:["4 oz (120 mL) of fruit juice","a peanut butter sandwich","IV 50% dextrose","1 mg of glucagon IM"],correct:0},{options:["15 minutes","5 minutes","1 hour","2 hours"],correct:0}]},rationale:"For a conscious client who can swallow, hypoglycemia is treated with 15–20 g of fast-acting carbohydrate, such as 4 oz of juice, and the glucose is rechecked after 15 minutes, repeating if it is still below 70 mg/dL. Foods with fat or protein, such as peanut butter, slow absorption and are given only after the glucose has recovered. IV dextrose and glucagon are for clients who cannot safely swallow.",tip:"Rule of 15: 15 g of fast carbohydrate, recheck in 15 minutes, repeat if still under 70 mg/dL. Then a snack or meal.",tags:["hypoglycemia","rule of 15","diabetes","insulin"],source:"ADA Standards of Care in Diabetes — Hypoglycemia"},
+{id:1818,domain:"basic",type:"ngn_matrix",ngn:true,stem:"A nurse is reinforcing discharge teaching with a client after a total hip arthroplasty using a posterior approach. For each instruction, indicate whether it is indicated or contraindicated.",matrix:{rows:["Keep the knees apart and avoid crossing the legs","Sit in a low, soft recliner to rest the hip","Use a raised toilet seat","Bend forward at the waist to put on shoes","Use a long-handled reacher and sock aid","Turn the operative leg inward when getting out of bed"],cols:["Indicated","Contraindicated"],correct:[0,1,0,1,0,1]},rationale:"After a posterior-approach hip replacement the hip must not flex beyond 90 degrees, adduct past the midline or rotate internally, because each position can dislocate the prosthesis. Keeping the legs apart, using a raised toilet seat and using a reacher and sock aid all keep flexion under 90 degrees. Low chairs, bending forward to reach the feet and turning the leg inward violate these precautions.",tip:"Posterior hip precautions: no flexion past 90°, no crossing legs, no turning the toes in.",tags:["hip arthroplasty","hip precautions","dislocation","discharge teaching"],source:"Lewis, Medical-Surgical Nursing — Hip arthroplasty postoperative care"},
+{id:1819,domain:"pharmacology",type:"ngn_matrix",ngn:true,stem:"A nurse is evaluating a client's understanding of discharge teaching about warfarin. For each statement, indicate whether it shows effective or ineffective understanding.",matrix:{rows:["I will keep the amount of leafy green vegetables I eat about the same each week.","I can take aspirin when I get a headache.","I will use a soft-bristled toothbrush and an electric razor.","If I miss a dose, I will take a double dose the next day.","I will go to my scheduled INR blood tests.","I will tell my dentist that I take warfarin."],cols:["Effective","Ineffective"],correct:[0,1,0,1,0,0]},rationale:"Warfarin antagonizes vitamin K, so vitamin K intake should stay consistent rather than be eliminated. Aspirin and other NSAIDs increase bleeding risk and should be avoided unless prescribed. Bleeding precautions such as a soft toothbrush and electric razor are appropriate. Doubling a missed dose risks bleeding; the client should follow the prescriber's instructions instead. Regular INR monitoring and telling all providers, including dentists, about warfarin are essential.",tip:"Warfarin = consistent vitamin K, regular INR checks, no doubling doses, avoid NSAIDs and aspirin unless prescribed. Antidote: vitamin K.",tags:["warfarin","anticoagulant","INR","client teaching"],source:"Lehne's Pharmacology for Nursing Care — Warfarin"},
 ];
 
 
 // ══════════════════════════════════════════════════════════════════
 //  STATE
 // ══════════════════════════════════════════════════════════════════
-let examState = {
-  mode: 'practice',
-  tutorMode: true,
-  timerEnabled: true,
-  ngnEnabled: true,
-  questions: [],
-  currentIndex: 0,
-  answers: {},       // { qIndex: answer }
-  flags: new Set(),
-  startTime: null,
-  questionTimer: null,
-  examTimer: null,
-  timePerQuestion: 60,
-  questionElapsed: {},
-  totalElapsed: 0,
-  submitted: false,
-  domains: ['all'],
-};
+function _freshExamState() {
+  return {
+    mode: 'practice',
+    label: null,
+    tutorMode: true,
+    timerEnabled: true,
+    ngnEnabled: true,
+    questions: [],
+    currentIndex: 0,
+    answers: {},       // { qIndex: answer }
+    flags: new Set(),
+    startTime: null,
+    totalElapsed: 0,
+    ended: false,
+    combo: 0,
+    bestCombo: 0,
+    catDone: null,     // CAT stopping-rule verdict once reached
+    lastRendered: -1,
+  };
+}
+let examState = _freshExamState();
+
+// Real NCLEX (since April 2023): 85–150 scored+unscored items, and the
+// test stops once the candidate is 95% confidently above or below the
+// passing standard. See catCheckStop().
+const CAT_MIN = 85, CAT_MAX = 150, CAT_PASS_LINE = 0.65;
 
 // ══════════════════════════════════════════════════════════════════
 //  NAVIGATION
@@ -3683,28 +3887,34 @@ let examState = {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  if (id !== 'exam') closePalette();
+  if (id === 'home' && typeof renderHub === 'function') renderHub();
+  window.scrollTo(0, 0);
 }
+
+const _SETUP_COPY = {
+  practice: ['Practice Mode Setup', 'Pick domains and a length. Questions you have never seen come first, so you work through the whole bank.'],
+  cat:      ['CAT Simulation Setup', `Variable length, ${CAT_MIN}–${CAT_MAX} questions, no feedback until the end — like test day. The exam stops once you are 95% confidently above or below the passing line.`],
+  rapid:    ['Rapid Review (25 Questions)', 'A quick 25-question sprint. Good as a daily warm-up.'],
+  ngn:      ['Next Gen NCLEX Focus', 'Only NGN-format items: matrix grids, bow-ties and drop-down cloze, built on client chart data.'],
+};
 
 function startSetup(mode) {
   examState.mode = mode;
-  const title = document.getElementById('setupTitle');
-  const countSection = document.getElementById('countSection');
-  if (mode === 'cat') {
-    title.textContent = 'CAT Simulation Setup';
-    countSection.style.display = 'none';
-    document.getElementById('timerChip').classList.add('selected');
-  } else if (mode === 'rapid') {
-    title.textContent = 'Rapid Review (25 Questions)';
-    document.getElementById('qCount').value = '25';
-    countSection.style.display = 'none';
-  } else if (mode === 'ngn') {
-    title.textContent = 'Next Gen NCLEX Focus';
-    document.getElementById('ngnChip').classList.add('selected');
-  } else {
-    title.textContent = 'Practice Mode Setup';
-    countSection.style.display = 'block';
-  }
-  // Chip interactions
+  const [title, sub] = _SETUP_COPY[mode] || _SETUP_COPY.practice;
+  document.getElementById('setupTitle').textContent = title;
+  const subEl = document.querySelector('#setup .setup-sub');
+  if (subEl) subEl.textContent = sub;
+  document.getElementById('countSection').style.display = (mode === 'cat' || mode === 'rapid') ? 'none' : 'block';
+  if (mode === 'rapid') document.getElementById('qCount').value = '25';
+
+  // Each mode starts from its own sensible defaults rather than whatever the
+  // last mode left behind. CAT hides feedback until the end, as on test day.
+  document.getElementById('tutorChip').classList.toggle('selected', mode !== 'cat');
+  document.getElementById('timerChip').classList.add('selected');
+  document.getElementById('ngnChip').classList.add('selected');
+  document.getElementById('ngnChip').style.display = mode === 'ngn' ? 'none' : '';
+
   document.querySelectorAll('#domainChips .chip').forEach(c => {
     c.onclick = () => {
       if (c.dataset.domain === 'all') {
@@ -3717,55 +3927,147 @@ function startSetup(mode) {
           document.querySelector('[data-domain="all"]').classList.add('selected');
         }
       }
+      buzz('tap');
     };
   });
   document.querySelectorAll('[data-opt]').forEach(c => {
-    c.onclick = () => c.classList.toggle('selected');
+    c.onclick = () => { c.classList.toggle('selected'); buzz('tap'); };
   });
   showScreen('setup');
 }
 
 function startExam() {
+  const mode = examState.mode;
+  const selectedDomains = [...document.querySelectorAll('#domainChips .chip.selected')].map(c => c.dataset.domain);
+  const includeAll = selectedDomains.includes('all');
+  const tutor = document.getElementById('tutorChip').classList.contains('selected');
+  const timer = document.getElementById('timerChip').classList.contains('selected');
+  const ngnOn = document.getElementById('ngnChip').classList.contains('selected');
+
+  const pool = QUESTION_BANK.filter(q => {
+    if (mode === 'ngn' && !q.ngn) return false;
+    if (mode !== 'ngn' && !ngnOn && q.ngn) return false;
+    return includeAll || selectedDomains.includes(q.domain);
+  });
+
+  let count;
+  if (mode === 'cat') count = CAT_MAX;
+  else if (mode === 'rapid') count = 25;
+  else count = parseInt(document.getElementById('qCount').value, 10) || 25;
+
+  launchSession(mode, freshFirst(pool).slice(0, count), { tutor, timer });
+}
+
+// Unseen questions first (shuffled), then everything else (shuffled), so
+// regular practice walks through the whole bank instead of re-drawing the
+// same favourites.
+function freshFirst(pool) {
+  const hist = (progressData && progressData.questionHistory) || {};
+  const unseen = pool.filter(q => !hist[q.id]);
+  const seen = pool.filter(q => hist[q.id]);
+  return [...shuffle(unseen), ...shuffle(seen)];
+}
+
+function shuffle(arr, rng = Math.random) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function launchSession(mode, questions, opts = {}) {
+  const { tutor = true, timer = true, label = null, restore = null } = opts;
+  if (!questions.length) { floatToast('No questions match that selection yet', 'bad'); return; }
+
+  stopExamTimer();
+  examState = _freshExamState();
+  Object.assign(examState, {
+    mode, label, tutorMode: tutor, timerEnabled: timer,
+    questions: restore ? questions : questions.map(q => prepareQuestion(q)),
+    startTime: Date.now(),
+  });
+  if (restore) {
+    Object.assign(examState, {
+      answers: restore.answers || {},
+      flags: new Set(restore.flags || []),
+      currentIndex: Math.min(restore.currentIndex || 0, questions.length - 1),
+      combo: restore.combo || 0,
+      bestCombo: restore.bestCombo || 0,
+      catDone: restore.catDone || null,
+    });
+  }
+  resetPending();
+  updateComboPill();
+
   document.getElementById('loading').classList.add('active');
   setTimeout(() => {
-    buildExam();
     document.getElementById('loading').classList.remove('active');
     showScreen('exam');
     renderQuestion();
-    if (examState.timerEnabled) startExamTimer();
-  }, 1200);
+    startExamTimer(restore ? restore.elapsed || 0 : 0);
+    saveActiveSession();
+  }, restore ? 150 : 450);
 }
 
-function buildExam() {
-  const selectedDomains = [...document.querySelectorAll('#domainChips .chip.selected')].map(c => c.dataset.domain);
-  const includeAll = selectedDomains.includes('all');
-  examState.tutorMode = document.getElementById('tutorChip').classList.contains('selected');
-  examState.timerEnabled = document.getElementById('timerChip').classList.contains('selected');
-  examState.ngnEnabled = document.getElementById('ngnChip').classList.contains('selected');
+// ══════════════════════════════════════════════════════════════════
+//  QUESTION PREPARATION — option shuffling
+// ══════════════════════════════════════════════════════════════════
+// In the stored bank the correct MCQ answer is option B ~79% of the time,
+// which a student can learn to exploit without knowing any nursing. Every
+// session therefore shows options in a fresh random order. Questions whose
+// options or rationale refer to other options by letter ("Both A and C",
+// "option D is incorrect") keep their authored order so the text still
+// makes sense.
+const _LETTER_PREFIX = /^[A-F][.)]\s+/;
+const _CROSS_REF_OPTS = /\b(all|none|both|neither) of the (above|options|choices)\b|\bboth [A-F]\b|\b[A-F] and [A-F]\b/i;
+const _LETTER_REF_TEXT = /\b(option|answer|choice)s?\s+\(?[A-F]\b|\([A-F]\)|\b[A-F]\)\s/;
 
-  let pool = QUESTION_BANK.filter(q => {
-    if (!examState.ngnEnabled && q.ngn) return false;
-    if (includeAll) return true;
-    return selectedDomains.includes(q.domain);
-  });
+function canShuffleOptions(q) {
+  if (!Array.isArray(q.options)) return false;
+  if (_CROSS_REF_OPTS.test(q.options.join(' | '))) return false;
+  if (_LETTER_REF_TEXT.test(`${q.rationale || ''} ${q.tip || ''}`)) return false;
+  return true;
+}
 
-  // Shuffle
-  pool = pool.sort(() => Math.random() - 0.5);
+function _derangedOrder(n) {
+  if (n < 2) return [...Array(n).keys()];
+  let p;
+  do { p = shuffle([...Array(n).keys()]); } while (p.every((v, i) => v === i));
+  return p;
+}
 
-  let count;
-  if (examState.mode === 'cat') count = Math.min(75, pool.length);
-  else if (examState.mode === 'rapid') count = Math.min(25, pool.length);
-  else count = Math.min(parseInt(document.getElementById('qCount').value) || 25, pool.length);
-
-  examState.questions = pool.slice(0, count);
-  examState.currentIndex = 0;
-  examState.answers = {};
-  examState.flags = new Set();
-  examState.startTime = Date.now();
-  examState.submitted = false;
-  examState.questionElapsed = {};
-  examState.combo = 0;
-  examState.bestCombo = 0;
+// Returns a per-session VIEW of a bank question. `perm[newPos] = oldIndex`.
+// Answers are stored against the view, so every renderer and scorer works on
+// the shuffled copy unchanged. `perm`/`clozePerms` are passed back in when a
+// saved session is resumed so the order is identical.
+function prepareQuestion(q, perm, clozePerms) {
+  const v = { ...q };
+  if (Array.isArray(q.options)) {
+    const prefixed = q.options.every((o, i) =>
+      o.startsWith(String.fromCharCode(65 + i) + '.') || o.startsWith(String.fromCharCode(65 + i) + ')'));
+    const opts = prefixed ? q.options.map(o => o.replace(_LETTER_PREFIX, '')) : q.options.slice();
+    if (!perm) perm = canShuffleOptions(q) ? shuffle([...opts.keys()]) : [...opts.keys()];
+    v.options = perm.map(i => opts[i]);
+    if (q.type === 'sata') v.correct = q.correct.map(c => perm.indexOf(c)).sort((a, b) => a - b);
+    else v.correct = perm.indexOf(q.correct);
+    v._perm = perm;
+  } else if (q.type === 'ordering') {
+    v._perm = perm || _derangedOrder(q.items.length);
+  }
+  if (q.type === 'cloze') {
+    const perms = clozePerms || q.cloze.blanks.map(b => _derangedOrder(b.options.length));
+    v.cloze = {
+      template: q.cloze.template,
+      blanks: q.cloze.blanks.map((b, bi) => ({
+        options: perms[bi].map(i => b.options[i]),
+        correct: perms[bi].indexOf(b.correct),
+      })),
+    };
+    v._clozePerms = perms;
+  }
+  return v;
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -3774,85 +4076,120 @@ function buildExam() {
 let globalTimerInterval = null;
 let globalSeconds = 0;
 
-function startExamTimer() {
-  globalSeconds = 0;
+// Elapsed time is always tracked (it feeds "Time used"); the clock is only
+// shown in timed mode. In timed mode it turns amber when you fall behind the
+// 1-minute-per-question pace — a nudge, never a forced submit.
+function startExamTimer(fromSeconds = 0) {
+  globalSeconds = fromSeconds;
+  examState.totalElapsed = globalSeconds;
   const display = document.getElementById('timerDisplay');
-  display.style.display = 'block';
+  display.style.display = examState.timerEnabled ? 'block' : 'none';
   document.getElementById('qCounter').style.display = 'block';
   if (globalTimerInterval) clearInterval(globalTimerInterval);
-  globalTimerInterval = setInterval(() => {
-    globalSeconds++;
-    const m = Math.floor(globalSeconds / 60).toString().padStart(2,'0');
-    const s = (globalSeconds % 60).toString().padStart(2,'0');
+  const tick = () => {
+    const m = Math.floor(globalSeconds / 60).toString().padStart(2, '0');
+    const s = (globalSeconds % 60).toString().padStart(2, '0');
     display.textContent = `${m}:${s}`;
+    const budget = (Object.keys(examState.answers).length + 1) * 60;
+    const behind = examState.timerEnabled && globalSeconds > budget;
+    display.classList.toggle('behind', behind);
+    display.title = behind ? 'Behind the 1-minute-per-question pace' : 'On pace (1 minute per question)';
+  };
+  tick();
+  globalTimerInterval = setInterval(() => {
+    if (document.hidden) return;            // don't bill time while the app is in the background
+    globalSeconds++;
     examState.totalElapsed = globalSeconds;
+    tick();
+    if (globalSeconds % 15 === 0) saveActiveSession();
   }, 1000);
 }
 
 function stopExamTimer() {
   if (globalTimerInterval) clearInterval(globalTimerInterval);
+  globalTimerInterval = null;
 }
 
 // ══════════════════════════════════════════════════════════════════
 //  RENDER QUESTION
 // ══════════════════════════════════════════════════════════════════
+// `reveal` decides whether right/wrong is shown. In tutor mode that is right
+// after submitting; in exam mode (CAT, tutor off) only when reviewing after
+// the exam has ended. Answers are otherwise shown as "locked in".
+function isRevealed(idx) {
+  return examState.answers[idx] !== undefined && (examState.tutorMode || examState.ended);
+}
+
 function renderQuestion() {
   const q = examState.questions[examState.currentIndex];
   const total = examState.questions.length;
   const idx = examState.currentIndex;
   const answered = examState.answers[idx];
+  const reveal = isRevealed(idx);
+  const isCat = examState.mode === 'cat' && !examState.ended;
 
-  document.getElementById('qCounter').textContent = `Q ${idx+1} / ${total}`;
-  document.getElementById('progressBar').style.width = `${((idx+1)/total)*100}%`;
+  document.getElementById('qCounter').textContent = isCat
+    ? `Q ${idx + 1} · ${CAT_MIN}–${CAT_MAX}` : `Q ${idx + 1} / ${total}`;
+  document.getElementById('progressBar').style.width = isCat
+    ? `${Math.min(100, ((idx + 1) / CAT_MIN) * 100)}%` : `${((idx + 1) / total) * 100}%`;
 
   updatePaletteGrid();
 
+  const bookmarked = isBookmarked(q.id);
   let html = '';
-  // Meta row
   html += `<div class="q-meta">
-    <span class="q-num">Question ${idx+1} of ${total}</span>
+    <span class="q-num">Question ${idx + 1}${isCat ? '' : ` of ${total}`}</span>
     <span class="q-category-badge">${domainLabel(q.domain)}</span>
     <span class="q-type-badge">${typeLabel(q.type)}</span>
     ${q.ngn ? '<span class="ngn-badge">NGN</span>' : ''}
     ${examState.flags.has(idx) ? '<span style="color:var(--gold);font-size:0.8rem">🚩 Flagged</span>' : ''}
+    <button class="bm-btn${bookmarked ? ' on' : ''}" id="bmBtn" onclick="toggleBookmark(${q.id})"
+      aria-pressed="${bookmarked}" title="Bookmark this question for later (B)">${bookmarked ? '★ Saved' : '☆ Save'}</button>
   </div>`;
 
-  // Case exhibit for NGN
-  if (q.caseData) {
-    html += renderCaseExhibit(q.caseData);
-  }
+  if (q.caseData) html += renderCaseExhibit(q.caseData);
 
-  // Stem
   html += `<div class="q-stem">${escapeHtml(q.stem)}</div>`;
 
-  // Question body by type
-  if (q.type === 'mcq') html += renderMCQ(q, idx, answered);
-  else if (q.type === 'sata') html += renderSATA(q, idx, answered);
-  else if (q.type === 'ngn_matrix') html += renderMatrix(q, idx, answered);
-  else if (q.type === 'ngn_bowties') html += renderBowtie(q, idx, answered);
-  else html += renderMCQ(q, idx, answered);
+  if (q.type === 'mcq') html += renderMCQ(q, idx, answered, reveal);
+  else if (q.type === 'sata') html += renderSATA(q, idx, answered, reveal);
+  else if (q.type === 'ngn_matrix') html += renderMatrix(q, idx, answered, reveal);
+  else if (q.type === 'ngn_bowties') html += renderBowtie(q, idx, answered, reveal);
+  else if (q.type === 'ordering') html += renderOrdering(q, idx, answered, reveal);
+  else if (q.type === 'cloze') html += renderCloze(q, idx, answered, reveal);
+  else html += renderMCQ(q, idx, answered, reveal);
 
-  // Feedback box
-  if (answered !== undefined && examState.tutorMode) {
-    html += renderFeedback(q, answered);
+  if (answered !== undefined && !reveal) {
+    html += `<div class="locked-note">🔒 Answer locked in. Results and rationales appear when the exam ends.</div>`;
+  }
+  if (reveal) html += renderFeedback(q, answered);
+  if (reveal) html += renderInsight(q);
+
+  if (answered === undefined && !_isTouch()) {
+    html += `<div class="kbd-hint">⌨ <kbd>1</kbd>–<kbd>6</kbd> select · <kbd>Enter</kbd> submit / next · <kbd>←</kbd><kbd>→</kbd> move · <kbd>F</kbd> flag · <kbd>B</kbd> bookmark</div>`;
   }
 
-  // AI Insight placeholder
-  html += `<div class="ai-insight" id="aiInsight">
-    <div class="ai-insight-header">✦ Clinical Insight</div>
-    <div class="ai-insight-body" id="aiInsightBody"><div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div></div>
-  </div>`;
-
   document.getElementById('examMain').innerHTML = html;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (examState.lastRendered !== idx) {
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+    examState.lastRendered = idx;
+  }
 
-  // Show/hide nav buttons
   const isAnswered = answered !== undefined;
   document.getElementById('btnSubmit').style.display = isAnswered ? 'none' : 'inline-flex';
-  document.getElementById('btnNext').style.display = isAnswered ? 'inline-flex' : 'none';
-  document.getElementById('btnPrev').disabled = idx === 0;
+  const nextBtn = document.getElementById('btnNext');
+  nextBtn.style.display = isAnswered ? 'inline-flex' : 'none';
+  const finishing = examState.catDone || idx === total - 1;
+  nextBtn.textContent = examState.ended ? (idx === total - 1 ? 'Back to Results →' : 'Next Question →')
+    : finishing ? 'See Results →' : 'Next Question →';
+  // The real CAT never lets you go back or skip ahead.
+  document.getElementById('btnPrev').disabled = idx === 0 || isCat;
+  const palBtn = document.querySelector('.q-palette-toggle');
+  if (palBtn) palBtn.style.display = isCat ? 'none' : '';
+  const endBtn = document.getElementById('btnEnd');
+  if (endBtn) endBtn.textContent = examState.ended ? '← Results' : 'End Exam';
+  updateComboPill();
 
-  // Exhibit tabs
   document.querySelectorAll('.exhibit-tab').forEach((tab, i) => {
     tab.onclick = () => {
       document.querySelectorAll('.exhibit-tab').forEach(t => t.classList.remove('active'));
@@ -3861,81 +4198,73 @@ function renderQuestion() {
       document.querySelectorAll('.exhibit-content')[i]?.classList.add('active');
     };
   });
+}
 
-  // Load AI insight if answered
-  if (isAnswered && examState.tutorMode) {
-    loadAIInsight(q);
-  }
+function _isTouch() {
+  return typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 }
 
 function renderCaseExhibit(data) {
   const tabs = Object.keys(data);
   const labels = { history: '📋 History & Physical', labs: '🧪 Laboratory Results', meds: '💊 Medications', vitals: '❤️ Vital Signs' };
   let html = `<div class="case-exhibit"><div class="exhibit-tab-row">`;
-  tabs.forEach((k,i) => {
-    html += `<button class="exhibit-tab ${i===0?'active':''}">${labels[k] || k}</button>`;
+  tabs.forEach((k, i) => {
+    html += `<button class="exhibit-tab ${i === 0 ? 'active' : ''}">${labels[k] || escapeHtml(k)}</button>`;
   });
   html += `</div>`;
-  tabs.forEach((k,i) => {
-    html += `<div class="exhibit-content ${i===0?'active':''}">${escapeHtml(data[k])}</div>`;
+  tabs.forEach((k, i) => {
+    html += `<div class="exhibit-content ${i === 0 ? 'active' : ''}">${escapeHtml(data[k])}</div>`;
   });
   html += `</div>`;
   return html;
 }
 
-function renderMCQ(q, idx, answered) {
-  const letters = ['A','B','C','D','E','F'];
-  let html = `<ul class="options-list">`;
-  q.options.forEach((opt, i) => {
-    let cls = '';
-    if (answered !== undefined) {
-      if (i === q.correct) cls = answered === i ? 'correct' : 'revealed-correct';
-      else if (answered === i && i !== q.correct) cls = 'incorrect';
-    } else if (answered === i) cls = 'selected';
-    const checkIcon = (cls === 'correct' || cls === 'revealed-correct') ? '✓' : cls === 'incorrect' ? '✗' : '';
-    const onClick = answered === undefined ? `onclick="selectMCQ(${i})"` : '';
-    html += `<li class="option-item ${cls}" ${onClick}>
-      <div class="option-letter">${letters[i]}</div>
-      <div class="option-text">${escapeHtml(opt)}</div>
+const _LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+function _optionClass(isSelected, isCorrect, answered, reveal) {
+  if (reveal) {
+    if (isCorrect) return isSelected ? 'correct' : 'revealed-correct';
+    return isSelected ? 'incorrect' : '';
+  }
+  if (answered !== undefined) return isSelected ? 'selected locked' : 'locked';
+  return isSelected ? 'selected' : '';
+}
+
+function _optionRow(i, text, cls, onClick) {
+  const checkIcon = (cls === 'correct' || cls === 'revealed-correct') ? '✓' : cls === 'incorrect' ? '✗' : '';
+  return `<li class="option-item ${cls}" ${onClick}>
+      <div class="option-letter">${_LETTERS[i]}</div>
+      <div class="option-text">${escapeHtml(text)}</div>
       <div class="option-check">${checkIcon}</div>
     </li>`;
-  });
-  html += `</ul>`;
-  return html;
 }
 
-function renderSATA(q, idx, answered) {
-  const letters = ['A','B','C','D','E','F'];
-  const selected = answered || [];
+function renderMCQ(q, idx, answered, reveal) {
+  const chosen = answered !== undefined ? answered : pendingAnswer;
+  let html = `<ul class="options-list">`;
+  q.options.forEach((opt, i) => {
+    const cls = _optionClass(chosen === i, i === q.correct, answered, reveal);
+    html += _optionRow(i, opt, cls, answered === undefined ? `onclick="selectMCQ(${i})"` : '');
+  });
+  return html + `</ul>`;
+}
+
+function renderSATA(q, idx, answered, reveal) {
+  const selected = answered !== undefined ? answered : pendingSATA;
   let html = `<div class="sata-note">✦ Select ALL that apply. There may be more than one correct answer.</div>`;
   html += `<ul class="options-list">`;
   q.options.forEach((opt, i) => {
-    let cls = '';
-    if (answered !== undefined) {
-      const isCorrect = q.correct.includes(i);
-      const isSelected = selected.includes(i);
-      if (isCorrect && isSelected) cls = 'correct';
-      else if (isCorrect && !isSelected) cls = 'revealed-correct';
-      else if (!isCorrect && isSelected) cls = 'incorrect';
-    } else if (selected.includes(i)) cls = 'selected';
-    const checkIcon = (cls === 'correct' || cls === 'revealed-correct') ? '✓' : cls === 'incorrect' ? '✗' : '';
-    const onClick = answered === undefined ? `onclick="toggleSATA(${i})"` : '';
-    html += `<li class="option-item ${cls}" ${onClick}>
-      <div class="option-letter">${letters[i]}</div>
-      <div class="option-text">${escapeHtml(opt)}</div>
-      <div class="option-check">${checkIcon}</div>
-    </li>`;
+    const cls = _optionClass(selected.includes(i), q.correct.includes(i), answered, reveal);
+    html += _optionRow(i, opt, cls, answered === undefined ? `onclick="toggleSATA(${i})"` : '');
   });
-  html += `</ul>`;
-  return html;
+  return html + `</ul>`;
 }
 
 // The bank carries two matrix shapes:
 //   1. rows: [string], cols: [string], correct: [colIndex per row]
 //   2. rows: [{label, expected, action_needed, rationale}] with no cols
 // matrixModel() maps shape 2 onto shape 1 so one renderer and one scorer
-// serve both. Shape 2 questions previously threw in renderMatrix() on their
-// missing cols array.
+// serve both.
 function matrixModel(q) {
   const m = q.matrix || {};
   if (Array.isArray(m.cols) && Array.isArray(m.correct)) {
@@ -3944,37 +4273,39 @@ function matrixModel(q) {
   const rows = m.rows || [];
   return {
     rows: rows.map(r => r.label),
-    cols: ['Expected \u2014 No Immediate Action', 'Requires Immediate Action'],
+    cols: ['Expected — No Immediate Action', 'Requires Immediate Action'],
     correct: rows.map(r => (r.action_needed ? 1 : 0)),
     rowNotes: rows.map(r => r.rationale || ''),
   };
 }
 
-function renderMatrix(q, idx, answered) {
+function renderMatrix(q, idx, answered, reveal) {
   const m = matrixModel(q);
-  let html = `<table class="matrix-table"><thead><tr><th style="text-align:left">Nursing Action</th>`;
-  m.cols.forEach(c => html += `<th>${c}</th>`);
+  const sel = answered !== undefined ? answered : pendingMatrix;
+  let html = `<div class="matrix-scroll"><table class="matrix-table"><thead><tr><th style="text-align:left">Item</th>`;
+  m.cols.forEach(c => html += `<th>${escapeHtml(c)}</th>`);
   html += `</tr></thead><tbody>`;
   m.rows.forEach((row, ri) => {
-    html += `<tr><td>${escapeHtml(row)}</td>`;
+    const note = reveal && m.rowNotes && m.rowNotes[ri]
+      ? `<div class="matrix-note">${escapeHtml(m.rowNotes[ri])}</div>` : '';
+    html += `<tr><td>${escapeHtml(row)}${note}</td>`;
     m.cols.forEach((col, ci) => {
-      const isSelected = answered && answered[ri] === ci;
+      const isSelected = sel && sel[ri] === ci;
       const isCorrect = m.correct[ri] === ci;
-      let dot_cls = isSelected ? 'selected' : '';
       const onClick = answered === undefined ? `onclick="selectMatrix(${ri}, ${ci})"` : '';
       let bg = '';
-      if (answered !== undefined) {
+      if (reveal) {
         if (isCorrect && isSelected) bg = 'background:rgba(67,233,123,0.2);';
         else if (isCorrect) bg = 'background:rgba(67,233,123,0.08);';
         else if (isSelected) bg = 'background:rgba(255,107,107,0.15);';
       }
-      html += `<td ${onClick} style="${bg}cursor:pointer">
-        <div class="matrix-radio ${dot_cls}" id="matrix_${ri}_${ci}"></div>
+      html += `<td ${onClick} style="${bg}${answered === undefined ? 'cursor:pointer' : ''}" aria-label="${escapeHtml(col)}">
+        <div class="matrix-radio ${isSelected ? 'selected' : ''}" id="matrix_${ri}_${ci}"></div>
       </td>`;
     });
     html += `</tr>`;
   });
-  html += `</tbody></table>`;
+  html += `</tbody></table></div>`;
   return html;
 }
 
@@ -3982,8 +4313,7 @@ function renderMatrix(q, idx, answered) {
 //   1. causes / actions / outcomes  + correctCauses / correctActions / correctOutcomes
 //   2. NGN style: condition + actions_to_take + actions_to_avoid + parameters
 // bowtieModel() maps shape 2 onto shape 1 so a single renderer and a single
-// scorer serve both. Shape 2 questions previously fell through to renderMCQ()
-// and threw on their missing options array.
+// scorer serve both.
 function bowtieModel(q) {
   const b = q.bowtie || {};
   if (b.causes) {
@@ -4028,38 +4358,32 @@ function _stableOrder(n, seed) {
   return idx;
 }
 
-function renderBowtie(q, idx, answered) {
+function renderBowtie(q, idx, answered, reveal) {
   const b = bowtieModel(q);
+  const sel = answered !== undefined ? answered : pendingBowtie;
   const sections = [
-    {title: b.titles[0], items: b.causes, key:'causes', correct: b.correctCauses},
-    {title: b.titles[1], items: b.actions, key:'actions', correct: b.correctActions},
-    {title: b.titles[2], items: b.outcomes, key:'outcomes', correct: b.correctOutcomes},
+    { title: b.titles[0], items: b.causes, key: 'causes', correct: b.correctCauses },
+    { title: b.titles[1], items: b.actions, key: 'actions', correct: b.correctActions },
+    { title: b.titles[2], items: b.outcomes, key: 'outcomes', correct: b.correctOutcomes },
   ].filter(sec => sec.items && sec.items.length);
 
   let html = '';
   if (b.condition) {
-    html += `<div style="background:var(--navy-mid);border:1px solid rgba(0,201,167,0.35);border-radius:10px;padding:14px 18px;margin-bottom:16px;text-align:center">
-      <div style="font-size:0.7rem;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🩺 Client Condition</div>
-      <div style="font-size:0.95rem;color:var(--white);font-weight:600">${escapeHtml(b.condition)}</div>
+    html += `<div class="bowtie-condition">
+      <div class="bowtie-condition-lbl">🩺 Client Condition</div>
+      <div class="bowtie-condition-txt">${escapeHtml(b.condition)}</div>
     </div>`;
   }
-  html += `<div style="display:grid;grid-template-columns:repeat(${sections.length},1fr);gap:16px;margin-bottom:20px">`;
+  html += `<div class="sata-note">✦ Select every item that applies in each column.</div>`;
+  html += `<div class="bowtie-grid" style="--bt-cols:${sections.length}">`;
   sections.forEach(sec => {
-    html += `<div style="background:var(--navy-mid);border:1px solid var(--border);border-radius:10px;padding:16px">
-      <div style="font-size:0.78rem;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">${sec.title}</div>`;
+    html += `<div class="bowtie-col"><div class="bowtie-col-title">${sec.title}</div>`;
     sec.items.forEach((item, i) => {
-      const ans = answered && answered[sec.key] || [];
-      const isSelected = ans.includes(i);
-      const isCorrect = sec.correct.includes(i);
-      let cls = '';
-      if (answered !== undefined) {
-        if (isCorrect && isSelected) cls = 'correct';
-        else if (isCorrect) cls = 'revealed-correct';
-        else if (isSelected) cls = 'incorrect';
-      } else if (isSelected) cls = 'selected';
+      const picked = (sel && sel[sec.key]) || [];
+      const cls = _optionClass(picked.includes(i), sec.correct.includes(i), answered, reveal);
       const onClick = answered === undefined ? `onclick="toggleBowtie('${sec.key}', ${i})"` : '';
-      html += `<div class="option-item ${cls}" style="padding:10px 14px;margin-bottom:8px;gap:10px" ${onClick}>
-        <div style="font-size:0.85rem;line-height:1.5">${escapeHtml(item)}</div>
+      html += `<div class="option-item bowtie-item ${cls}" data-bt="${sec.key}-${i}" ${onClick}>
+        <div class="bowtie-item-txt">${escapeHtml(item)}</div>
       </div>`;
     });
     html += `</div>`;
@@ -4068,44 +4392,157 @@ function renderBowtie(q, idx, answered) {
   return html;
 }
 
-function renderFeedback(q, answered) {
-  const isCorrect = checkCorrect(q, answered);
-  const cls = isCorrect ? 'correct-fb' : 'incorrect-fb';
-  const headerCls = isCorrect ? 'correct' : 'incorrect';
-  const icon = isCorrect ? '✓' : '✗';
-  const label = isCorrect ? 'Correct!' : 'Incorrect';
-  return `<div class="feedback-box ${cls}" style="display:block">
-    <div class="fb-header ${headerCls}">${icon} ${label}</div>
-    <div class="fb-body">
-      <div class="rationale-title">Rationale:</div>
-      <p>${escapeHtml(q.rationale)}</p>
-      ${q.tip ? `<div class="nclex-tip"><strong>NCLEX Tip:</strong> ${escapeHtml(q.tip)}</div>` : ''}
-    </div>
-  </div>`;
+// ─── Ordered response ─────────────────────────────────────────────
+// `q.items` is stored in the correct order. The pool shows them shuffled
+// (q._perm); the answer is the list of original indices in the order the
+// student tapped them. Tap-to-order works the same on phones and desktops,
+// unlike HTML5 drag-and-drop, which mobile browsers barely support.
+function renderOrdering(q, idx, answered, reveal) {
+  return `<div class="sata-note">✦ Tap the steps in the order you would perform them. Tap a numbered step to put it back.</div>
+    <div id="orderWidget">${orderWidgetHtml(q, answered, reveal)}</div>`;
 }
 
+function orderWidgetHtml(q, answered, reveal) {
+  const chosen = answered !== undefined ? answered : pendingOrder;
+  const locked = answered !== undefined;
+  let html = `<ol class="order-chosen">`;
+  chosen.forEach((orig, pos) => {
+    const cls = reveal ? (orig === pos ? 'correct' : 'incorrect') : (locked ? 'locked' : 'selected');
+    const onClick = locked ? '' : `onclick="unpickOrder(${pos})"`;
+    html += `<li class="option-item ${cls}" ${onClick}>
+      <div class="option-letter">${pos + 1}</div>
+      <div class="option-text">${escapeHtml(q.items[orig])}</div>
+      <div class="option-check">${reveal ? (orig === pos ? '✓' : '✗') : ''}</div>
+    </li>`;
+  });
+  for (let k = chosen.length; k < q.items.length && !locked; k++) {
+    html += `<li class="order-slot">${k + 1}</li>`;
+  }
+  html += `</ol>`;
+  const remaining = q._perm.filter(i => !chosen.includes(i));
+  if (remaining.length && !locked) {
+    html += `<div class="order-pool-lbl">Steps to place</div><ul class="options-list order-pool">`;
+    remaining.forEach((orig, k) => {
+      html += `<li class="option-item" onclick="pickOrder(${orig})">
+        <div class="option-letter">${_LETTERS[k] || '•'}</div>
+        <div class="option-text">${escapeHtml(q.items[orig])}</div><div class="option-check"></div>
+      </li>`;
+    });
+    html += `</ul>`;
+  }
+  if (reveal && !chosen.every((o, i) => o === i)) {
+    html += `<div class="order-answer"><div class="rationale-title">Correct order</div><ol>${
+      q.items.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ol></div>`;
+  }
+  return html;
+}
+
+// ─── Drop-down cloze ──────────────────────────────────────────────
+function renderCloze(q, idx, answered, reveal) {
+  const sel = answered !== undefined ? answered : pendingCloze;
+  const parts = q.cloze.template.split(/\{(\d+)\}/);
+  let html = `<div class="sata-note">✦ Choose the option that best completes each sentence.</div><div class="cloze-text">`;
+  parts.forEach((part, k) => {
+    if (k % 2 === 0) { html += escapeHtml(part); return; }
+    const bi = Number(part);
+    const blank = q.cloze.blanks[bi];
+    const val = sel[bi];
+    const cls = reveal ? (Number(val) === blank.correct ? 'correct' : 'incorrect') : (val !== undefined ? 'filled' : '');
+    html += `<select class="cloze-select ${cls}" aria-label="Blank ${bi + 1}" ${answered !== undefined ? 'disabled' : ''}
+      onchange="selectCloze(${bi}, this.value)">
+      <option value="" ${val === undefined ? 'selected' : ''} disabled>Select…</option>
+      ${blank.options.map((o, oi) => `<option value="${oi}" ${Number(val) === oi && val !== undefined ? 'selected' : ''}>${escapeHtml(o)}</option>`).join('')}
+    </select>`;
+    if (reveal && Number(val) !== blank.correct) {
+      html += `<span class="cloze-fix">✓ ${escapeHtml(blank.options[blank.correct])}</span>`;
+    }
+  });
+  html += `</div>`;
+  return html;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SCORING
+// ══════════════════════════════════════════════════════════════════
 function checkCorrect(q, answered) {
+  if (answered === undefined || answered === null) return false;
   if (q.type === 'sata') {
     if (!Array.isArray(answered)) return false;
-    const sortedA = [...answered].sort().join(',');
-    const sortedC = [...q.correct].sort().join(',');
-    return sortedA === sortedC;
+    const a = [...answered].sort((x, y) => x - y).join(',');
+    const c = [...q.correct].sort((x, y) => x - y).join(',');
+    return a === c;
   }
   if (q.type === 'ngn_matrix') {
-    if (!answered) return false;
     return matrixModel(q).correct.every((c, i) => answered[i] === c);
   }
   if (q.type === 'ngn_bowties') {
-    if (!answered) return false;
     const b = bowtieModel(q);
     const check = (key) => {
-      const a = (answered[key] || []).sort().join(',');
-      const c = b['correct'+key.charAt(0).toUpperCase()+key.slice(1)].sort().join(',');
+      const a = [...(answered[key] || [])].sort((x, y) => x - y).join(',');
+      const c = [...b['correct' + key.charAt(0).toUpperCase() + key.slice(1)]].sort((x, y) => x - y).join(',');
       return a === c;
     };
     return check('causes') && check('actions') && check('outcomes');
   }
+  if (q.type === 'ordering') {
+    return Array.isArray(answered) && answered.length === q.items.length && answered.every((v, i) => v === i);
+  }
+  if (q.type === 'cloze') {
+    return q.cloze.blanks.every((b, i) => Number(answered[i]) === b.correct);
+  }
   return answered === q.correct;
+}
+
+// NGN-style partial credit, shown as a learning signal next to the binary
+// right/wrong that drives stats. SATA and bow-tie use +/- scoring (a wrong
+// pick cancels a right one), matrix and cloze score each row or blank 0/1,
+// and ordered response is all-or-nothing, as on the exam.
+function scoreItem(q, a) {
+  const plusMinus = (picked, correct) => {
+    const hits = picked.filter(i => correct.includes(i)).length;
+    return Math.max(0, hits - (picked.length - hits));
+  };
+  if (q.type === 'sata') return { earned: plusMinus(a || [], q.correct), max: q.correct.length };
+  if (q.type === 'ngn_matrix') {
+    const m = matrixModel(q);
+    return { earned: m.correct.filter((c, i) => a && a[i] === c).length, max: m.rows.length };
+  }
+  if (q.type === 'ngn_bowties') {
+    const b = bowtieModel(q);
+    const keys = [['causes', b.correctCauses], ['actions', b.correctActions], ['outcomes', b.correctOutcomes]];
+    return {
+      earned: keys.reduce((s, [k, c]) => s + plusMinus((a && a[k]) || [], c), 0),
+      max: keys.reduce((s, [, c]) => s + c.length, 0),
+    };
+  }
+  if (q.type === 'cloze') {
+    return { earned: q.cloze.blanks.filter((b, i) => a && Number(a[i]) === b.correct).length, max: q.cloze.blanks.length };
+  }
+  return { earned: checkCorrect(q, a) ? 1 : 0, max: 1 };
+}
+
+function renderFeedback(q, answered) {
+  const isCorrect = checkCorrect(q, answered);
+  const { earned, max } = scoreItem(q, answered);
+  const partial = !isCorrect && max > 1 && earned > 0;
+  const cls = isCorrect ? 'correct-fb' : partial ? 'partial-fb' : 'incorrect-fb';
+  const headerCls = isCorrect ? 'correct' : partial ? 'partial' : 'incorrect';
+  const label = isCorrect ? '✓ Correct!' : partial ? '◐ Partially correct' : '✗ Incorrect';
+  let credit = '';
+  if (max > 1) credit = `<span class="credit-chip">NGN scoring: ${earned} / ${max} points</span>`;
+  if (q.type === 'ordering' && !isCorrect && Array.isArray(answered)) {
+    const placed = answered.filter((v, i) => v === i).length;
+    credit = `<span class="credit-chip">${placed} of ${q.items.length} steps in the right place · ordered response is all-or-nothing</span>`;
+  }
+  return `<div class="feedback-box ${cls}" style="display:block">
+    <div class="fb-header ${headerCls}">${label} ${credit}</div>
+    <div class="fb-body">
+      <div class="rationale-title">Rationale:</div>
+      <p>${escapeHtml(q.rationale || (q.matrix && q.matrix.rationale) || 'See the explanation for each row above.')}</p>
+      ${q.tip ? `<div class="nclex-tip"><strong>NCLEX Tip:</strong> ${escapeHtml(q.tip)}</div>` : ''}
+      ${q.source ? `<div class="q-source">📚 Source: ${escapeHtml(q.source)}</div>` : ''}
+    </div>
+  </div>`;
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -4115,92 +4552,150 @@ let pendingAnswer = null;
 let pendingSATA = [];
 let pendingMatrix = {};
 let pendingBowtie = { causes: [], actions: [], outcomes: [] };
+let pendingOrder = [];
+let pendingCloze = {};
+
+function resetPending() {
+  pendingAnswer = null; pendingSATA = []; pendingMatrix = {};
+  pendingBowtie = { causes: [], actions: [], outcomes: [] };
+  pendingOrder = []; pendingCloze = {};
+}
+
+function _locked() { return examState.answers[examState.currentIndex] !== undefined; }
 
 function selectMCQ(i) {
-  buzz('tap');
-  if (examState.answers[examState.currentIndex] !== undefined) return;
+  if (_locked()) return;
+  buzz('tap'); playSound('tap');
   pendingAnswer = i;
-  document.querySelectorAll('.option-item').forEach((el, idx) => {
+  document.querySelectorAll('#examMain .options-list .option-item').forEach((el, idx) => {
     el.classList.toggle('selected', idx === i);
-    document.querySelectorAll('.option-letter')[idx].style.borderColor = idx === i ? 'var(--teal)' : '';
   });
 }
 
 function toggleSATA(i) {
-  buzz('tap');
-  if (examState.answers[examState.currentIndex] !== undefined) return;
+  if (_locked()) return;
+  buzz('tap'); playSound('tap');
   const pos = pendingSATA.indexOf(i);
   if (pos > -1) pendingSATA.splice(pos, 1);
   else pendingSATA.push(i);
-  document.querySelectorAll('.option-item').forEach((el, idx) => {
+  document.querySelectorAll('#examMain .options-list .option-item').forEach((el, idx) => {
     el.classList.toggle('selected', pendingSATA.includes(idx));
   });
 }
 
 function selectMatrix(ri, ci) {
-  buzz('tap');
-  if (examState.answers[examState.currentIndex] !== undefined) return;
+  if (_locked()) return;
+  buzz('tap'); playSound('tap');
   pendingMatrix[ri] = ci;
-  document.querySelectorAll('.matrix-radio').forEach(r => r.classList.remove('selected'));
-  document.querySelectorAll('.matrix-table tr').forEach((row, rowIdx) => {
-    if (rowIdx === 0) return;
-    const cells = row.querySelectorAll('td');
-    cells.forEach((cell, colIdx) => {
-      if (colIdx === 0) return;
-      const radio = cell.querySelector('.matrix-radio');
-      if (radio && pendingMatrix[rowIdx-1] === colIdx-1) radio.classList.add('selected');
-    });
-  });
+  document.querySelectorAll(`[id^="matrix_${ri}_"]`).forEach(r => r.classList.remove('selected'));
+  document.getElementById(`matrix_${ri}_${ci}`)?.classList.add('selected');
 }
 
 function toggleBowtie(key, i) {
-  buzz('tap');
-  if (examState.answers[examState.currentIndex] !== undefined) return;
+  if (_locked()) return;
+  buzz('tap'); playSound('tap');
   const arr = pendingBowtie[key];
   const pos = arr.indexOf(i);
   if (pos > -1) arr.splice(pos, 1);
   else arr.push(i);
-  renderQuestion(); // re-render to show selection
-  // Re-mount because we re-rendered — re-point pending
-  // Quick trick: restore pendingBowtie state
+  document.querySelector(`[data-bt="${key}-${i}"]`)?.classList.toggle('selected', arr.includes(i));
+}
+
+function _refreshOrderWidget() {
+  const q = examState.questions[examState.currentIndex];
+  const el = document.getElementById('orderWidget');
+  if (el) el.innerHTML = orderWidgetHtml(q, undefined, false);
+}
+
+function pickOrder(orig) {
+  if (_locked() || pendingOrder.includes(orig)) return;
+  buzz('tap'); playSound('tap');
+  pendingOrder.push(orig);
+  _refreshOrderWidget();
+}
+
+function unpickOrder(pos) {
+  if (_locked()) return;
+  buzz('tap');
+  pendingOrder.splice(pos, 1);
+  _refreshOrderWidget();
+}
+
+function selectCloze(bi, value) {
+  if (_locked()) return;
+  buzz('tap'); playSound('tap');
+  pendingCloze[bi] = Number(value);
+  document.querySelectorAll('.cloze-select')[bi]?.classList.add('filled');
 }
 
 // ══════════════════════════════════════════════════════════════════
 //  SUBMIT
 // ══════════════════════════════════════════════════════════════════
 function submitAnswer() {
+  if (_locked()) return;
   const q = examState.questions[examState.currentIndex];
   let answer;
   if (q.type === 'mcq') {
-    if (pendingAnswer === null) { shakeSubmit(); return; }
+    if (pendingAnswer === null) return shakeSubmit();
     answer = pendingAnswer;
   } else if (q.type === 'sata') {
-    if (pendingSATA.length === 0) { shakeSubmit(); return; }
-    answer = [...pendingSATA];
+    if (pendingSATA.length === 0) return shakeSubmit();
+    answer = [...pendingSATA].sort((a, b) => a - b);
   } else if (q.type === 'ngn_matrix') {
-    const totalRows = matrixModel(q).rows.length;
-    if (Object.keys(pendingMatrix).length < totalRows) { shakeSubmit(); return; }
+    if (Object.keys(pendingMatrix).length < matrixModel(q).rows.length) return shakeSubmit('Answer every row');
     answer = { ...pendingMatrix };
   } else if (q.type === 'ngn_bowties') {
+    const n = pendingBowtie.causes.length + pendingBowtie.actions.length + pendingBowtie.outcomes.length;
+    if (n === 0) return shakeSubmit();
     answer = JSON.parse(JSON.stringify(pendingBowtie));
+  } else if (q.type === 'ordering') {
+    if (pendingOrder.length < q.items.length) return shakeSubmit('Place every step first');
+    answer = [...pendingOrder];
+  } else if (q.type === 'cloze') {
+    if (Object.keys(pendingCloze).length < q.cloze.blanks.length) return shakeSubmit('Fill every blank');
+    answer = { ...pendingCloze };
   } else {
-    if (pendingAnswer === null) { shakeSubmit(); return; }
+    if (pendingAnswer === null) return shakeSubmit();
     answer = pendingAnswer;
   }
 
   examState.answers[examState.currentIndex] = answer;
-  const _wasCorrect = checkCorrect(q, answer);
-  registerAnswerFeedback(_wasCorrect, _wasCorrect ? 12 : 2);
-  pendingAnswer = null; pendingSATA = []; pendingMatrix = {}; pendingBowtie = {causes:[],actions:[],outcomes:[]};
+  const wasCorrect = checkCorrect(q, answer);
+  if (examState.tutorMode) registerAnswerFeedback(wasCorrect, wasCorrect ? 12 : 2);
+  else { buzz('tap'); playSound('tap'); }
+  resetPending();
 
+  if (examState.mode === 'cat') catCheckStop();
   renderQuestion();
-  updatePaletteGrid();
+  saveActiveSession();
 }
 
-function shakeSubmit() {
+// The NCLEX 95% confidence-interval rule, applied to this bank's percent
+// correct against a 65% practice line. Items here are not difficulty-
+// calibrated, so this mirrors the real exam's stopping logic, not its
+// item-level adaptivity.
+function catCheckStop() {
+  const qs = examState.questions;
+  let n = 0, c = 0;
+  qs.forEach((q, i) => {
+    if (examState.answers[i] === undefined) return;
+    n++; if (checkCorrect(q, examState.answers[i])) c++;
+  });
+  if (examState.catDone) return;
+  if (n >= CAT_MAX) { examState.catDone = { kind: 'max', n, c }; }
+  else if (n >= CAT_MIN) {
+    const p = c / n, half = 1.96 * Math.sqrt((p * (1 - p)) / n);
+    if (p - half > CAT_PASS_LINE) examState.catDone = { kind: 'above', n, c };
+    else if (p + half < CAT_PASS_LINE) examState.catDone = { kind: 'below', n, c };
+  }
+  if (examState.catDone) floatToast(`🏁 The exam has stopped at question ${n}`, 'good');
+}
+
+function shakeSubmit(msg) {
   const btn = document.getElementById('btnSubmit');
   btn.style.animation = 'shake 0.3s ease';
-  btn.textContent = 'Please select an answer';
+  btn.textContent = msg || 'Please select an answer';
+  buzz('wrong');
   setTimeout(() => { btn.style.animation = ''; btn.textContent = 'Submit Answer'; }, 1500);
 }
 
@@ -4209,20 +4704,24 @@ function shakeSubmit() {
 // ══════════════════════════════════════════════════════════════════
 function nextQuestion() {
   const total = examState.questions.length;
+  if (examState.catDone && !examState.ended) return endExam();
   if (examState.currentIndex < total - 1) {
     examState.currentIndex++;
-    pendingAnswer = null; pendingSATA = []; pendingMatrix = {};
+    resetPending();
     renderQuestion();
+    saveActiveSession();
   } else {
     endExam();
   }
 }
 
 function prevQuestion() {
+  if (examState.mode === 'cat' && !examState.ended) return;
   if (examState.currentIndex > 0) {
     examState.currentIndex--;
-    pendingAnswer = null; pendingSATA = []; pendingMatrix = {};
+    resetPending();
     renderQuestion();
+    saveActiveSession();
   }
 }
 
@@ -4230,8 +4729,9 @@ function flagQuestion() {
   const idx = examState.currentIndex;
   if (examState.flags.has(idx)) examState.flags.delete(idx);
   else examState.flags.add(idx);
+  buzz('tap');
   renderQuestion();
-  updatePaletteGrid();
+  saveActiveSession();
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -4241,7 +4741,7 @@ function togglePalette() {
   document.getElementById('paletteDrawer').classList.toggle('open');
   updatePaletteGrid();
 }
-function closePalette() { document.getElementById('paletteDrawer').classList.remove('open'); }
+function closePalette() { document.getElementById('paletteDrawer')?.classList.remove('open'); }
 
 function updatePaletteGrid() {
   const grid = document.getElementById('paletteGrid');
@@ -4249,29 +4749,54 @@ function updatePaletteGrid() {
   grid.innerHTML = examState.questions.map((q, i) => {
     let cls = '';
     if (i === examState.currentIndex) cls = 'current';
-    else if (examState.answers[i] !== undefined) cls = 'answered';
+    else if (examState.answers[i] !== undefined) {
+      cls = 'answered';
+      if (isRevealed(i)) cls += checkCorrect(q, examState.answers[i]) ? ' right' : ' wrong';
+    }
     if (examState.flags.has(i)) cls = 'flagged';
-    return `<div class="palette-q ${cls}" onclick="jumpTo(${i})">${i+1}</div>`;
+    return `<div class="palette-q ${cls}" onclick="jumpTo(${i})">${i + 1}</div>`;
   }).join('');
 }
 
 function jumpTo(i) {
+  if (examState.mode === 'cat' && !examState.ended) return;
   examState.currentIndex = i;
+  resetPending();
   renderQuestion();
   closePalette();
+  saveActiveSession();
 }
 
 // ══════════════════════════════════════════════════════════════════
 //  END EXAM / RESULTS
 // ══════════════════════════════════════════════════════════════════
-function openEndModal() { document.getElementById('endModal').classList.add('active'); }
+function openEndModal() {
+  if (examState.ended) { showScreen('results'); return; }
+  document.getElementById('endModal').classList.add('active');
+}
 function closeEndModal() { document.getElementById('endModal').classList.remove('active'); }
 
 function endExam() {
   closeEndModal();
+  // Coming back from reviewing a question must never save the session twice.
+  if (examState.ended) { showScreen('results'); return; }
   stopExamTimer();
+  examState.ended = true;
+  if (examState.mode === 'cat') {
+    // CAT is strictly sequential: questions after the stop were never
+    // presented, so they are not "skipped".
+    const n = examState.questions.findIndex((_, i) => examState.answers[i] === undefined);
+    if (n > 0) examState.questions = examState.questions.slice(0, n);
+  }
+  clearActiveSession();
   showResults();
 }
+
+const _MODE_NAMES = {
+  practice: 'Practice', cat: 'CAT Simulation', rapid: 'Rapid Review', ngn: 'Next Gen Focus',
+  daily: 'Daily Challenge', review: 'Smart Review', bookmarks: 'Bookmarks', retry: 'Retry Misses', domain: 'Focus Practice',
+};
+function modeName(m) { return _MODE_NAMES[m] || m; }
 
 function showResults() {
   const _gameBefore = gameSnapshot(progressData);
@@ -4282,15 +4807,10 @@ function showResults() {
 
   questions.forEach((q, i) => {
     if (!domainResults[q.domain]) domainResults[q.domain] = { correct: 0, total: 0 };
+    domainResults[q.domain].total++;
     if (answers[i] !== undefined) {
       answered++;
-      if (checkCorrect(q, answers[i])) {
-        correct++;
-        domainResults[q.domain].correct++;
-      }
-      domainResults[q.domain].total++;
-    } else {
-      domainResults[q.domain].total++;
+      if (checkCorrect(q, answers[i])) { correct++; domainResults[q.domain].correct++; }
     }
   });
 
@@ -4299,16 +4819,40 @@ function showResults() {
   const mins = Math.floor(examState.totalElapsed / 60);
   const secs = examState.totalElapsed % 60;
   const timeStr = `${mins}m ${secs}s`;
+  const missed = questions.map((q, i) => i).filter(i => answers[i] !== undefined && !checkCorrect(questions[i], answers[i]));
+  examState.missedIds = missed.map(i => questions[i].id);
 
-  // Score ring
   const circumference = 2 * Math.PI * 80;
   const strokeDash = (pct / 100) * circumference;
   const ringColor = pct >= 65 ? 'var(--teal)' : pct >= 50 ? 'var(--gold)' : 'var(--red)';
 
+  let title = pass ? 'Outstanding Performance!' : 'Keep Studying!';
+  let sub = pass ? 'You are performing at NCLEX passing level. Keep this momentum!' : 'Review the rationales below and focus on your weak areas.';
+  let badge = pass ? '🎉' : '📚';
+  if (examState.mode === 'daily') {
+    badge = '📅'; title = `Daily Challenge: ${correct}/${answered}`;
+    sub = 'Same 10 questions for everyone today. A new set unlocks tomorrow.';
+  }
+  if (examState.mode === 'review') {
+    badge = '🔁'; title = `Smart Review: ${correct} closed`;
+    sub = 'Questions you get right move further out in your review schedule. Misses come back sooner.';
+  }
+  let catNote = '';
+  if (examState.mode === 'cat') {
+    const d = examState.catDone;
+    const verdict = !d ? `You ended the exam after ${answered} question${answered === 1 ? '' : 's'}, before the stopping rule could decide.`
+      : d.kind === 'above' ? `Stopped at question ${d.n}: you were 95% confidently <strong>above</strong> the 65% practice line.`
+      : d.kind === 'below' ? `Stopped at question ${d.n}: you were 95% confidently <strong>below</strong> the 65% practice line.`
+      : `Ran to the ${CAT_MAX}-question maximum: too close to call, so your final accuracy decides.`;
+    catNote = `<div class="ncsbn-bar" style="border-color:rgba(100,223,223,0.3)"><div class="ncsbn-icon">🏁</div>
+      <div class="ncsbn-text">${verdict} Questions in this simulator are not difficulty-calibrated, so this mirrors the real exam's stopping rule, not its scoring.</div></div>`;
+  }
+
   let html = `<div class="results-header">
-    <div class="results-badge">${pass ? '🎉' : '📚'}</div>
-    <h2 class="results-title">${pass ? 'Outstanding Performance!' : 'Keep Studying!'}</h2>
-    <p class="results-sub">${pass ? 'You are performing at NCLEX passing level. Keep this momentum!' : 'Review the rationales below and focus on your weak areas.'}</p>
+    <div class="results-badge">${badge}</div>
+    <div class="results-mode">${escapeHtml(modeName(examState.mode))}</div>
+    <h2 class="results-title">${title}</h2>
+    <p class="results-sub">${sub}</p>
   </div>
 
   <div class="score-ring-wrap">
@@ -4333,10 +4877,16 @@ function showResults() {
   </div>
 
   <div id="sessionRewards"></div>
+  ${catNote}
+
+  ${missed.length ? `<div class="retry-row">
+    <button class="btn btn-primary" onclick="retryMissed()">🔁 Retry the ${missed.length} I missed</button>
+    <button class="btn btn-secondary" onclick="bookmarkMissed()">☆ Bookmark them for later</button>
+  </div>` : ''}
 
   <div class="ncsbn-bar">
     <div class="ncsbn-icon">ℹ️</div>
-    <div class="ncsbn-text">The real NCLEX uses the <strong>NCSBN Next Gen NCLEX (NGN)</strong> computerized adaptive testing (CAT) model. You need to demonstrate clinical judgment above the passing standard. A score of <strong>≥65%</strong> in practice generally indicates readiness. Focus on domains below 60%.</div>
+    <div class="ncsbn-text">Since April 2023 the real NCLEX is a <strong>computerized adaptive test of 85–150 items</strong> that stops once it is 95% confident you are above or below the passing standard. In practice, a score of <strong>≥65%</strong> on a bank like this generally indicates readiness. Focus on domains below 60%.</div>
   </div>
 
   <div class="domain-breakdown">
@@ -4352,19 +4902,26 @@ function showResults() {
     }).join('')}
   </div>
 
-  <div class="review-section">
-    <div class="domain-title">Question Review</div>
+  <div class="review-section" id="reviewSection">
+    <div class="review-head">
+      <div class="domain-title" style="margin:0">Question Review</div>
+      <div class="review-filter" role="group" aria-label="Filter questions">
+        <button class="chip selected" data-filter="all" onclick="filterReview('all')">All ${total}</button>
+        <button class="chip" data-filter="incorrect" onclick="filterReview('incorrect')">Missed ${missed.length}</button>
+        ${examState.flags.size ? `<button class="chip" data-filter="flagged" onclick="filterReview('flagged')">Flagged ${examState.flags.size}</button>` : ''}
+      </div>
+    </div>
     ${questions.map((q, i) => {
       const ans = answers[i];
       const isCorrect = ans !== undefined && checkCorrect(q, ans);
       const statusCls = ans === undefined ? '' : (isCorrect ? 'correct' : 'incorrect');
       const statusLabel = ans === undefined ? '—' : (isCorrect ? '✓ Correct' : '✗ Incorrect');
-      return `<div class="review-item" onclick="reviewItem(${i})">
+      return `<div class="review-item" data-status="${statusCls || 'skipped'}" data-flagged="${examState.flags.has(i) ? 1 : 0}" onclick="reviewItem(${i})">
         <div class="review-item-header">
           <div class="review-status ${statusCls}"></div>
-          <strong style="font-size:0.82rem;color:var(--muted)">Q${i+1}</strong>
+          <strong style="font-size:0.82rem;color:var(--muted)">Q${i + 1}</strong>
           <span class="q-category-badge" style="font-size:0.7rem;padding:2px 8px">${domainLabel(q.domain)}</span>
-          <span style="font-size:0.78rem;color:${isCorrect?'var(--green)':'var(--red)'};margin-left:auto">${statusLabel}</span>
+          <span style="font-size:0.78rem;color:${isCorrect ? 'var(--green)' : 'var(--red)'};margin-left:auto">${statusLabel}</span>
         </div>
         <div class="review-q-text">${escapeHtml(q.stem.substring(0, 120))}${q.stem.length > 120 ? '…' : ''}</div>
         ${!isCorrect && ans !== undefined ? `<div class="review-answer">
@@ -4375,16 +4932,15 @@ function showResults() {
   </div>
 
   <div class="results-cta">
-    <button class="btn btn-primary" onclick="startSetup('practice')">Retake Practice ↻</button>
+    <button class="btn btn-primary" onclick="startSetup('practice')">New Practice Session ↻</button>
     <button class="btn btn-secondary" onclick="showScreen('home')">← Back to Home</button>
-    <button class="btn btn-secondary" onclick="startSetup('cat')">Try CAT Simulation →</button>
+    <button class="btn btn-secondary" onclick="showProgressDashboard()">📈 My Progress</button>
   </div>
   <div style="height:60px"></div>
   `;
 
   document.getElementById('resultsContent').innerHTML = html;
   showScreen('results');
-  stopExamTimer();
   saveSessionToProgress(questions, answers, domainResults, correct, answered, pct, examState.mode, timeStr);
 
   const _gameAfter = gameSnapshot(progressData);
@@ -4392,35 +4948,76 @@ function showResults() {
   if (_rewards) _rewards.innerHTML = renderSessionRewards(_gameBefore, _gameAfter);
   const _rankedUp = _gameAfter.rank.index > _gameBefore.rank.index;
   const _newBadges = _gameAfter.badges.length - _gameBefore.badges.length;
-  if (_rankedUp) { buzz('rankup'); celebrate('big'); }
-  else if (_newBadges > 0) { buzz('unlock'); celebrate('small'); }
+  const _newQuests = _gameAfter.quests.done.length - _gameBefore.quests.done.length;
+  if (_rankedUp) { buzz('rankup'); playSound('rankup'); celebrate('big'); }
+  else if (_newBadges > 0 || _newQuests > 0) { buzz('unlock'); playSound('unlock'); celebrate('small'); }
+  else if (examState.mode === 'daily' && pct >= 80) { buzz('goal'); playSound('unlock'); celebrate('small'); }
   else if (dailyProgress(progressData).met) { buzz('goal'); }
 }
 
+function filterReview(kind) {
+  document.querySelectorAll('#reviewSection .review-filter .chip').forEach(c =>
+    c.classList.toggle('selected', c.dataset.filter === kind));
+  document.querySelectorAll('#reviewSection .review-item').forEach(el => {
+    const show = kind === 'all' || (kind === 'incorrect' && el.dataset.status === 'incorrect')
+      || (kind === 'flagged' && el.dataset.flagged === '1');
+    el.style.display = show ? '' : 'none';
+  });
+}
+
+function retryMissed() {
+  const ids = new Set(examState.missedIds || []);
+  launchSession('retry', shuffle(QUESTION_BANK.filter(q => ids.has(q.id))), { tutor: true, timer: false });
+}
+
+function bookmarkMissed() {
+  const ids = examState.missedIds || [];
+  ids.forEach(id => { if (!isBookmarked(id)) toggleBookmark(id, true); });
+  floatToast(`☆ ${ids.length} question${ids.length === 1 ? '' : 's'} bookmarked`, 'good');
+  renderHub();
+}
+
 function getCorrectLabel(q) {
-  if (q.type === 'sata') return q.options.filter((_,i) => q.correct.includes(i)).map((o,i) => `${String.fromCharCode(65+q.correct[i])}`).join(', ');
-  if (q.type === 'mcq') return `Option ${String.fromCharCode(65 + q.correct)}: ${q.options[q.correct].substring(0,50)}`;
+  if (q.type === 'sata') return q.correct.map(i => _LETTERS[i]).join(', ');
+  if (q.type === 'mcq') {
+    const t = q.options[q.correct];
+    return `${_LETTERS[q.correct]}: ${t.substring(0, 60)}${t.length > 60 ? '…' : ''}`;
+  }
+  if (q.type === 'ordering') return q.items.map((t, i) => `${i + 1}. ${t.substring(0, 24)}`).join(' → ').substring(0, 120) + '…';
+  if (q.type === 'cloze') return q.cloze.blanks.map(b => b.options[b.correct]).join(' · ');
   return 'See rationale';
 }
 
 function reviewItem(i) {
   examState.currentIndex = i;
+  examState.lastRendered = -1;
+  resetPending();
   showScreen('exam');
   renderQuestion();
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  AI INSIGHT
+//  TRACK RECORD PANEL
 // ══════════════════════════════════════════════════════════════════
-// Renders the built-in clinical rationale (q.tip) for the current question.
-// Insights are static, curated rationales bundled with each question — no
-// network call is made (a browser-side API key would be exposed publicly).
-function loadAIInsight(q) {
-  const panel = document.getElementById('aiInsight');
-  const body = document.getElementById('aiInsightBody');
-  if (!panel || !body) return;
-  panel.classList.add('visible');
-  body.textContent = q.tip || 'Review the rationale and key concepts above.';
+// Shown under the rationale. The tip already sits in the feedback box, so
+// this panel shows what only the app knows: your history with this exact
+// question and where it sits in your review schedule.
+function renderInsight(q) {
+  const h = progressData && progressData.questionHistory && progressData.questionHistory[q.id];
+  let history;
+  if (!h) history = 'First time you have seen this one.';
+  else {
+    const box = srsBox(h);
+    const sched = box >= SRS_MASTERED ? '🏆 mastered'
+      : h.correct < h.seen ? `🔁 in your review queue (level ${box} of ${SRS_MASTERED})` : '✓ never missed';
+    history = `Before this session: seen ${h.seen}×, correct ${h.correct}× · ${sched}`;
+  }
+  const tags = (q.tags || []).slice(0, 6).map(t => `<span class="tag-chip">${escapeHtml(t)}</span>`).join('');
+  return `<div class="ai-insight visible">
+    <div class="ai-insight-header">📈 Your Track Record</div>
+    <div class="ai-insight-body">${escapeHtml(history)}</div>
+    ${tags ? `<div class="tag-row">${tags}</div>` : ''}
+  </div>`;
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -4451,7 +5048,7 @@ function typeLabel(t) {
   const labels = {
     mcq: 'Multiple Choice', sata: 'Select All That Apply',
     ngn_matrix: 'Matrix Grid', ngn_bowties: 'Bowtie Clinical Judgment',
-    ordering: 'Ordered Response', dropdown: 'Drop-down Cloze'
+    ordering: 'Ordered Response', dropdown: 'Drop-down Cloze', cloze: 'Drop-down Cloze'
   };
   return labels[t] || t;
 }
@@ -4979,8 +5576,15 @@ document.addEventListener('DOMContentLoaded', () => { initMemes(); initMantra();
 const _DOMAINS_ALL = ['management','safety','health','psychosocial','basic','pharmacology','reduction','physio'];
 let progressData = null;
 
+// Study days follow the student's own calendar. (They used to be UTC dates,
+// which ended the day at 7 pm on the US east coast and split one evening's
+// study across two "days".)
+function todayStr(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 function _progressEmpty() {
-  const today = new Date().toISOString().slice(0,10);
+  const today = todayStr();
   return {
     version: '1.0',
     createdAt: today,
@@ -4989,7 +5593,8 @@ function _progressEmpty() {
     totalCorrect: 0,
     sessions: [],
     domainTotals: Object.fromEntries(_DOMAINS_ALL.map(d => [d, {correct:0, total:0}])),
-    questionHistory: {}
+    questionHistory: {},
+    bookmarks: [],
   };
 }
 
@@ -5016,9 +5621,48 @@ function updateProgressBadge() {
   badge.style.display = 'flex';
 }
 
+// ══════════════════════════════════════════════════════════════════
+//  SPACED REVIEW (Leitner boxes)
+// ══════════════════════════════════════════════════════════════════
+// Every question you have ever MISSED goes into a review queue. Each correct
+// answer moves it up a level and pushes the next review further out; a miss
+// drops it back to level 0 (due again today). Reaching SRS_MASTERED means you
+// got it right on four spaced occasions — it leaves the queue for good.
+const SRS_INTERVALS = [0, 1, 3, 7];   // days to wait at levels 0..3
+const SRS_MASTERED = 4;
+
+// Entries saved before boxes existed have no `box`: a question never missed
+// starts at its correct count, anything missed starts at level 0.
+function srsBox(h) {
+  if (typeof h.box === 'number') return h.box;
+  return h.correct >= h.seen ? Math.min(h.correct, SRS_MASTERED) : 0;
+}
+
+function srsDue(h, today = todayStr()) {
+  if (!h || h.correct >= h.seen) return false;          // never missed
+  const box = srsBox(h);
+  if (box >= SRS_MASTERED) return false;
+  if (!h.lastSeen) return true;
+  return _dayGap(h.lastSeen, today) >= SRS_INTERVALS[box];
+}
+
+function reviewQueue() {
+  const hist = (progressData && progressData.questionHistory) || {};
+  const today = todayStr();
+  return Object.entries(hist)
+    .filter(([, h]) => srsDue(h, today))
+    .sort((a, b) => srsBox(a[1]) - srsBox(b[1]) || String(a[1].lastSeen).localeCompare(String(b[1].lastSeen)))
+    .map(([id]) => Number(id));
+}
+
+function _typeKey(t) {
+  if (t === 'mcq' || t === 'sata' || t === 'ordering') return t;
+  return 'ngn';
+}
+
 function saveSessionToProgress(questions, answers, domainResults, correct, answered, pct, mode, timeStr) {
   if (!progressData) progressData = _progressEmpty();
-  const today = new Date().toISOString().slice(0,10);
+  const today = todayStr();
   progressData.lastUpdated = today;
   progressData.totalAnswered += answered;
   progressData.totalCorrect += correct;
@@ -5029,18 +5673,29 @@ function saveSessionToProgress(questions, answers, domainResults, correct, answe
     progressData.domainTotals[domain].total += data.total;
   });
 
+  const types = {};
   questions.forEach((q, i) => {
     const ans = answers[i];
     if (ans === undefined) return;
+    const ok = checkCorrect(q, ans);
     const id = String(q.id);
-    if (!progressData.questionHistory[id]) progressData.questionHistory[id] = {seen:0, correct:0, lastSeen:null};
-    progressData.questionHistory[id].seen++;
-    if (checkCorrect(q, ans)) progressData.questionHistory[id].correct++;
-    progressData.questionHistory[id].lastSeen = today;
+    const h = progressData.questionHistory[id] || {seen:0, correct:0, lastSeen:null};
+    const box = srsBox(h);
+    h.seen++;
+    if (ok) h.correct++;
+    h.box = ok ? Math.min(box + 1, SRS_MASTERED) : 0;
+    h.last = ok ? 1 : 0;
+    h.lastSeen = today;
+    progressData.questionHistory[id] = h;
+
+    const k = _typeKey(q.type);
+    types[k] = types[k] || { c: 0, t: 0 };
+    types[k].t++; if (ok) types[k].c++;
   });
 
   progressData.sessions.push({ date: today, mode, answered, correct, pct, time: timeStr,
     bestCombo: (typeof examState !== 'undefined' && examState.bestCombo) || 0,
+    types,
     domains: Object.fromEntries(Object.entries(domainResults).map(([d,v]) => [d,{correct:v.correct,total:v.total}]))
   });
 
@@ -5048,11 +5703,42 @@ function saveSessionToProgress(questions, answers, domainResults, correct, answe
   updateProgressBadge();
 }
 
+// ══════════════════════════════════════════════════════════════════
+//  BOOKMARKS
+// ══════════════════════════════════════════════════════════════════
+function isBookmarked(id) {
+  return !!(progressData && Array.isArray(progressData.bookmarks) && progressData.bookmarks.includes(id));
+}
+
+function toggleBookmark(id, quiet) {
+  if (!progressData) progressData = _progressEmpty();
+  if (!Array.isArray(progressData.bookmarks)) progressData.bookmarks = [];
+  const i = progressData.bookmarks.indexOf(id);
+  if (i > -1) progressData.bookmarks.splice(i, 1);
+  else progressData.bookmarks.push(id);
+  _autoSaveProgress();
+  if (quiet) return;
+  buzz('tap');
+  const on = i === -1;
+  const btn = document.getElementById('bmBtn');
+  if (btn) {
+    btn.classList.toggle('on', on);
+    btn.setAttribute('aria-pressed', String(on));
+    btn.textContent = on ? '★ Saved' : '☆ Save';
+  }
+  floatToast(on ? '★ Bookmarked — find it on the home screen' : 'Bookmark removed', on ? 'good' : '');
+}
+
+function startBookmarks() {
+  const ids = new Set((progressData && progressData.bookmarks) || []);
+  launchSession('bookmarks', shuffle(QUESTION_BANK.filter(q => ids.has(q.id))).slice(0, 50), { tutor: true, timer: false });
+}
+
 function exportProgress() {
   if (!progressData || progressData.totalAnswered === 0) {
     alert('No progress to export yet. Complete at least one session first!'); return;
   }
-  progressData.lastUpdated = new Date().toISOString().slice(0,10);
+  progressData.lastUpdated = todayStr();
   const blob = new Blob([JSON.stringify(progressData, null, 2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -5084,14 +5770,23 @@ function importProgressFile(event) {
           progressData.domainTotals[d].total += v.total || 0;
         });
         Object.entries(loaded.questionHistory || {}).forEach(([id,v]) => {
-          if (!progressData.questionHistory[id]) progressData.questionHistory[id] = {seen:0, correct:0, lastSeen:null};
-          progressData.questionHistory[id].seen += v.seen || 0;
-          progressData.questionHistory[id].correct += v.correct || 0;
-          progressData.questionHistory[id].lastSeen = v.lastSeen || progressData.questionHistory[id].lastSeen;
+          const cur = progressData.questionHistory[id];
+          if (!cur) { progressData.questionHistory[id] = { ...v }; return; }
+          const theirsNewer = String(v.lastSeen || '') > String(cur.lastSeen || '');
+          cur.seen += v.seen || 0;
+          cur.correct += v.correct || 0;
+          if (theirsNewer) {
+            cur.lastSeen = v.lastSeen;
+            if (typeof v.box === 'number') cur.box = v.box;
+            if (typeof v.last === 'number') cur.last = v.last;
+          }
         });
-        progressData.lastUpdated = new Date().toISOString().slice(0,10);
+        progressData.bookmarks = [...new Set([...(progressData.bookmarks || []), ...(loaded.bookmarks || [])])];
+        progressData.lastUpdated = todayStr();
       } else {
+        const keepBookmarks = (progressData && progressData.bookmarks) || [];
         progressData = loaded;
+        progressData.bookmarks = [...new Set([...keepBookmarks, ...(loaded.bookmarks || [])])];
       }
       _autoSaveProgress();
       updateProgressBadge();
@@ -5112,14 +5807,20 @@ function clearProgress() {
   showScreen('home');
 }
 
+// ══════════════════════════════════════════════════════════════════
+//  PROGRESS DASHBOARD
+// ══════════════════════════════════════════════════════════════════
 function showProgressDashboard() {
   const el = document.getElementById('progressContent');
   if (!progressData || progressData.totalAnswered === 0) {
     el.innerHTML = `<div style="text-align:center;padding:80px 20px;color:var(--muted)">
       <div style="font-size:3rem;margin-bottom:16px">📊</div>
       <h2 style="font-family:'Fraunces',serif;color:var(--white);margin-bottom:12px">No Progress Yet</h2>
-      <p>Complete your first practice session to start tracking your progress.</p>
-      <button class="btn btn-primary" onclick="showScreen('home')" style="margin-top:28px">Start Practicing →</button>
+      <p>Complete your first session to start tracking your progress. Today's Daily Challenge is a good first step.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:28px">
+        <button class="btn btn-primary" onclick="startDailyChallenge()">📅 Daily Challenge</button>
+        <button class="btn btn-secondary" onclick="showScreen('home')">← Home</button>
+      </div>
     </div>`;
     showScreen('progress'); return;
   }
@@ -5140,7 +5841,7 @@ function showProgressDashboard() {
   const barColor = p => p >= 70 ? 'linear-gradient(90deg,var(--teal),var(--sky))' : p >= 50 ? 'linear-gradient(90deg,var(--gold),#ffaa00)' : 'linear-gradient(90deg,var(--red),#ff9999)';
   const scoreColor = p => p >= 65 ? 'var(--teal)' : p >= 50 ? 'var(--gold)' : 'var(--red)';
 
-  el.innerHTML = `<div style="max-width:720px;margin:0 auto;padding:40px 20px 80px">
+  el.innerHTML = `<div class="dash-wrap">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:12px">
       <h2 style="font-family:'Fraunces',serif;font-size:1.8rem;color:var(--white)">My Progress</h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -5154,17 +5855,25 @@ function showProgressDashboard() {
 
     ${renderRankCard(_snap)}
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:28px">
+    <div class="dash-card">${renderQuestCard(_snap.quests, true)}</div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px">
       ${[
         {num: progressData.totalAnswered, lbl: 'Total Answered', color: 'var(--teal)'},
         {num: `${totalPct}%`, lbl: 'Overall Accuracy', color: pctColor},
         {num: sessCount, lbl: 'Sessions', color: 'var(--sky)'},
         {num: uniqueQ, lbl: 'Unique Questions', color: 'var(--gold)'},
-      ].map(s => `<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center">
+      ].map(s => `<div class="stat-tile">
         <div style="font-family:'Fraunces',serif;font-size:2rem;color:${s.color}">${s.num}</div>
         <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:4px">${s.lbl}</div>
       </div>`).join('')}
     </div>
+
+    <div class="dash-card">${renderHeatmap(progressData)}</div>
+
+    <div class="dash-card">${renderTrend(progressData)}</div>
+
+    <div class="dash-card">${renderCoverage(progressData)}</div>
 
     ${weakest.length > 0 ? `<div style="background:rgba(255,107,107,0.05);border:1px solid rgba(255,107,107,0.2);border-radius:12px;padding:20px 24px;margin-bottom:20px">
       <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--red);margin-bottom:14px">⚠ Focus Areas — Weakest Domains</div>
@@ -5179,23 +5888,25 @@ function showProgressDashboard() {
       </button>`).join('')}
     </div>` : ''}
 
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px">
+    <div class="dash-card">
       ${renderBadgeCase(_snap)}
     </div>
 
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px">
-      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--teal);margin-bottom:16px">All Domains — Cumulative Performance</div>
-      ${domainArr.map(w => `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-        <span style="min-width:190px;font-size:0.83rem;color:var(--white)">${domainLabel(w.domain)}</span>
-        <div style="flex:1;height:8px;background:var(--navy-mid);border-radius:4px">
+    <div class="dash-card">
+      <div class="dash-label">All Domains — Cumulative Performance</div>
+      ${domainArr.map(w => `<div class="dash-domain-row">
+        <span class="dash-domain-name">${domainLabel(w.domain)}</span>
+        <div style="flex:1;min-width:0;height:8px;background:var(--navy-mid);border-radius:4px">
           <div style="height:100%;width:${w.pct}%;background:${barColor(w.pct)};border-radius:4px;transition:width 0.8s ease"></div>
         </div>
         <span style="font-size:0.8rem;color:var(--muted);min-width:80px;text-align:right">${w.pct}% (${w.correct}/${w.total})</span>
       </div>`).join('')}
     </div>
 
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:28px">
-      <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--teal);margin-bottom:16px">Session History (${sessCount})</div>
+    ${renderTypeBreakdown(progressData)}
+
+    <div class="dash-card">
+      <div class="dash-label">Session History (${sessCount})</div>
       <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:0.82rem">
           <thead><tr style="color:var(--muted);font-size:0.68rem;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid var(--border)">
@@ -5205,13 +5916,13 @@ function showProgressDashboard() {
             <th style="padding:8px 6px;text-align:center">Score</th>
             <th style="padding:8px 6px;text-align:right">Time</th>
           </tr></thead>
-          <tbody>${[...progressData.sessions].reverse().map(s => `
+          <tbody>${[...progressData.sessions].reverse().slice(0, 60).map(s => `
             <tr style="border-bottom:1px solid rgba(100,180,255,0.06)">
-              <td style="padding:10px 6px;color:var(--muted)">${s.date}</td>
-              <td style="padding:10px 6px;color:var(--white);text-transform:capitalize">${s.mode}</td>
+              <td style="padding:10px 6px;color:var(--muted)">${escapeHtml(s.date)}</td>
+              <td style="padding:10px 6px;color:var(--white)">${escapeHtml(modeName(s.mode))}</td>
               <td style="padding:10px 6px;text-align:center;color:var(--white)">${s.answered}</td>
               <td style="padding:10px 6px;text-align:center"><strong style="color:${scoreColor(s.pct)}">${s.pct}%</strong></td>
-              <td style="padding:10px 6px;text-align:right;color:var(--muted)">${s.time}</td>
+              <td style="padding:10px 6px;text-align:right;color:var(--muted)">${escapeHtml(s.time)}</td>
             </tr>`).join('')}
           </tbody>
         </table>
@@ -5226,8 +5937,131 @@ function showProgressDashboard() {
 
   showScreen('progress');
 }
+
+// ─── Activity heatmap: the last 16 weeks, one square per day ──────
+function _addDays(dateStr, n) {
+  const d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() + n);
+  return todayStr(d);
+}
+
+function renderHeatmap(data) {
+  const perDay = {};
+  (data.sessions || []).forEach(s => { perDay[s.date] = (perDay[s.date] || 0) + (s.answered || 0); });
+  const today = todayStr();
+  const weeks = 16;
+  const start = _addDays(weekKey(today), -7 * (weeks - 1));  // a Monday
+  const level = n => n === 0 ? 0 : n < 10 ? 1 : n < 20 ? 2 : n < 40 ? 3 : 4;
+  let cols = '';
+  let active = 0;
+  for (let w = 0; w < weeks; w++) {
+    let cells = '';
+    for (let d = 0; d < 7; d++) {
+      const day = _addDays(start, w * 7 + d);
+      const n = perDay[day] || 0;
+      if (n) active++;
+      const future = day > today;
+      cells += `<div class="hm-cell hm-${future ? 'f' : level(n)}${day === today ? ' hm-today' : ''}"
+        title="${day}: ${n} question${n === 1 ? '' : 's'}"></div>`;
+    }
+    cols += `<div class="hm-col">${cells}</div>`;
+  }
+  return `<div class="dash-label">Study Activity — last ${weeks} weeks</div>
+    <div class="hm-wrap"><div class="hm-days"><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span><span>Sun</span></div>
+    <div class="hm-grid">${cols}</div></div>
+    <div class="hm-foot"><span>${active} study day${active === 1 ? '' : 's'} in this window</span>
+      <span class="hm-legend">Less <i class="hm-cell hm-0"></i><i class="hm-cell hm-1"></i><i class="hm-cell hm-2"></i><i class="hm-cell hm-3"></i><i class="hm-cell hm-4"></i> More</span></div>`;
+}
+
+// ─── Accuracy trend across recent sessions ────────────────────────
+function renderTrend(data) {
+  const pts = (data.sessions || []).filter(s => s.answered >= 5).slice(-20);
+  if (pts.length < 2) {
+    return `<div class="dash-label">Accuracy Trend</div>
+      <div class="dash-empty">Finish a couple of sessions of 5+ questions and your trend line appears here.</div>`;
+  }
+  const W = 600, H = 150, P = 24;
+  const x = i => P + (i * (W - 2 * P)) / (pts.length - 1);
+  const y = p => H - P - (p / 100) * (H - 2 * P);
+  const line = pts.map((s, i) => `${x(i).toFixed(1)},${y(s.pct).toFixed(1)}`).join(' ');
+  const recent = pts.slice(-5), earlier = pts.slice(0, Math.max(1, pts.length - 5));
+  const avg = a => Math.round(a.reduce((t, s) => t + s.pct, 0) / a.length);
+  const delta = pts.length > 5 ? avg(recent) - avg(earlier) : null;
+  const deltaTxt = delta === null ? '' : delta > 0 ? `<span style="color:var(--green)">▲ ${delta} pts</span> vs. earlier sessions`
+    : delta < 0 ? `<span style="color:var(--red)">▼ ${-delta} pts</span> vs. earlier sessions` : 'Holding steady vs. earlier sessions';
+  return `<div class="dash-label">Accuracy Trend — last ${pts.length} sessions</div>
+    <svg class="trend-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="Session accuracy over the last ${pts.length} sessions">
+      <line x1="${P}" x2="${W - P}" y1="${y(65)}" y2="${y(65)}" class="trend-pass"/>
+      <text x="${W - P}" y="${y(65) - 6}" text-anchor="end" class="trend-lbl">65% readiness line</text>
+      <text x="${P}" y="${y(100) - 6}" class="trend-lbl">100%</text>
+      <text x="${P}" y="${y(0) + 16}" class="trend-lbl">0%</text>
+      <polyline points="${line}" class="trend-line"/>
+      ${pts.map((s, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(s.pct).toFixed(1)}" r="4" class="trend-dot"><title>${escapeHtml(s.date)} · ${escapeHtml(modeName(s.mode))}: ${s.pct}% (${s.correct}/${s.answered})</title></circle>`).join('')}
+    </svg>
+    <div class="dash-sub">Recent 5 sessions average <strong style="color:var(--white)">${avg(recent)}%</strong>${deltaTxt ? ' · ' + deltaTxt : ''}</div>`;
+}
+
+// ─── Bank coverage & spaced review ────────────────────────────────
+function renderCoverage(data) {
+  const hist = data.questionHistory || {};
+  const total = QUESTION_BANK.length;
+  let mastered = 0, learning = 0, seen = 0;
+  Object.values(hist).forEach(h => {
+    seen++;
+    if (srsBox(h) >= SRS_MASTERED - 1 && h.last !== 0) mastered++;
+    else if (h.correct < h.seen) learning++;
+  });
+  const comfortable = seen - mastered - learning;
+  const due = reviewQueue().length;
+  const pc = n => (n / total) * 100;
+  const bm = (data.bookmarks || []).length;
+  return `<div class="dash-label">Question Bank Coverage</div>
+    <div class="cov-bar" role="img" aria-label="${seen} of ${total} questions seen">
+      <div class="cov-seg cov-mastered" style="width:${pc(mastered)}%"></div>
+      <div class="cov-seg cov-ok" style="width:${pc(comfortable)}%"></div>
+      <div class="cov-seg cov-learning" style="width:${pc(learning)}%"></div>
+    </div>
+    <div class="cov-legend">
+      <span><i class="cov-dot cov-mastered"></i>Solid ${mastered}</span>
+      <span><i class="cov-dot cov-ok"></i>Right so far ${comfortable}</span>
+      <span><i class="cov-dot cov-learning"></i>Still learning ${learning}</span>
+      <span><i class="cov-dot"></i>Unseen ${total - seen}</span>
+    </div>
+    <div class="dash-sub">You've seen <strong style="color:var(--white)">${seen.toLocaleString()}</strong> of ${total.toLocaleString()} questions (${Math.round(pc(seen))}%).</div>
+    <div class="cov-actions">
+      <button class="prog-btn${due ? ' primary' : ''}" ${due ? '' : 'disabled'} onclick="startSmartReview()">🔁 Smart Review · ${due} due</button>
+      <button class="prog-btn" ${bm ? '' : 'disabled'} onclick="startBookmarks()">★ Bookmarks · ${bm}</button>
+    </div>`;
+}
+
+// ─── Performance by question format ───────────────────────────────
+function renderTypeBreakdown(data) {
+  const agg = {};
+  (data.sessions || []).forEach(s => Object.entries(s.types || {}).forEach(([k, v]) => {
+    agg[k] = agg[k] || { c: 0, t: 0 };
+    agg[k].c += v.c; agg[k].t += v.t;
+  }));
+  const labels = { mcq: 'Multiple Choice', sata: 'Select All That Apply', ngn: 'NGN (matrix, bow-tie, cloze)', ordering: 'Ordered Response' };
+  const rows = Object.entries(agg).filter(([, v]) => v.t > 0);
+  if (!rows.length) return '';
+  return `<div class="dash-card">
+    <div class="dash-label">By Question Format</div>
+    ${rows.map(([k, v]) => {
+      const p = Math.round((v.c / v.t) * 100);
+      return `<div class="dash-domain-row">
+        <span class="dash-domain-name">${labels[k] || k}</span>
+        <div style="flex:1;min-width:0;height:8px;background:var(--navy-mid);border-radius:4px">
+          <div style="height:100%;width:${p}%;background:linear-gradient(90deg,var(--sky),var(--teal));border-radius:4px"></div>
+        </div>
+        <span style="font-size:0.8rem;color:var(--muted);min-width:80px;text-align:right">${p}% (${v.c}/${v.t})</span>
+      </div>`;
+    }).join('')}
+    <div class="dash-sub">SATA and NGN items count as correct only when fully right — exactly how most review books score them.</div>
+  </div>`;
+}
+
 // ══════════════════════════════════════════════════════════════════
-//  GAMIFICATION — RANKS, STREAKS, BADGES
+//  GAMIFICATION — RANKS, STREAKS, BADGES, QUESTS
 // ══════════════════════════════════════════════════════════════════
 // Everything here is DERIVED from progressData. Nothing new is stored, so
 // a progress JSON exported before this feature existed still produces a
@@ -5283,52 +6117,54 @@ const BADGES = [
     test: s => s.sessions >= 25,           progress: s => [s.sessions, 25] },
   { id:'comeback',      icon:'📈', name:'Comeback',         desc:'Follow a sub-50% session with an 80%+ one',
     test: s => s.comeback },
+  { id:'daily_first',   icon:'☀️', name:'Daily Ritual',     desc:'Complete a Daily Challenge',
+    test: s => s.dailies >= 1,             progress: s => [s.dailies, 1] },
+  { id:'daily_ten',     icon:'🌤️', name:'Regular',          desc:'Complete 10 Daily Challenges',
+    test: s => s.dailies >= 10,            progress: s => [s.dailies, 10] },
+  { id:'quests_five',   icon:'🗺️', name:'Quest Hunter',     desc:'Complete 5 weekly quests',
+    test: s => s.questsDone >= 5,          progress: s => [s.questsDone, 5] },
+  { id:'gap_closer',    icon:'🔁', name:'Gap Closer',       desc:'Master 25 questions you once missed',
+    test: s => s.missesMastered >= 25,     progress: s => [s.missesMastered, 25] },
+  { id:'ngn_ten',       icon:'🧩', name:'Clinical Judge',   desc:'Get 10 NGN-format items fully right',
+    test: s => s.ngnCorrect >= 10,         progress: s => [s.ngnCorrect, 10] },
+  { id:'half_bank',     icon:'🔭', name:'Bank Explorer',    desc:'See half of the question bank',
+    test: s => s.uniqueQuestions >= Math.floor(QUESTION_BANK.length / 2),
+    progress: s => [s.uniqueQuestions, Math.floor(QUESTION_BANK.length / 2)] },
 ];
 
 const _DOMAIN_MASTERY_MIN = 25;
 const _DOMAIN_MASTERY_PCT = 80;
+const QUEST_XP = 120;
 
 function gameStats(data) {
   const empty = { answered:0, correct:0, overallPct:0, sessions:0, uniqueQuestions:0,
                   currentStreak:0, bestStreak:0, domainsTouched:0, masteredDomains:0,
-                  longestSession:0, bestCombo:0, bestPerfect:false, comeback:false, studyDays:0 };
+                  longestSession:0, bestCombo:0, bestPerfect:false, comeback:false, studyDays:0,
+                  dailies:0, dailyStreak:0, questsDone:0, missesMastered:0, ngnCorrect:0 };
   if (!data || !data.totalAnswered) return empty;
 
   const sessions = Array.isArray(data.sessions) ? data.sessions : [];
   const domains = Object.values(data.domainTotals || {});
   const dates = [...new Set(sessions.map(s => s.date).filter(Boolean))].sort();
+  const dailyDates = [...new Set(sessions.filter(s => s.mode === 'daily').map(s => s.date))].sort();
+  const today = todayStr();
 
-  let bestStreak = 0, run = 0, prev = null;
-  dates.forEach(d => {
-    run = (prev && _dayGap(prev, d) === 1) ? run + 1 : 1;
-    bestStreak = Math.max(bestStreak, run);
-    prev = d;
-  });
-
-  // The current streak only counts if the last study day was today or yesterday.
-  const today = new Date().toISOString().slice(0, 10);
-  let currentStreak = 0;
-  if (dates.length) {
-    const gapToNow = _dayGap(dates[dates.length - 1], today);
-    if (gapToNow <= 1) {
-      currentStreak = 1;
-      for (let i = dates.length - 1; i > 0; i--) {
-        if (_dayGap(dates[i - 1], dates[i]) === 1) currentStreak++; else break;
-      }
-    }
-  }
+  const { best: bestStreak, current: currentStreak } = _streaks(dates, today);
+  const { current: dailyStreak } = _streaks(dailyDates, today);
 
   let comeback = false;
   for (let i = 1; i < sessions.length; i++) {
     if (sessions[i - 1].pct < 50 && sessions[i].pct >= 80) { comeback = true; break; }
   }
 
+  const hist = Object.values(data.questionHistory || {});
+
   return {
     answered: data.totalAnswered,
     correct: data.totalCorrect,
     overallPct: Math.round((data.totalCorrect / data.totalAnswered) * 100),
     sessions: sessions.length,
-    uniqueQuestions: Object.keys(data.questionHistory || {}).length,
+    uniqueQuestions: hist.length,
     currentStreak, bestStreak, studyDays: dates.length,
     domainsTouched: domains.filter(d => d.total > 0).length,
     masteredDomains: domains.filter(d =>
@@ -5337,7 +6173,31 @@ function gameStats(data) {
     bestCombo: sessions.reduce((m, s) => Math.max(m, s.bestCombo || 0), 0),
     bestPerfect: sessions.some(s => s.pct === 100 && s.answered >= 10),
     comeback,
+    dailies: dailyDates.length,
+    dailyStreak,
+    questsDone: allTimeQuestsDone(sessions),
+    missesMastered: hist.filter(h => h.correct < h.seen && srsBox(h) >= SRS_MASTERED).length,
+    ngnCorrect: sessions.reduce((t, s) => t + ((s.types && s.types.ngn && s.types.ngn.c) || 0), 0),
   };
+}
+
+// Longest run of consecutive days, and the run that is still alive (its
+// last day is today or yesterday).
+function _streaks(dates, today) {
+  let best = 0, run = 0, prev = null;
+  dates.forEach(d => {
+    run = (prev && _dayGap(prev, d) === 1) ? run + 1 : 1;
+    best = Math.max(best, run);
+    prev = d;
+  });
+  let current = 0;
+  if (dates.length && _dayGap(dates[dates.length - 1], today) <= 1) {
+    current = 1;
+    for (let i = dates.length - 1; i > 0; i--) {
+      if (_dayGap(dates[i - 1], dates[i]) === 1) current++; else break;
+    }
+  }
+  return { best, current };
 }
 
 function _dayGap(a, b) {
@@ -5345,13 +6205,14 @@ function _dayGap(a, b) {
 }
 
 // XP rewards showing up (2/question) but rewards getting it right far more (10).
-// Badges and streak days are worth real XP so consistency beats cramming.
+// Badges, quests and streak days are worth real XP so consistency beats cramming.
 function gameXP(stats) {
   if (!stats.answered) return 0;
   return stats.correct * 10
        + stats.answered * 2
        + earnedBadges(stats).length * 150
-       + stats.studyDays * 25;
+       + stats.studyDays * 25
+       + stats.questsDone * QUEST_XP;
 }
 
 function earnedBadges(stats) {
@@ -5374,7 +6235,104 @@ function rankFor(xp) {
 function gameSnapshot(data) {
   const stats = gameStats(data);
   const xp = gameXP(stats);
-  return { stats, xp, rank: rankFor(xp), badges: earnedBadges(stats) };
+  return { stats, xp, rank: rankFor(xp), badges: earnedBadges(stats), quests: weekQuests(data) };
+}
+
+// ─── Weekly quests ────────────────────────────────────────────────
+// Three quests a week, the same three for everyone, chosen from the week's
+// Monday date. Progress is derived from that week's sessions, so quests from
+// past weeks are scored retroactively and travel with the progress JSON.
+function weekKey(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));     // back to Monday
+  return todayStr(d);
+}
+
+function _seededRng(seedStr) {
+  let h = 1779033703 ^ seedStr.length;
+  for (let i = 0; i < seedStr.length; i++) {
+    h = Math.imul(h ^ seedStr.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  let a = h >>> 0;
+  return () => {                                          // mulberry32
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const QUEST_POOL = [
+  { id:'answer60', icon:'📝', name:'Steady Hands',      desc:'Answer 60 questions',                      target:60, of: w => w.answered },
+  { id:'days4',    icon:'📆', name:'Show Up',           desc:'Study on 4 different days',                target:4,  of: w => w.days },
+  { id:'daily3',   icon:'☀️', name:'Challenge Accepted', desc:'Complete 3 Daily Challenges',             target:3,  of: w => w.dailies },
+  { id:'review20', icon:'🔁', name:'Close the Gaps',    desc:'Answer 20 Smart Review questions',         target:20, of: w => w.review },
+  { id:'sharp',    icon:'🎯', name:'Sharpshooter',      desc:'Score 80%+ on a session of 15+ questions', target:1,  of: w => w.sharp },
+  { id:'ngn5',     icon:'🧩', name:'Clinical Judgment', desc:'Get 5 NGN-format items fully right',       target:5,  of: w => w.ngn },
+  { id:'sata8',    icon:'☑️', name:'Select All',        desc:'Get 8 SATA questions fully right',         target:8,  of: w => w.sata },
+  { id:'combo8',   icon:'⚡', name:'In the Zone',       desc:'Reach a combo of 8 in a row',              target:8,  of: w => w.combo },
+];
+
+function _weekAggregate(sessions) {
+  const w = { answered:0, days:0, dailies:0, review:0, sharp:0, ngn:0, sata:0, combo:0, domains:{} };
+  const days = new Set(), dailies = new Set();
+  sessions.forEach(s => {
+    w.answered += s.answered || 0;
+    days.add(s.date);
+    if (s.mode === 'daily') dailies.add(s.date);
+    if (s.mode === 'review') w.review += s.answered || 0;
+    if ((s.answered || 0) >= 15 && s.pct >= 80) w.sharp++;
+    w.ngn += (s.types && s.types.ngn && s.types.ngn.c) || 0;
+    w.sata += (s.types && s.types.sata && s.types.sata.c) || 0;
+    w.combo = Math.max(w.combo, s.bestCombo || 0);
+    Object.entries(s.domains || {}).forEach(([d, v]) => { w.domains[d] = (w.domains[d] || 0) + (v.total || 0); });
+  });
+  w.days = days.size; w.dailies = dailies.size;
+  return w;
+}
+
+function questsForWeek(key) {
+  const rng = _seededRng('quests:' + key);
+  const picks = shuffle(QUEST_POOL, rng).slice(0, 2);
+  const dom = _DOMAINS_ALL[Math.floor(rng() * _DOMAINS_ALL.length)];
+  picks.push({ id:'domain_' + dom, icon:'🩺', name:'Specialist Rotation',
+    desc:`Answer 20 ${domainLabel(dom)} questions`, target:20, of: w => w.domains[dom] || 0, domain: dom });
+  return picks;
+}
+
+function _questStatus(key, sessions) {
+  const w = _weekAggregate(sessions.filter(s => s.date && weekKey(s.date) === key));
+  return questsForWeek(key).map(q => {
+    const cur = Math.min(q.of(w), q.target);
+    return { ...q, cur, done: cur >= q.target };
+  });
+}
+
+function weekQuests(data) {
+  const key = weekKey(todayStr());
+  const list = _questStatus(key, (data && data.sessions) || []);
+  const end = _addDays(key, 7);
+  return { key, list, done: list.filter(q => q.done).map(q => q.id), daysLeft: _dayGap(todayStr(), end) };
+}
+
+function allTimeQuestsDone(sessions) {
+  const keys = [...new Set(sessions.filter(s => s.date).map(s => weekKey(s.date)))];
+  return keys.reduce((t, k) => t + _questStatus(k, sessions).filter(q => q.done).length, 0);
+}
+
+function renderQuestCard(quests, withHeader) {
+  const done = quests.done.length;
+  return `${withHeader ? `<div class="dash-label">Weekly Quests <span class="quest-meta">${done}/3 done · resets in ${quests.daysLeft} day${quests.daysLeft === 1 ? '' : 's'} · +${QUEST_XP} XP each</span></div>` : ''}
+    <div class="quest-list">${quests.list.map(q => `<div class="quest${q.done ? ' done' : ''}">
+      <div class="quest-icon">${q.done ? '✅' : q.icon}</div>
+      <div class="quest-body">
+        <div class="quest-name">${escapeHtml(q.name)}</div>
+        <div class="quest-desc">${escapeHtml(q.desc)}</div>
+        <div class="quest-bar"><div class="quest-fill" style="width:${Math.round((q.cur / q.target) * 100)}%"></div></div>
+      </div>
+      <div class="quest-num">${q.cur}/${q.target}</div>
+    </div>`).join('')}</div>`;
 }
 
 // ─── Header pill ──────────────────────────────────────────────────
@@ -5395,6 +6353,7 @@ function updateRankPill() {
 function renderSessionRewards(before, after) {
   const gained = after.xp - before.xp;
   const fresh = after.badges.filter(b => !before.badges.some(p => p.id === b.id));
+  const freshQuests = after.quests.list.filter(q => q.done && !before.quests.done.includes(q.id));
   const levelUp = after.rank.index > before.rank.index;
 
   let html = `<div class="xp-earned-row">
@@ -5406,23 +6365,38 @@ function renderSessionRewards(before, after) {
   if (typeof examState !== 'undefined' && examState.bestCombo >= 3) {
     html += `<div class="xp-earned-chip">⚡ best run of <strong>${examState.bestCombo}</strong> in a row</div>`;
   }
+  if (typeof examState !== 'undefined' && examState.mode === 'daily' && after.stats.dailyStreak > 1) {
+    html += `<div class="xp-earned-chip">☀️ <strong>${after.stats.dailyStreak}</strong> daily challenges in a row</div>`;
+  }
   const _daily = dailyProgress(progressData);
   html += `<div class="xp-earned-chip">${_daily.met ? '✅' : '🎯'} <strong>${_daily.answered}</strong>/${_daily.goal} today</div>`;
   html += `</div>`;
 
-  if (levelUp || fresh.length) {
+  if (levelUp || fresh.length || freshQuests.length) {
     html += `<div class="unlock-banner">
-      <div class="unlock-title">🎊 ${levelUp ? 'Rank up!' : 'New badges unlocked!'}</div>
+      <div class="unlock-title">🎊 ${levelUp ? 'Rank up!' : fresh.length ? 'New badges unlocked!' : 'Quest complete!'}</div>
       <div class="unlock-list">`;
+    let k = 0;
     if (levelUp) {
       html += `<div class="unlock-item" style="animation-delay:0s">${after.rank.emblem}
         <span>${escapeHtml(after.rank.name)} — ${escapeHtml(after.rank.blurb)}</span></div>`;
+      k++;
     }
-    fresh.forEach((b, i) => {
-      html += `<div class="unlock-item" style="animation-delay:${(levelUp ? i + 1 : i) * 0.12}s">${b.icon}
+    fresh.forEach(b => {
+      html += `<div class="unlock-item" style="animation-delay:${k++ * 0.12}s">${b.icon}
         <span>${escapeHtml(b.name)} — ${escapeHtml(b.desc)}</span></div>`;
     });
+    freshQuests.forEach(q => {
+      html += `<div class="unlock-item" style="animation-delay:${k++ * 0.12}s">🗺️
+        <span>Quest: ${escapeHtml(q.name)} — ${escapeHtml(q.desc)} (+${QUEST_XP} XP)</span></div>`;
+    });
     html += `</div></div>`;
+  } else {
+    const open = after.quests.list.filter(q => !q.done);
+    if (open.length) {
+      const q = open.sort((a, b) => (b.cur / b.target) - (a.cur / a.target))[0];
+      html += `<div class="quest-nudge">🗺️ Closest quest: <strong>${escapeHtml(q.name)}</strong> — ${q.cur}/${q.target}. ${escapeHtml(q.desc)}.</div>`;
+    }
   }
   return html;
 }
@@ -5456,8 +6430,8 @@ function renderRankCard(snap) {
         <div class="streak-chip-lbl">Best Streak</div>
       </div>
       <div class="streak-chip">
-        <div class="streak-chip-num">📆 ${stats.studyDays}</div>
-        <div class="streak-chip-lbl">Study Days</div>
+        <div class="streak-chip-num">☀️ ${stats.dailies}</div>
+        <div class="streak-chip-lbl">Daily Challenges</div>
       </div>
       <div class="streak-chip">
         <div class="streak-chip-num">🧠 ${stats.masteredDomains}/8</div>
@@ -5578,7 +6552,8 @@ function prefersReducedMotion() {
 function updateComboPill() {
   const pill = document.getElementById('comboPill');
   if (!pill) return;
-  const c = examState.combo || 0;
+  // Exam mode hides correctness until the end, so it hides the combo too.
+  const c = examState.tutorMode ? (examState.combo || 0) : 0;
   if (c < 2) { pill.classList.remove('live', 'hot'); pill.textContent = ''; return; }
   pill.classList.add('live');
   pill.classList.toggle('hot', c >= 10);
@@ -5600,16 +6575,16 @@ function registerAnswerFeedback(isCorrect, xpGained) {
     examState.bestCombo = Math.max(examState.bestCombo || 0, examState.combo);
     const milestone = COMBO_MILESTONES[examState.combo];
     if (milestone) {
-      buzz(milestone.haptic);
+      buzz(milestone.haptic); playSound('combo');
       floatToast(`${examState.combo >= 10 ? '🔥' : '⚡'} ${milestone.msg}`, 'good');
     } else {
-      buzz('correct');
+      buzz('correct'); playSound('correct');
       floatToast(`✓ +${xpGained} XP`, 'good');
     }
   } else {
     const lost = examState.combo || 0;
     examState.combo = 0;
-    buzz('wrong');
+    buzz('wrong'); playSound('wrong');
     // Losing a long combo is worth naming; losing a 1 is not worth a nag.
     if (lost >= 3) floatToast(`Streak of ${lost} ended — read the rationale`, 'bad');
   }
@@ -5667,7 +6642,7 @@ function celebrate(intensity) {
 const DAILY_GOAL = 20;
 
 function dailyProgress(data) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayStr();
   const answered = ((data && data.sessions) || [])
     .filter(s => s.date === today)
     .reduce((a, s) => a + (s.answered || 0), 0);
@@ -5766,6 +6741,259 @@ function initInstallHint() {
   };
   document.body.appendChild(bar);
 }
+// ══════════════════════════════════════════════════════════════════
+//  DAILY CHALLENGE
+// ══════════════════════════════════════════════════════════════════
+// Ten questions picked from the calendar date, so everyone studying that day
+// gets the same set and can compare notes: six multiple-choice, two SATA,
+// one NGN-format item and one ordered-response item.
+function dailyChallengeQuestions(dateStr = todayStr()) {
+  const rng = _seededRng('daily:' + dateStr);
+  const byType = t => QUESTION_BANK.filter(q => t(q));
+  const pick = (arr, n) => shuffle(arr, rng).slice(0, n);
+  const set = [
+    ...pick(byType(q => q.type === 'mcq'), 6),
+    ...pick(byType(q => q.type === 'sata'), 2),
+    ...pick(byType(q => q.ngn), 1),
+    ...pick(byType(q => q.type === 'ordering'), 1),
+  ];
+  return shuffle(set, rng);
+}
+
+function dailyChallengeStatus() {
+  const today = todayStr();
+  const s = ((progressData && progressData.sessions) || []).find(x => x.mode === 'daily' && x.date === today);
+  return s ? { done: true, correct: s.correct, answered: s.answered } : { done: false };
+}
+
+function startDailyChallenge() {
+  launchSession('daily', dailyChallengeQuestions(), { tutor: true, timer: true });
+}
+
+function startSmartReview() {
+  const byId = new Map(QUESTION_BANK.map(q => [q.id, q]));
+  const qs = reviewQueue().map(id => byId.get(id)).filter(Boolean).slice(0, 20);
+  if (!qs.length) { floatToast('Nothing due — misses you make will show up here', ''); return; }
+  launchSession('review', shuffle(qs), { tutor: true, timer: false });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  RESUME AN UNFINISHED SESSION
+// ══════════════════════════════════════════════════════════════════
+// Phones kill background tabs constantly. The in-progress session is saved
+// after every answer so closing the app never throws away 40 questions.
+const ACTIVE_KEY = 'nclexActive';
+
+function saveActiveSession() {
+  if (!examState.questions.length || examState.ended) return;
+  const snap = {
+    v: 1, savedAt: Date.now(),
+    mode: examState.mode, label: examState.label,
+    tutor: examState.tutorMode, timer: examState.timerEnabled,
+    items: examState.questions.map(q => ({ id: q.id, p: q._perm || null, c: q._clozePerms || null })),
+    answers: examState.answers, flags: [...examState.flags],
+    currentIndex: examState.currentIndex, elapsed: globalSeconds,
+    combo: examState.combo, bestCombo: examState.bestCombo, catDone: examState.catDone,
+  };
+  try { localStorage.setItem(ACTIVE_KEY, JSON.stringify(snap)); } catch (e) {}
+}
+
+function clearActiveSession() {
+  try { localStorage.removeItem(ACTIVE_KEY); } catch (e) {}
+}
+
+function loadActiveSession() {
+  try {
+    const snap = JSON.parse(localStorage.getItem(ACTIVE_KEY) || 'null');
+    if (!snap || snap.v !== 1 || !Array.isArray(snap.items) || !snap.items.length) return null;
+    if (Date.now() - snap.savedAt > 14 * 86400000) { clearActiveSession(); return null; }
+    return snap;
+  } catch (e) { return null; }
+}
+
+function resumeSession() {
+  const snap = loadActiveSession();
+  if (!snap) { renderHub(); return; }
+  const byId = new Map(QUESTION_BANK.map(q => [q.id, q]));
+  const qs = snap.items.map(it => byId.has(it.id) ? prepareQuestion(byId.get(it.id), it.p || undefined, it.c || undefined) : null);
+  if (qs.some(q => !q)) { clearActiveSession(); floatToast('That session could not be restored', 'bad'); renderHub(); return; }
+  launchSession(snap.mode, qs, { tutor: snap.tutor, timer: snap.timer, label: snap.label, restore: snap });
+}
+
+function discardActiveSession() {
+  if (!confirm('Discard your unfinished session? Answers in it will not be saved to your progress.')) return;
+  clearActiveSession();
+  renderHub();
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  HOME — STUDY HUB
+// ══════════════════════════════════════════════════════════════════
+function renderHub() {
+  document.querySelectorAll('[data-bank-count]').forEach(e => { e.textContent = QUESTION_BANK.length.toLocaleString(); });
+  const el = document.getElementById('studyHub');
+  if (!el) return;
+  const active = loadActiveSession();
+  const daily = dailyChallengeStatus();
+  const due = reviewQueue().length;
+  const bm = ((progressData && progressData.bookmarks) || []).length;
+  const quests = weekQuests(progressData);
+  const dstreak = gameStats(progressData).dailyStreak;
+  const goal = dailyProgress(progressData);
+
+  let html = '';
+  if (active) {
+    const n = Object.keys(active.answers || {}).length;
+    html += `<div class="resume-bar">
+      <div><strong>⏸ Unfinished ${escapeHtml(modeName(active.mode))}</strong>
+        <span>${n} of ${active.mode === 'cat' ? `${CAT_MIN}–${CAT_MAX}` : active.items.length} answered</span></div>
+      <div class="resume-actions">
+        <button class="btn btn-primary" onclick="resumeSession()">Resume →</button>
+        <button class="prog-btn" onclick="discardActiveSession()">Discard</button>
+      </div>
+    </div>`;
+  }
+
+  html += `<div class="hub-grid">
+    <div class="hub-card hub-daily${daily.done ? ' done' : ''}">
+      <div class="hub-top"><span class="hub-icon">☀️</span><span class="hub-title">Daily Challenge</span>
+        ${dstreak > 0 ? `<span class="hub-pill">🔥 ${dstreak}</span>` : ''}</div>
+      <div class="hub-desc">${daily.done
+        ? `Done today: <strong>${daily.correct}/${daily.answered}</strong>. A new set unlocks tomorrow.`
+        : '10 mixed questions — the same set for everyone today.'}</div>
+      <button class="btn ${daily.done ? 'btn-secondary' : 'btn-primary'} hub-btn" onclick="startDailyChallenge()">${daily.done ? 'Replay' : 'Start'} →</button>
+    </div>
+
+    <div class="hub-card">
+      <div class="hub-top"><span class="hub-icon">🔁</span><span class="hub-title">Smart Review</span>
+        ${due ? `<span class="hub-pill hot">${due} due</span>` : ''}</div>
+      <div class="hub-desc">${due
+        ? 'Questions you missed, brought back on a spaced schedule until they stick.'
+        : 'Nothing due. Questions you miss come back here on a spaced schedule.'}</div>
+      <button class="btn ${due ? 'btn-primary' : 'btn-secondary'} hub-btn" ${due ? '' : 'disabled'} onclick="startSmartReview()">Review ${due ? Math.min(due, 20) : ''} →</button>
+    </div>
+
+    <div class="hub-card hub-quests">
+      <div class="hub-top"><span class="hub-icon">🗺️</span><span class="hub-title">Weekly Quests</span>
+        <span class="hub-pill">${quests.done.length}/3</span></div>
+      ${renderQuestCard(quests, false)}
+    </div>
+
+    <div class="hub-card">
+      <div class="hub-top"><span class="hub-icon">🎯</span><span class="hub-title">Today</span>
+        <span class="hub-pill${goal.met ? ' ok' : ''}">${goal.answered}/${goal.goal}</span></div>
+      <div class="hub-bar"><div class="hub-bar-fill" style="width:${goal.pct}%"></div></div>
+      <div class="hub-desc">${goal.met ? 'Daily goal met — your streak is safe.' : `${goal.goal - goal.answered} more questions keeps your streak alive.`}</div>
+      <div class="hub-row">
+        <button class="prog-btn" ${bm ? '' : 'disabled'} onclick="startBookmarks()">★ Bookmarks · ${bm}</button>
+        <button class="prog-btn" onclick="showProgressDashboard()">📈 Progress</button>
+      </div>
+    </div>
+  </div>`;
+  el.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ══════════════════════════════════════════════════════════════════
+function initKeyboard() {
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('exam').classList.contains('active')) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const tag = (e.target && e.target.tagName) || '';
+    if (tag === 'SELECT' || tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (document.getElementById('endModal').classList.contains('active')) {
+      if (e.key === 'Escape') closeEndModal();
+      return;
+    }
+    const q = examState.questions[examState.currentIndex];
+    if (!q) return;
+    const k = e.key.toLowerCase();
+    let n = -1;
+    if (/^[1-6]$/.test(k)) n = Number(k) - 1;
+
+    if (n >= 0 && !_locked()) {
+      if (q.type === 'mcq' && n < q.options.length) selectMCQ(n);
+      else if (q.type === 'sata' && n < q.options.length) toggleSATA(n);
+      else if (q.type === 'ordering') {
+        const rem = q._perm.filter(i => !pendingOrder.includes(i));
+        if (n < rem.length) pickOrder(rem[n]);
+      } else return;
+      e.preventDefault();
+      return;
+    }
+    if (k === 'enter') {
+      e.preventDefault();
+      if (_locked()) nextQuestion(); else submitAnswer();
+    } else if (k === 'arrowright' && _locked()) nextQuestion();
+    else if (k === 'arrowleft') prevQuestion();
+    else if (k === 'f') flagQuestion();
+    else if (k === 'b') toggleBookmark(q.id);
+    else if (k === 'escape') closePalette();
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  SOUND
+// ══════════════════════════════════════════════════════════════════
+// Short synthesized tones — no audio files, so nothing extra to download or
+// cache. Off by default: plenty of people study in libraries and on wards.
+let soundEnabled = false;
+let _audioCtx = null;
+
+function initSound() {
+  try { soundEnabled = localStorage.getItem('nclexSound') === '1'; } catch (e) {}
+  renderSoundBtn();
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  try { localStorage.setItem('nclexSound', soundEnabled ? '1' : '0'); } catch (e) {}
+  renderSoundBtn();
+  if (soundEnabled) playSound('correct');
+}
+
+function renderSoundBtn() {
+  const btn = document.getElementById('soundBtn');
+  if (!btn) return;
+  btn.classList.toggle('off', !soundEnabled);
+  btn.textContent = soundEnabled ? '🔊 Sound on' : '🔈 Sound off';
+  btn.setAttribute('aria-pressed', String(soundEnabled));
+}
+
+const SOUND_NOTES = {
+  tap:     [[880, 0, 0.03, 0.03]],
+  correct: [[660, 0, 0.09, 0.08], [990, 0.08, 0.14, 0.08]],
+  wrong:   [[220, 0, 0.18, 0.07], [196, 0.12, 0.2, 0.06]],
+  combo:   [[660, 0, 0.08, 0.07], [830, 0.07, 0.08, 0.07], [990, 0.14, 0.16, 0.07]],
+  unlock:  [[523, 0, 0.1, 0.07], [659, 0.09, 0.1, 0.07], [784, 0.18, 0.1, 0.07], [1047, 0.27, 0.25, 0.07]],
+  rankup:  [[392, 0, 0.12, 0.07], [523, 0.1, 0.12, 0.07], [659, 0.2, 0.12, 0.07], [784, 0.3, 0.12, 0.07], [1047, 0.42, 0.4, 0.08]],
+};
+
+function playSound(name) {
+  if (!soundEnabled) return;
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    _audioCtx = _audioCtx || new Ctx();
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    const t0 = _audioCtx.currentTime;
+    (SOUND_NOTES[name] || SOUND_NOTES.tap).forEach(([freq, at, dur, vol]) => {
+      const osc = _audioCtx.createOscillator();
+      const gain = _audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.0001, t0 + at);
+      gain.gain.exponentialRampToValueAtTime(vol, t0 + at + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + at + dur);
+      osc.connect(gain).connect(_audioCtx.destination);
+      osc.start(t0 + at);
+      osc.stop(t0 + at + dur + 0.02);
+    });
+  } catch (e) {}
+}
+
+document.addEventListener('DOMContentLoaded', () => { initSound(); initKeyboard(); renderHub(); });
 </script>
 <input type="file" id="progressFileInput" accept=".json" style="display:none" onchange="importProgressFile(event)">
 </body>

@@ -19,7 +19,7 @@ import { readFileSync } from 'node:fs';
 const DEFAULT_FILES = ['nclex_simulator.html', 'nclex_public.html'];
 
 // Kept in sync with renderQuestion()/checkCorrect() and the domain chips.
-const TYPES = new Set(['mcq', 'sata', 'ngn_matrix', 'ngn_bowties']);
+const TYPES = new Set(['mcq', 'sata', 'ngn_matrix', 'ngn_bowties', 'ordering', 'cloze']);
 const DOMAINS = new Set([
   'management', 'safety', 'health', 'psychosocial',
   'basic', 'pharmacology', 'reduction', 'physio',
@@ -134,6 +134,31 @@ function validate(file) {
       }
     }
 
+    if (q.type === 'ordering') {
+      if (!Array.isArray(q.items) || q.items.length < 3) {
+        err(q, 'ordering needs an items array of at least 3 steps, listed in the correct order');
+      } else if (new Set(q.items).size !== q.items.length) {
+        err(q, 'ordering has duplicate steps, so the correct order is ambiguous');
+      }
+      if (!q.source) warn(q, 'ordering item has no source — sequences are exactly what guidelines revise');
+    }
+
+    if (q.type === 'cloze') {
+      const c = q.cloze;
+      if (!c || typeof c.template !== 'string' || !Array.isArray(c.blanks) || !c.blanks.length) {
+        return err(q, 'cloze needs cloze.template and a non-empty cloze.blanks');
+      }
+      const refs = [...c.template.matchAll(/\{(\d+)\}/g)].map(m => Number(m[1]));
+      c.blanks.forEach((b, i) => {
+        if (!refs.includes(i)) err(q, `cloze.blanks[${i}] is never referenced as {${i}} in the template`);
+        if (!Array.isArray(b.options) || b.options.length < 2) err(q, `cloze.blanks[${i}] needs at least 2 options`);
+        else if (!Number.isInteger(b.correct) || b.correct < 0 || b.correct >= b.options.length) {
+          err(q, `cloze.blanks[${i}].correct is outside its options`);
+        }
+      });
+      refs.forEach(r => { if (r >= c.blanks.length) err(q, `template references {${r}} but there is no such blank`); });
+    }
+
     if (q.type === 'ngn_bowties') {
       const b = q.bowtie;
       if (!b) return err(q, 'ngn_bowties needs a bowtie object');
@@ -163,7 +188,30 @@ function validate(file) {
     }
   });
 
-  return { file, count: bank.length, errors, warnings };
+  return { file, count: bank.length, errors, warnings, stats: bankStats(bank) };
+}
+
+// Test-wiseness signals. These are not errors — the app shuffles options at
+// runtime so position no longer gives anything away — but they are worth
+// watching when writing new items: a bank where the right answer is usually
+// the longest option can be passed by length-guessing alone.
+function bankStats(bank) {
+  const mcq = bank.filter(q => q.type === 'mcq');
+  const longest = mcq.filter(q => {
+    const lens = q.options.map(o => o.replace(/^[A-F][.)]\s+/, '').length);
+    return lens[q.correct] === Math.max(...lens);
+  }).length;
+  const pos = {};
+  mcq.forEach(q => { pos[q.correct] = (pos[q.correct] || 0) + 1; });
+  const types = {}, domains = {};
+  bank.forEach(q => { types[q.type] = (types[q.type] || 0) + 1; domains[q.domain] = (domains[q.domain] || 0) + 1; });
+  const pct = n => `${Math.round((n / mcq.length) * 100)}%`;
+  return [
+    `formats: ${Object.entries(types).map(([k, v]) => `${k} ${v}`).join(', ')}`,
+    `domains: ${Object.entries(domains).map(([k, v]) => `${k} ${v}`).join(', ')}`,
+    `MCQ key position as authored: ${Object.keys(pos).sort().map(k => `${'ABCDEF'[k]} ${pct(pos[k])}`).join(', ')} (shuffled at runtime)`,
+    `MCQ correct option is the longest: ${pct(longest)} — aim for well under 50% in new items`,
+  ];
 }
 
 const files = process.argv.slice(2);
@@ -175,6 +223,7 @@ for (const file of targets) {
   console.log(`\n${r.file} — ${r.count} questions`);
   r.errors.forEach(e => console.log(`  ERROR   ${e}`));
   r.warnings.forEach(w => console.log(`  warning ${w}`));
+  r.stats.forEach(line => console.log(`  stats   ${line}`));
   if (!r.errors.length && !r.warnings.length) console.log('  clean');
   else console.log(`  ${r.errors.length} error(s), ${r.warnings.length} warning(s)`);
   if (r.errors.length) failed = true;

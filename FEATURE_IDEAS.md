@@ -33,6 +33,23 @@ no build step and no new dependencies.
 - **Badge progress bars** — locked badges show `cur / target` instead of being
   binary.
 
+- **Bookmarks** (was #1) — persisted in `progressData.bookmarks`, practised from the hub.
+- **Spaced repetition** (was #2) — Leitner boxes on `questionHistory`. See `srsBox()`, `reviewQueue()`.
+- **Keyboard shortcuts** (was #4). See `initKeyboard()`.
+- **Daily challenge** (was #5). See `dailyChallengeQuestions()`.
+- **Source per question** (part of #6) — optional `source` field, shown under the rationale.
+- **Weekly quests, heatmap, accuracy trend, coverage, resume, sound, option shuffling,
+  ordered-response and drop-down cloze items, CAT stopping rule.**
+
+---
+
+## Still open
+
+- Printable score summary (#3 below).
+- `reviewed:` dates and a validator check for stale items (rest of #6).
+- Rewrite distractors so the key isn't the longest option 84% of the time.
+- Rebalance domains — Physiological Adaptation holds 43% of the bank.
+
 ---
 
 ## 1. Bookmark / flag questions for review

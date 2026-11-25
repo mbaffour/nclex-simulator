@@ -138,7 +138,7 @@ on that, so keep the formatting.
 {
   id: 1801,                    // unique integer across the whole bank
   domain: "pharmacology",      // one of the eight domain keys below
-  type: "mcq",                 // mcq | sata | ngn_matrix | ngn_bowties
+  type: "mcq",                 // mcq | sata | ngn_matrix | ngn_bowties | ordering | cloze
   ngn: true,                   // optional; marks the item as Next Gen format
   stem: "A nurse is caring for…",
   rationale: "Option C is correct because…",
@@ -250,6 +250,62 @@ bowtie: {
   correctCauses: [0, 2], correctActions: [0, 1, 3], correctOutcomes: [0, 2],
 }
 ```
+
+### `ordering` — ordered response
+
+List `items` in the **correct** order; the app shuffles them for display and the
+student taps them into sequence. Scored all-or-nothing, as on the exam. Give a
+`source` — sequences (PPE, BLS) are exactly what guidelines revise.
+
+```js
+{
+  …shared…,
+  type: "ordering",
+  items: ["Put on the gown", "Put on the mask", "Put on goggles", "Put on gloves"],
+  source: "CDC — Sequence for Putting On PPE",
+}
+```
+
+### `cloze` — NGN drop-down cloze
+
+`{0}`, `{1}`… in the template mark the drop-downs. Each blank's options are
+shuffled at runtime, so writing the correct one first is fine.
+
+```js
+{
+  …shared…,
+  type: "cloze", ngn: true,
+  caseData: { history: "…", labs: "…" },
+  cloze: {
+    template: "The findings are most consistent with {0}. The first prescription is {1}.",
+    blanks: [
+      { options: ["diabetic ketoacidosis", "hypoglycemia", …], correct: 0 },
+      { options: ["IV 0.9% sodium chloride", "IV D5W", …], correct: 0 },
+    ],
+  },
+}
+```
+
+### Optional: `source`
+
+Any question may carry `source: "ACOG Practice Bulletin 222"`. It is shown under
+the rationale. New questions should always have one.
+
+---
+
+## Answer options are shuffled
+
+MCQ and SATA options are shown in a fresh random order every session (authored,
+the key was option B 79% of the time). Two consequences for authors:
+
+- Don't write "A.", "B." prefixes — they're stripped anyway.
+- If an option or rationale refers to another option by letter ("Both A and C",
+  "option D is wrong"), the question is left unshuffled so the text still makes
+  sense. Prefer describing the option instead.
+
+The validator also prints how often the correct MCQ option is the **longest**
+one (currently 84%). A student can learn to exploit that, so make distractors as
+specific and as long as the key.
 
 ---
 

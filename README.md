@@ -12,16 +12,25 @@ A Next Gen NCLEX practice simulator built with love for nursing students prepari
 
 | Feature | Details |
 |---|---|
-| **Practice Modes** | Practice (tutor), CAT Simulation, Next Gen NCLEX, Rapid Review |
-| **Question Types** | MCQ, SATA, NGN Matrix Grid, NGN Bow-tie Clinical Judgment |
+| **Practice Modes** | Practice (tutor), CAT Simulation, Next Gen NCLEX, Rapid Review, Daily Challenge, Smart Review, Bookmarks |
+| **Question Types** | MCQ, SATA, Ordered Response, NGN Matrix Grid, NGN Bow-tie, NGN Drop-down Cloze |
+| **Shuffled Options** | Answer order is randomised every session, so you can't learn the key's position |
+| **NGN Partial Credit** | SATA, matrix, bow-tie and cloze show NGN-style points alongside right/wrong |
 | **Clinical Domains** | All 8 NCLEX domains covered |
 | **Clinical Rationales** | Built-in expert rationale and clinical insight per question |
-| **Adaptive CAT** | Mirrors real NCLEX adaptive difficulty (75–145 Qs) |
-| **Timed Mode** | 1 minute per question to simulate exam pressure |
+| **CAT Simulation** | 85–150 questions, no feedback until the end, real NCLEX 95%-confidence stopping rule |
+| **Timed Mode** | Clock turns amber when you fall behind 1 minute per question |
+| **Resume** | Close the app mid-session and pick up where you left off |
+| **Keyboard** | `1`–`6` select, `Enter` submit/next, `←`/`→` move, `F` flag, `B` bookmark |
 | **Score Breakdown** | Domain-level performance tracking with visual charts |
 | **Ranks & XP** | 10 nursing-career ranks, earned by answering — accuracy counts for more than volume |
 | **Study Streaks** | Consecutive-day tracking, so showing up daily is worth something |
-| **Badges** | 17 unlockable badges, with progress bars showing how close you are |
+| **Badges** | 23 unlockable badges, with progress bars showing how close you are |
+| **Weekly Quests** | Three quests a week (+120 XP each), the same for everyone |
+| **Daily Challenge** | 10 date-seeded questions — everyone gets the same set each day |
+| **Smart Review** | Spaced repetition of every question you've missed |
+| **Progress Charts** | Study heatmap, accuracy trend, bank coverage, per-format accuracy |
+| **Sound** | Optional synthesized sound effects (off by default) |
 | **Live Combos** | Consecutive-correct counter during a session, with milestone feedback |
 | **Haptics** | Vibration feedback for answers, milestones and unlocks (Android; toggleable) |
 | **Daily Goal** | A 20-question target that keeps your streak alive |
@@ -88,13 +97,19 @@ keeps working exactly as before.
 Study with instant feedback after each question. Rationale, NCLEX tip, and built-in clinical insight shown immediately. Best for learning new material.
 
 ### 🎯 CAT Simulation
-Mirrors the real NCLEX Computerized Adaptive Test. Difficulty adjusts to your performance across 75–145 questions. Closest thing to the real deal.
+Exam conditions: no feedback until the end, no going back, and 85–150 questions. It stops as soon as you are 95% confidently above or below a 65% line — the same stopping rule the real NCLEX uses. Questions here aren't difficulty-calibrated, so it simulates the stopping rule, not the item-level adaptivity.
 
 ### 🧠 Next Gen NCLEX (NGN)
-Focused practice on the NGN item types in the bank: Matrix Grid and Bow-tie Clinical Judgment, built on unfolding client-chart case data. The 2023+ NCLEX format.
+Only NGN items: Matrix Grid, Bow-tie and Drop-down Cloze, built on client-chart case data. The 2023+ NCLEX format.
 
 ### ⚡ Rapid Review
-High-yield 25-question sprint. Perfect for daily warmup or that final week grind.
+A mixed 25-question sprint. Good daily warm-up.
+
+### ☀️ Daily Challenge
+Ten questions chosen from the date, so everyone studying today gets the same set. Keep a daily-challenge streak going.
+
+### 🔁 Smart Review
+Every question you miss goes into a spaced-review queue. Get it right and it comes back after 1, 3, then 7 days; miss it and it's due again today. Four spaced correct answers and it's mastered.
 
 ---
 
