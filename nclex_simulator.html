@@ -1184,6 +1184,107 @@
     .dash-card { padding: 18px 16px; }
     .cloze-text { padding: 14px 16px; font-size: 0.95rem; }
   }
+
+  /* ─── STUDY FOR CLASS ─── */
+  #study, #flash { overflow-y: auto; }
+  .study-wrap { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+  .setup-hint { text-transform: none; letter-spacing: 0; color: var(--muted); font-size: 0.74rem; margin-left: 6px; }
+  .level-tabs, .style-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .style-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .level-tab, .style-tab {
+    display: flex; flex-direction: column; gap: 3px; text-align: left; cursor: pointer;
+    background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 14px;
+    color: var(--white); font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .level-tab strong, .style-tab strong { font-size: 0.88rem; font-weight: 600; }
+  .level-tab span, .style-tab span { font-size: 0.72rem; color: var(--muted); }
+  .level-tab:hover, .style-tab:hover { border-color: rgba(0,201,167,0.5); }
+  .level-tab.on, .style-tab.on { border-color: var(--teal); background: rgba(0,201,167,0.1); }
+  .level-tab.on strong, .style-tab.on strong { color: var(--teal); }
+  .course-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .course-card {
+    text-align: left; cursor: pointer; background: var(--card); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 14px 16px; color: var(--white); font-family: 'DM Sans', sans-serif;
+    display: flex; flex-direction: column; gap: 6px; transition: all 0.2s; min-width: 0;
+  }
+  .course-card:hover { border-color: rgba(0,201,167,0.5); transform: translateY(-2px); }
+  .course-card.on { border-color: var(--teal); background: rgba(0,201,167,0.1); box-shadow: 0 0 0 1px var(--teal) inset; }
+  .course-top { display: flex; align-items: center; gap: 8px; }
+  .course-icon { font-size: 1.2rem; }
+  .course-name { font-size: 0.9rem; font-weight: 600; }
+  .course-card.on .course-name { color: var(--teal); }
+  .course-desc { font-size: 0.74rem; color: var(--muted); line-height: 1.45; }
+  .course-bar { height: 4px; background: var(--navy-mid); border-radius: 2px; overflow: hidden; margin-top: 4px; }
+  .course-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--sky)); }
+  .course-meta { font-size: 0.7rem; color: var(--muted); }
+  .chip-group button.chip { font-family: 'DM Sans', sans-serif; cursor: pointer; }
+  .study-search {
+    width: 100%; background: var(--card); border: 1.5px solid var(--border); color: var(--white);
+    padding: 13px 16px; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 1rem; outline: none;
+  }
+  .study-search:focus { border-color: var(--teal); }
+  .mnemo-matches { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; margin-top: 12px; }
+  .mnemo-mini { background: rgba(247,201,72,0.05); border: 1px solid rgba(247,201,72,0.25); border-radius: 10px; padding: 12px 14px; }
+  .mnemo-mini-title { font-size: 0.82rem; color: var(--gold); font-weight: 600; margin-bottom: 6px; }
+  .mnemo-mini-row { font-size: 0.76rem; color: #b8cce0; line-height: 1.5; }
+  .mnemo-mini-row strong { color: var(--teal); margin-right: 4px; }
+  .study-launch { margin-top: 30px; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .study-count { font-size: 0.95rem; color: var(--muted); }
+  .study-count strong { font-family: 'Fraunces', serif; font-size: 1.6rem; color: var(--teal); margin-right: 4px; }
+  .study-go { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 18px; }
+  .study-go .number-select { width: auto; }
+  .medmath-card {
+    margin-top: 20px; background: linear-gradient(135deg, rgba(100,223,223,0.07), var(--card) 60%);
+    border: 1px solid rgba(100,223,223,0.3); border-radius: var(--radius); padding: 22px;
+  }
+  .hub-card.hub-school { grid-column: 1 / -1; border-color: rgba(100,223,223,0.35); background: linear-gradient(135deg, rgba(100,223,223,0.08), var(--card) 55%); }
+  .hub-levels { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  /* Med math input */
+  .calc-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 22px; }
+  .calc-lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); }
+  .calc-row { display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+  .calc-input {
+    width: 160px; max-width: 100%; background: var(--navy-mid); border: 1.5px solid var(--teal); color: var(--white);
+    padding: 10px 14px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 1.2rem; outline: none;
+    font-variant-numeric: tabular-nums;
+  }
+  .calc-input.correct { border-color: var(--green); background: rgba(67,233,123,0.1); }
+  .calc-input.incorrect { border-color: var(--red); background: rgba(255,107,107,0.1); }
+  .calc-unit { font-size: 1rem; color: var(--sky); }
+  .calc-steps { padding-left: 20px; margin: 4px 0 8px; line-height: 1.8; }
+
+  /* Flashcards */
+  .flash-wrap { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
+  .flash-head { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--muted); margin-bottom: 10px; }
+  .flash-card { background: var(--card); border: 1px solid var(--border); border-radius: calc(var(--radius) * 1.2); padding: 26px; min-height: 260px; }
+  .flash-card.flipped { border-color: rgba(0,201,167,0.35); }
+  .flash-opts { list-style: none; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .flash-opts li { display: flex; gap: 12px; font-size: 0.9rem; color: #b8cce0; line-height: 1.5; }
+  .flash-opts li span { color: var(--muted); font-weight: 600; min-width: 16px; }
+  .flash-answer { margin-top: 10px; animation: slideIn 0.25s ease; }
+  .flash-why { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .ans-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .ans-list li { font-size: 0.9rem; line-height: 1.5; padding: 8px 12px; border-radius: 8px; }
+  .ans-ok { background: rgba(67,233,123,0.08); border: 1px solid rgba(67,233,123,0.3); color: var(--white); }
+  .ans-no { color: var(--muted); opacity: 0.65; }
+  .ans-col { color: var(--green); font-weight: 600; }
+  .ans-sec { font-size: 0.74rem; color: var(--teal); text-transform: uppercase; letter-spacing: 1px; margin: 12px 0 6px; }
+  .ans-order { padding-left: 22px; line-height: 1.8; font-size: 0.92rem; color: var(--white); }
+  .ans-fill { color: var(--green); }
+  .ans-calc { font-family: 'Fraunces', serif; font-size: 1.8rem; color: var(--green); margin-bottom: 8px; }
+  .flash-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+  .flash-btn { min-width: 180px; justify-content: center; }
+  .flash-btn kbd { font-family: inherit; font-size: 0.68rem; opacity: 0.6; border: 1px solid currentColor; border-radius: 4px; padding: 0 5px; margin-left: 6px; }
+
+  @media(max-width:768px) {
+    .level-tabs { grid-template-columns: 1fr 1fr; }
+    .style-tabs { grid-template-columns: 1fr; }
+    .course-grid { grid-template-columns: 1fr; }
+    .flash-card { padding: 18px 16px; }
+    .flash-btn { min-width: 0; flex: 1; }
+    .flash-btn kbd { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -1258,8 +1359,8 @@
     <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:60px 20px;flex-direction:column;width:100%;box-sizing:border-box;overflow-x:hidden">
       <div class="dedication-banner">❤️ Made with love for Peyton — Future ICU Nurse &amp; total rockstar 🩺</div>
       <div class="home-badge">✦ 1,800+ questions · built-in rationales · works offline</div>
-      <h1 class="home-title">Pass the <span>NCLEX</span><br>on your first try.</h1>
-      <p class="home-desc">Over 1,800 practice questions across all 8 clinical domains — Next Generation NCLEX formats, a CAT-style exam simulation, a daily challenge, spaced review of your misses, and a rationale for every question.</p>
+      <h1 class="home-title">From first semester<br>to passing the <span>NCLEX</span>.</h1>
+      <p class="home-desc">Study for any nursing-school course — Fundamentals through Critical Care — with flashcards, quizzes and med-math practice, then prepare for licensure with over 1,800 questions across all 8 NCLEX domains, Next Generation formats, a CAT-style exam simulation, a daily challenge, spaced review of your misses, and a rationale for every question.</p>
       <div id="studyHub" class="study-hub"></div>
       <div class="mode-grid">
         <div class="mode-card" onclick="startSetup('practice')">
@@ -1472,6 +1573,30 @@
       <button class="prog-btn" onclick="showScreen('home')" style="margin-left:auto">← Home</button>
     </header>
     <div id="progressContent"></div>
+  </div>
+
+  <!-- ═══════════ STUDY FOR CLASS ═══════════ -->
+  <div id="study" class="screen">
+    <header>
+      <div class="logo">
+        <div class="logo-cross"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-4V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1z"/></svg></div>
+        <div><div class="logo-text">NCLEX Pro</div><div class="logo-sub">Nursing School</div></div>
+      </div>
+      <button class="prog-btn" onclick="showScreen('home')" style="margin-left:auto">← Home</button>
+    </header>
+    <div id="studyContent"></div>
+  </div>
+
+  <!-- ═══════════ FLASHCARDS ═══════════ -->
+  <div id="flash" class="screen">
+    <header>
+      <div class="logo">
+        <div class="logo-cross"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-4V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v4H5a1 1 0 0 0-1 1v4a1 1 0 0 0 1 1h4v4a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-4h4a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1z"/></svg></div>
+        <div><div class="logo-text">NCLEX Pro</div><div class="logo-sub">Flashcards</div></div>
+      </div>
+      <button class="prog-btn" onclick="showScreen('home')" style="margin-left:auto">← Home</button>
+    </header>
+    <div id="flashContent"></div>
   </div>
 
 </div><!-- #app -->
@@ -4143,8 +4268,8 @@ function renderQuestion() {
     <span class="q-type-badge">${typeLabel(q.type)}</span>
     ${q.ngn ? '<span class="ngn-badge">NGN</span>' : ''}
     ${examState.flags.has(idx) ? '<span style="color:var(--gold);font-size:0.8rem">🚩 Flagged</span>' : ''}
-    <button class="bm-btn${bookmarked ? ' on' : ''}" id="bmBtn" onclick="toggleBookmark(${q.id})"
-      aria-pressed="${bookmarked}" title="Bookmark this question for later (B)">${bookmarked ? '★ Saved' : '☆ Save'}</button>
+    ${q.generated ? '' : `<button class="bm-btn${bookmarked ? ' on' : ''}" id="bmBtn" onclick="toggleBookmark(${q.id})"
+      aria-pressed="${bookmarked}" title="Bookmark this question for later (B)">${bookmarked ? '★ Saved' : '☆ Save'}</button>`}
   </div>`;
 
   if (q.caseData) html += renderCaseExhibit(q.caseData);
@@ -4157,6 +4282,7 @@ function renderQuestion() {
   else if (q.type === 'ngn_bowties') html += renderBowtie(q, idx, answered, reveal);
   else if (q.type === 'ordering') html += renderOrdering(q, idx, answered, reveal);
   else if (q.type === 'cloze') html += renderCloze(q, idx, answered, reveal);
+  else if (q.type === 'calc') html += renderCalc(q, idx, answered, reveal);
   else html += renderMCQ(q, idx, answered, reveal);
 
   if (answered !== undefined && !reveal) {
@@ -4165,7 +4291,7 @@ function renderQuestion() {
   if (reveal) html += renderFeedback(q, answered);
   if (reveal) html += renderInsight(q);
 
-  if (answered === undefined && !_isTouch()) {
+  if (answered === undefined && !_isTouch() && q.type !== 'calc') {
     html += `<div class="kbd-hint">⌨ <kbd>1</kbd>–<kbd>6</kbd> select · <kbd>Enter</kbd> submit / next · <kbd>←</kbd><kbd>→</kbd> move · <kbd>F</kbd> flag · <kbd>B</kbd> bookmark</div>`;
   }
 
@@ -4173,6 +4299,7 @@ function renderQuestion() {
   if (examState.lastRendered !== idx) {
     window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
     examState.lastRendered = idx;
+    if (q.type === 'calc' && answered === undefined && !_isTouch()) document.getElementById('calcInput')?.focus({ preventScroll: true });
   }
 
   const isAnswered = answered !== undefined;
@@ -4490,6 +4617,7 @@ function checkCorrect(q, answered) {
   if (q.type === 'cloze') {
     return q.cloze.blanks.every((b, i) => Number(answered[i]) === b.correct);
   }
+  if (q.type === 'calc') return calcIsCorrect(q, answered);
   return answered === q.correct;
 }
 
@@ -4539,6 +4667,7 @@ function renderFeedback(q, answered) {
     <div class="fb-body">
       <div class="rationale-title">Rationale:</div>
       <p>${escapeHtml(q.rationale || (q.matrix && q.matrix.rationale) || 'See the explanation for each row above.')}</p>
+      ${q.steps ? `<ol class="calc-steps">${q.steps.map(st => `<li>${escapeHtml(st)}</li>`).join('')}</ol>` : ''}
       ${q.tip ? `<div class="nclex-tip"><strong>NCLEX Tip:</strong> ${escapeHtml(q.tip)}</div>` : ''}
       ${q.source ? `<div class="q-source">📚 Source: ${escapeHtml(q.source)}</div>` : ''}
     </div>
@@ -4554,11 +4683,12 @@ let pendingMatrix = {};
 let pendingBowtie = { causes: [], actions: [], outcomes: [] };
 let pendingOrder = [];
 let pendingCloze = {};
+let pendingCalc = '';
 
 function resetPending() {
   pendingAnswer = null; pendingSATA = []; pendingMatrix = {};
   pendingBowtie = { causes: [], actions: [], outcomes: [] };
-  pendingOrder = []; pendingCloze = {};
+  pendingOrder = []; pendingCloze = {}; pendingCalc = '';
 }
 
 function _locked() { return examState.answers[examState.currentIndex] !== undefined; }
@@ -4654,6 +4784,10 @@ function submitAnswer() {
   } else if (q.type === 'cloze') {
     if (Object.keys(pendingCloze).length < q.cloze.blanks.length) return shakeSubmit('Fill every blank');
     answer = { ...pendingCloze };
+  } else if (q.type === 'calc') {
+    const typed = (document.getElementById('calcInput') || {}).value ?? pendingCalc;
+    if (isNaN(_parseNum(typed))) return shakeSubmit('Enter a number');
+    answer = String(typed).trim();
   } else {
     if (pendingAnswer === null) return shakeSubmit();
     answer = pendingAnswer;
@@ -4795,6 +4929,7 @@ function endExam() {
 const _MODE_NAMES = {
   practice: 'Practice', cat: 'CAT Simulation', rapid: 'Rapid Review', ngn: 'Next Gen Focus',
   daily: 'Daily Challenge', review: 'Smart Review', bookmarks: 'Bookmarks', retry: 'Retry Misses', domain: 'Focus Practice',
+  course: 'Study for Class', medmath: 'Med Math',
 };
 function modeName(m) { return _MODE_NAMES[m] || m; }
 
@@ -4833,6 +4968,10 @@ function showResults() {
     badge = '📅'; title = `Daily Challenge: ${correct}/${answered}`;
     sub = 'Same 10 questions for everyone today. A new set unlocks tomorrow.';
   }
+  if (examState.mode === 'medmath') {
+    badge = '🧮'; title = `Med Math: ${correct}/${answered}`;
+    sub = correct === answered ? 'Every calculation right. Bump up the level when this feels easy.' : 'Open a missed problem below to see the worked solution step by step.';
+  }
   if (examState.mode === 'review') {
     badge = '🔁'; title = `Smart Review: ${correct} closed`;
     sub = 'Questions you get right move further out in your review schedule. Misses come back sooner.';
@@ -4850,7 +4989,7 @@ function showResults() {
 
   let html = `<div class="results-header">
     <div class="results-badge">${badge}</div>
-    <div class="results-mode">${escapeHtml(modeName(examState.mode))}</div>
+    <div class="results-mode">${escapeHtml(examState.label || modeName(examState.mode))}</div>
     <h2 class="results-title">${title}</h2>
     <p class="results-sub">${sub}</p>
   </div>
@@ -4932,7 +5071,9 @@ function showResults() {
   </div>
 
   <div class="results-cta">
-    <button class="btn btn-primary" onclick="startSetup('practice')">New Practice Session ↻</button>
+    ${examState.mode === 'course' || examState.mode === 'medmath'
+      ? `<button class="btn btn-primary" onclick="${examState.mode === 'medmath' ? 'startMedMath(studyPrefs.mathLevel, 10)' : 'openStudy()'}">${examState.mode === 'medmath' ? 'More med math ↻' : 'Study builder ↻'}</button>`
+      : `<button class="btn btn-primary" onclick="startSetup('practice')">New Practice Session ↻</button>`}
     <button class="btn btn-secondary" onclick="showScreen('home')">← Back to Home</button>
     <button class="btn btn-secondary" onclick="showProgressDashboard()">📈 My Progress</button>
   </div>
@@ -4985,6 +5126,7 @@ function getCorrectLabel(q) {
   }
   if (q.type === 'ordering') return q.items.map((t, i) => `${i + 1}. ${t.substring(0, 24)}`).join(' → ').substring(0, 120) + '…';
   if (q.type === 'cloze') return q.cloze.blanks.map(b => b.options[b.correct]).join(' · ');
+  if (q.type === 'calc') return `${_fmt(q.calc.answer)} ${q.calc.unit}`;
   return 'See rationale';
 }
 
@@ -5003,6 +5145,10 @@ function reviewItem(i) {
 // this panel shows what only the app knows: your history with this exact
 // question and where it sits in your review schedule.
 function renderInsight(q) {
+  if (q.generated) {
+    return `<div class="ai-insight visible"><div class="ai-insight-header">🧮 Med Math</div>
+      <div class="ai-insight-body">New numbers every time you practice. Speed comes from setting the problem up the same way, every time.</div></div>`;
+  }
   const h = progressData && progressData.questionHistory && progressData.questionHistory[q.id];
   let history;
   if (!h) history = 'First time you have seen this one.';
@@ -5048,7 +5194,7 @@ function typeLabel(t) {
   const labels = {
     mcq: 'Multiple Choice', sata: 'Select All That Apply',
     ngn_matrix: 'Matrix Grid', ngn_bowties: 'Bowtie Clinical Judgment',
-    ordering: 'Ordered Response', dropdown: 'Drop-down Cloze', cloze: 'Drop-down Cloze'
+    ordering: 'Ordered Response', dropdown: 'Drop-down Cloze', cloze: 'Drop-down Cloze', calc: 'Dosage Calculation'
   };
   return labels[t] || t;
 }
@@ -5656,7 +5802,7 @@ function reviewQueue() {
 }
 
 function _typeKey(t) {
-  if (t === 'mcq' || t === 'sata' || t === 'ordering') return t;
+  if (t === 'mcq' || t === 'sata' || t === 'ordering' || t === 'calc') return t;
   return 'ngn';
 }
 
@@ -5678,6 +5824,10 @@ function saveSessionToProgress(questions, answers, domainResults, correct, answe
     const ans = answers[i];
     if (ans === undefined) return;
     const ok = checkCorrect(q, ans);
+    const k = _typeKey(q.type);
+    types[k] = types[k] || { c: 0, t: 0 };
+    types[k].t++; if (ok) types[k].c++;
+    if (q.generated) return;      // generated med-math problems have no fixed identity to schedule
     const id = String(q.id);
     const h = progressData.questionHistory[id] || {seen:0, correct:0, lastSeen:null};
     const box = srsBox(h);
@@ -5687,15 +5837,12 @@ function saveSessionToProgress(questions, answers, domainResults, correct, answe
     h.last = ok ? 1 : 0;
     h.lastSeen = today;
     progressData.questionHistory[id] = h;
-
-    const k = _typeKey(q.type);
-    types[k] = types[k] || { c: 0, t: 0 };
-    types[k].t++; if (ok) types[k].c++;
   });
 
   progressData.sessions.push({ date: today, mode, answered, correct, pct, time: timeStr,
     bestCombo: (typeof examState !== 'undefined' && examState.bestCombo) || 0,
     types,
+    ...(typeof examState !== 'undefined' && examState.label ? { label: examState.label } : {}),
     domains: Object.fromEntries(Object.entries(domainResults).map(([d,v]) => [d,{correct:v.correct,total:v.total}]))
   });
 
@@ -5812,7 +5959,7 @@ function clearProgress() {
 // ══════════════════════════════════════════════════════════════════
 function showProgressDashboard() {
   const el = document.getElementById('progressContent');
-  if (!progressData || progressData.totalAnswered === 0) {
+  if (!progressData || (progressData.totalAnswered === 0 && !(progressData.flashLog || []).length)) {
     el.innerHTML = `<div style="text-align:center;padding:80px 20px;color:var(--muted)">
       <div style="font-size:3rem;margin-bottom:16px">📊</div>
       <h2 style="font-family:'Fraunces',serif;color:var(--white);margin-bottom:12px">No Progress Yet</h2>
@@ -5826,7 +5973,7 @@ function showProgressDashboard() {
   }
 
   const _snap = gameSnapshot(progressData);
-  const totalPct = Math.round((progressData.totalCorrect / progressData.totalAnswered) * 100);
+  const totalPct = progressData.totalAnswered ? Math.round((progressData.totalCorrect / progressData.totalAnswered) * 100) : 0;
   const sessCount = progressData.sessions.length;
   const uniqueQ = Object.keys(progressData.questionHistory).length;
   const pctColor = totalPct >= 65 ? 'var(--teal)' : totalPct >= 50 ? 'var(--gold)' : 'var(--red)';
@@ -5903,6 +6050,8 @@ function showProgressDashboard() {
       </div>`).join('')}
     </div>
 
+    ${renderCourseBreakdown()}
+
     ${renderTypeBreakdown(progressData)}
 
     <div class="dash-card">
@@ -5919,7 +6068,7 @@ function showProgressDashboard() {
           <tbody>${[...progressData.sessions].reverse().slice(0, 60).map(s => `
             <tr style="border-bottom:1px solid rgba(100,180,255,0.06)">
               <td style="padding:10px 6px;color:var(--muted)">${escapeHtml(s.date)}</td>
-              <td style="padding:10px 6px;color:var(--white)">${escapeHtml(modeName(s.mode))}</td>
+              <td style="padding:10px 6px;color:var(--white)">${escapeHtml(modeName(s.mode))}${s.label ? `<div style="font-size:0.72rem;color:var(--muted)">${escapeHtml(s.label)}</div>` : ''}</td>
               <td style="padding:10px 6px;text-align:center;color:var(--white)">${s.answered}</td>
               <td style="padding:10px 6px;text-align:center"><strong style="color:${scoreColor(s.pct)}">${s.pct}%</strong></td>
               <td style="padding:10px 6px;text-align:right;color:var(--muted)">${escapeHtml(s.time)}</td>
@@ -5948,6 +6097,7 @@ function _addDays(dateStr, n) {
 function renderHeatmap(data) {
   const perDay = {};
   (data.sessions || []).forEach(s => { perDay[s.date] = (perDay[s.date] || 0) + (s.answered || 0); });
+  (data.flashLog || []).forEach(f => { perDay[f.date] = (perDay[f.date] || 0) + (f.n || 0); });
   const today = todayStr();
   const weeks = 16;
   const start = _addDays(weekKey(today), -7 * (weeks - 1));  // a Monday
@@ -6034,6 +6184,23 @@ function renderCoverage(data) {
     </div>`;
 }
 
+// ─── Performance by nursing-school course ─────────────────────────
+function renderCourseBreakdown() {
+  const rows = COURSES.map(c => ({ c, p: courseProgress(c.id) })).filter(r => r.p.seen > 0);
+  if (!rows.length) return '';
+  return `<div class="dash-card">
+    <div class="dash-label">By Nursing Course <span class="quest-meta">tap one to study it</span></div>
+    ${rows.map(({ c, p }) => `<button class="focus-row" onclick="studyCourse('${c.id}')">
+      <span style="width:170px;flex-shrink:0;font-size:0.83rem;color:var(--white)">${c.icon} ${escapeHtml(c.name)}</span>
+      <div style="flex:1;min-width:0;height:6px;background:var(--navy-mid);border-radius:3px">
+        <div style="height:100%;width:${p.pct}%;background:${p.pct >= 70 ? 'linear-gradient(90deg,var(--teal),var(--sky))' : p.pct >= 50 ? 'linear-gradient(90deg,var(--gold),#ffaa00)' : 'linear-gradient(90deg,var(--red),#ff9999)'};border-radius:3px"></div>
+      </div>
+      <span style="font-size:0.78rem;color:var(--muted);min-width:96px;text-align:right">${p.pct}% · ${p.seen}/${p.total}</span>
+    </button>`).join('')}
+    <div class="dash-sub">A question can belong to more than one course — a heparin question counts for Pharmacology and Med-Surg.</div>
+  </div>`;
+}
+
 // ─── Performance by question format ───────────────────────────────
 function renderTypeBreakdown(data) {
   const agg = {};
@@ -6041,7 +6208,7 @@ function renderTypeBreakdown(data) {
     agg[k] = agg[k] || { c: 0, t: 0 };
     agg[k].c += v.c; agg[k].t += v.t;
   }));
-  const labels = { mcq: 'Multiple Choice', sata: 'Select All That Apply', ngn: 'NGN (matrix, bow-tie, cloze)', ordering: 'Ordered Response' };
+  const labels = { mcq: 'Multiple Choice', sata: 'Select All That Apply', ngn: 'NGN (matrix, bow-tie, cloze)', ordering: 'Ordered Response', calc: 'Dosage Calculation' };
   const rows = Object.entries(agg).filter(([, v]) => v.t > 0);
   if (!rows.length) return '';
   return `<div class="dash-card">
@@ -6130,6 +6297,12 @@ const BADGES = [
   { id:'half_bank',     icon:'🔭', name:'Bank Explorer',    desc:'See half of the question bank',
     test: s => s.uniqueQuestions >= Math.floor(QUESTION_BANK.length / 2),
     progress: s => [s.uniqueQuestions, Math.floor(QUESTION_BANK.length / 2)] },
+  { id:'flash_200',     icon:'🃏', name:'Flashcard Fiend',  desc:'Review 200 flashcards',
+    test: s => s.cardsReviewed >= 200,     progress: s => [s.cardsReviewed, 200] },
+  { id:'med_math',      icon:'🧮', name:'Med Math Ace',     desc:'Get 25 dosage calculations right',
+    test: s => s.calcCorrect >= 25,        progress: s => [s.calcCorrect, 25] },
+  { id:'well_rounded',  icon:'🎓', name:'Well-Rounded',     desc:'Study questions from all 10 nursing courses',
+    test: s => s.coursesTouched >= COURSES.length, progress: s => [s.coursesTouched, COURSES.length] },
 ];
 
 const _DOMAIN_MASTERY_MIN = 25;
@@ -6140,12 +6313,14 @@ function gameStats(data) {
   const empty = { answered:0, correct:0, overallPct:0, sessions:0, uniqueQuestions:0,
                   currentStreak:0, bestStreak:0, domainsTouched:0, masteredDomains:0,
                   longestSession:0, bestCombo:0, bestPerfect:false, comeback:false, studyDays:0,
-                  dailies:0, dailyStreak:0, questsDone:0, missesMastered:0, ngnCorrect:0 };
-  if (!data || !data.totalAnswered) return empty;
+                  dailies:0, dailyStreak:0, questsDone:0, missesMastered:0, ngnCorrect:0,
+                  cardsReviewed:0, calcCorrect:0, coursesTouched:0 };
+  if (!data || (!data.totalAnswered && !(data.flashLog || []).length)) return empty;
 
   const sessions = Array.isArray(data.sessions) ? data.sessions : [];
   const domains = Object.values(data.domainTotals || {});
-  const dates = [...new Set(sessions.map(s => s.date).filter(Boolean))].sort();
+  const flashLog = Array.isArray(data.flashLog) ? data.flashLog : [];
+  const dates = [...new Set([...sessions, ...flashLog].map(s => s.date).filter(Boolean))].sort();
   const dailyDates = [...new Set(sessions.filter(s => s.mode === 'daily').map(s => s.date))].sort();
   const today = todayStr();
 
@@ -6162,7 +6337,7 @@ function gameStats(data) {
   return {
     answered: data.totalAnswered,
     correct: data.totalCorrect,
-    overallPct: Math.round((data.totalCorrect / data.totalAnswered) * 100),
+    overallPct: data.totalAnswered ? Math.round((data.totalCorrect / data.totalAnswered) * 100) : 0,
     sessions: sessions.length,
     uniqueQuestions: hist.length,
     currentStreak, bestStreak, studyDays: dates.length,
@@ -6175,7 +6350,10 @@ function gameStats(data) {
     comeback,
     dailies: dailyDates.length,
     dailyStreak,
-    questsDone: allTimeQuestsDone(sessions),
+    questsDone: allTimeQuestsDone(data),
+    cardsReviewed: flashLog.reduce((t, f) => t + (f.n || 0), 0),
+    calcCorrect: sessions.reduce((t, s) => t + ((s.types && s.types.calc && s.types.calc.c) || 0), 0),
+    coursesTouched: _coursesTouched(data),
     missesMastered: hist.filter(h => h.correct < h.seen && srsBox(h) >= SRS_MASTERED).length,
     ngnCorrect: sessions.reduce((t, s) => t + ((s.types && s.types.ngn && s.types.ngn.c) || 0), 0),
   };
@@ -6200,6 +6378,15 @@ function _streaks(dates, today) {
   return { best, current };
 }
 
+function _coursesTouched(data) {
+  const tax = buildTaxonomy(), touched = new Set();
+  Object.keys(data.questionHistory || {}).forEach(id => {
+    const v = tax.get(Number(id));
+    if (v) v.courses.forEach(c => touched.add(c));
+  });
+  return touched.size;
+}
+
 function _dayGap(a, b) {
   return Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000);
 }
@@ -6207,8 +6394,9 @@ function _dayGap(a, b) {
 // XP rewards showing up (2/question) but rewards getting it right far more (10).
 // Badges, quests and streak days are worth real XP so consistency beats cramming.
 function gameXP(stats) {
-  if (!stats.answered) return 0;
+  if (!stats.answered && !stats.cardsReviewed) return 0;
   return stats.correct * 10
+       + stats.cardsReviewed * 1
        + stats.answered * 2
        + earnedBadges(stats).length * 150
        + stats.studyDays * 25
@@ -6272,10 +6460,12 @@ const QUEST_POOL = [
   { id:'ngn5',     icon:'🧩', name:'Clinical Judgment', desc:'Get 5 NGN-format items fully right',       target:5,  of: w => w.ngn },
   { id:'sata8',    icon:'☑️', name:'Select All',        desc:'Get 8 SATA questions fully right',         target:8,  of: w => w.sata },
   { id:'combo8',   icon:'⚡', name:'In the Zone',       desc:'Reach a combo of 8 in a row',              target:8,  of: w => w.combo },
+  { id:'cards40',  icon:'🃏', name:'Flip Side',         desc:'Review 40 flashcards',                      target:40, of: w => w.cards },
+  { id:'calc10',   icon:'🧮', name:'Do the Math',       desc:'Get 10 dosage calculations right',          target:10, of: w => w.calc },
 ];
 
-function _weekAggregate(sessions) {
-  const w = { answered:0, days:0, dailies:0, review:0, sharp:0, ngn:0, sata:0, combo:0, domains:{} };
+function _weekAggregate(sessions, flashLog = []) {
+  const w = { answered:0, days:0, dailies:0, review:0, sharp:0, ngn:0, sata:0, combo:0, domains:{}, cards:0, calc:0 };
   const days = new Set(), dailies = new Set();
   sessions.forEach(s => {
     w.answered += s.answered || 0;
@@ -6285,9 +6475,11 @@ function _weekAggregate(sessions) {
     if ((s.answered || 0) >= 15 && s.pct >= 80) w.sharp++;
     w.ngn += (s.types && s.types.ngn && s.types.ngn.c) || 0;
     w.sata += (s.types && s.types.sata && s.types.sata.c) || 0;
+    w.calc += (s.types && s.types.calc && s.types.calc.c) || 0;
     w.combo = Math.max(w.combo, s.bestCombo || 0);
     Object.entries(s.domains || {}).forEach(([d, v]) => { w.domains[d] = (w.domains[d] || 0) + (v.total || 0); });
   });
+  flashLog.forEach(f => { w.cards += f.n || 0; days.add(f.date); });
   w.days = days.size; w.dailies = dailies.size;
   return w;
 }
@@ -6301,8 +6493,9 @@ function questsForWeek(key) {
   return picks;
 }
 
-function _questStatus(key, sessions) {
-  const w = _weekAggregate(sessions.filter(s => s.date && weekKey(s.date) === key));
+function _questStatus(key, data) {
+  const inWeek = x => x.date && weekKey(x.date) === key;
+  const w = _weekAggregate(((data && data.sessions) || []).filter(inWeek), ((data && data.flashLog) || []).filter(inWeek));
   return questsForWeek(key).map(q => {
     const cur = Math.min(q.of(w), q.target);
     return { ...q, cur, done: cur >= q.target };
@@ -6311,14 +6504,15 @@ function _questStatus(key, sessions) {
 
 function weekQuests(data) {
   const key = weekKey(todayStr());
-  const list = _questStatus(key, (data && data.sessions) || []);
+  const list = _questStatus(key, data);
   const end = _addDays(key, 7);
   return { key, list, done: list.filter(q => q.done).map(q => q.id), daysLeft: _dayGap(todayStr(), end) };
 }
 
-function allTimeQuestsDone(sessions) {
-  const keys = [...new Set(sessions.filter(s => s.date).map(s => weekKey(s.date)))];
-  return keys.reduce((t, k) => t + _questStatus(k, sessions).filter(q => q.done).length, 0);
+function allTimeQuestsDone(data) {
+  const all = [...(data.sessions || []), ...(data.flashLog || [])];
+  const keys = [...new Set(all.filter(s => s.date).map(s => weekKey(s.date)))];
+  return keys.reduce((t, k) => t + _questStatus(k, data).filter(q => q.done).length, 0);
 }
 
 function renderQuestCard(quests, withHeader) {
@@ -6339,7 +6533,7 @@ function renderQuestCard(quests, withHeader) {
 function updateRankPill() {
   const pill = document.getElementById('rankPill');
   if (!pill) return;
-  if (!progressData || !progressData.totalAnswered) { pill.style.display = 'none'; return; }
+  if (!progressData || (!progressData.totalAnswered && !(progressData.flashLog || []).length)) { pill.style.display = 'none'; return; }
   const { stats, rank, badges } = gameSnapshot(progressData);
   pill.innerHTML = `<span>${rank.emblem}</span><span>${escapeHtml(rank.name)}</span>`
     + (stats.currentStreak > 0
@@ -6790,7 +6984,7 @@ function saveActiveSession() {
     v: 1, savedAt: Date.now(),
     mode: examState.mode, label: examState.label,
     tutor: examState.tutorMode, timer: examState.timerEnabled,
-    items: examState.questions.map(q => ({ id: q.id, p: q._perm || null, c: q._clozePerms || null })),
+    items: examState.questions.map(q => q.generated ? { gen: q } : ({ id: q.id, p: q._perm || null, c: q._clozePerms || null })),
     answers: examState.answers, flags: [...examState.flags],
     currentIndex: examState.currentIndex, elapsed: globalSeconds,
     combo: examState.combo, bestCombo: examState.bestCombo, catDone: examState.catDone,
@@ -6815,7 +7009,7 @@ function resumeSession() {
   const snap = loadActiveSession();
   if (!snap) { renderHub(); return; }
   const byId = new Map(QUESTION_BANK.map(q => [q.id, q]));
-  const qs = snap.items.map(it => byId.has(it.id) ? prepareQuestion(byId.get(it.id), it.p || undefined, it.c || undefined) : null);
+  const qs = snap.items.map(it => it.gen ? it.gen : byId.has(it.id) ? prepareQuestion(byId.get(it.id), it.p || undefined, it.c || undefined) : null);
   if (qs.some(q => !q)) { clearActiveSession(); floatToast('That session could not be restored', 'bad'); renderHub(); return; }
   launchSession(snap.mode, qs, { tutor: snap.tutor, timer: snap.timer, label: snap.label, restore: snap });
 }
@@ -6855,6 +7049,15 @@ function renderHub() {
   }
 
   html += `<div class="hub-grid">
+    <div class="hub-card hub-school">
+      <div class="hub-top"><span class="hub-icon">📚</span><span class="hub-title">Study for Class</span></div>
+      <div class="hub-desc">Not at NCLEX yet? Study any course, body system or topic — with quizzes, flashcards and med-math practice.</div>
+      <div class="hub-levels">
+        ${STUDY_LEVELS.filter(l => l.id !== 'nclex').map(l => `<button class="prog-btn" onclick="openStudy('${l.id}')">${escapeHtml(l.name)}</button>`).join('')}
+        <button class="prog-btn" onclick="openStudy()">🔎 Search a topic</button>
+        <button class="prog-btn primary" onclick="openStudy(); setTimeout(() => document.querySelector('.medmath-card')?.scrollIntoView({behavior:'smooth'}), 80)">🧮 Med Math</button>
+      </div>
+    </div>
     <div class="hub-card hub-daily${daily.done ? ' done' : ''}">
       <div class="hub-top"><span class="hub-icon">☀️</span><span class="hub-title">Daily Challenge</span>
         ${dstreak > 0 ? `<span class="hub-pill">🔥 ${dstreak}</span>` : ''}</div>
@@ -6928,7 +7131,7 @@ function initKeyboard() {
     } else if (k === 'arrowright' && _locked()) nextQuestion();
     else if (k === 'arrowleft') prevQuestion();
     else if (k === 'f') flagQuestion();
-    else if (k === 'b') toggleBookmark(q.id);
+    else if (k === 'b' && !q.generated) toggleBookmark(q.id);
     else if (k === 'escape') closePalette();
   });
 }
@@ -6994,6 +7197,683 @@ function playSound(name) {
 }
 
 document.addEventListener('DOMContentLoaded', () => { initSound(); initKeyboard(); renderHub(); });
+// ══════════════════════════════════════════════════════════════════
+//  NURSING SCHOOL — COURSES, LEVELS AND BODY SYSTEMS
+// ══════════════════════════════════════════════════════════════════
+// The bank is written around the 8 NCLEX client-need domains, but nursing
+// school is taught in courses (Fundamentals, Med-Surg, OB, Peds...). Each
+// question is mapped to courses and body systems from its domain, tags and
+// wording, so a student can study for this week's unit exam as easily as
+// for the NCLEX. A question can belong to several courses. The mapping is
+// computed once at startup — nothing extra is stored in the bank.
+const STUDY_LEVELS = [
+  { id: 'y1',     name: 'Foundations',    sub: 'Year 1 / first semesters' },
+  { id: 'y2',     name: 'Core Clinical',  sub: 'Year 2 / middle semesters' },
+  { id: 'senior', name: 'Senior & Specialty', sub: 'Final semesters' },
+  { id: 'nclex',  name: 'NCLEX Prep',     sub: 'Everything, exam-style' },
+];
+
+const _AGE_CHILD = /\b(\d{1,2})[- ](?:year|yr)s?[- ]old\b/i;
+function _isChildAge(text) {
+  const m = text.match(_AGE_CHILD);
+  return !!m && Number(m[1]) < 18;
+}
+
+const COURSES = [
+  { id: 'fundamentals', icon: '🧺', name: 'Fundamentals of Nursing', level: 'y1',
+    desc: 'Safety, infection control, hygiene, mobility, vital signs, documentation',
+    match: (q, t) => q.domain === 'safety' || q.domain === 'basic'
+      || /\b(hand hygiene|infection control|isolation precautions?|ppe|sterile|fall|restraint|positioning|pressure (injury|ulcer)|bed bath|hygiene|vital signs?|ambulat|transfer|body mechanics|documentation|chart(ing)?|foley|catheter care|enema|nasogastric|ng tube|specimen|intake and output|oral care|sleep|nutrition)\b/.test(t) },
+  { id: 'assessment', icon: '🩺', name: 'Health Assessment', level: 'y1',
+    desc: 'Head-to-toe exam, normal vs. abnormal findings, lab values',
+    match: (q, t) => /\b(auscultat|palpat|percuss|inspect|heart sounds?|lung sounds?|breath sounds?|crackles|wheez|murmur|bruit|reflex|pupil|glasgow|gcs|turgor|edema grade|capillary refill|normal (range|value|finding)|expected finding|assessment finding|head-to-toe|cranial nerve)/.test(t) },
+  { id: 'pharm', icon: '💊', name: 'Pharmacology', level: 'y2',
+    desc: 'Drug classes, side effects, antidotes, safe administration',
+    match: (q, t) => q.domain === 'pharmacology' },
+  { id: 'medsurg', icon: '🏥', name: 'Medical-Surgical Nursing', level: 'y2',
+    desc: 'Adult health across every body system, pre- and post-op care',
+    match: (q, t, c) => (q.domain === 'physio' || q.domain === 'reduction')
+      && !c.has('maternity') && !c.has('peds') },
+  { id: 'mental', icon: '🧠', name: 'Mental Health Nursing', level: 'y2',
+    desc: 'Therapeutic communication, psych disorders, psychotropics, crisis',
+    match: (q, t) => q.domain === 'psychosocial'
+      || /\b(depress|schizo|bipolar|anxiety|panic|suicid|psychosis|psychotic|delusion|hallucinat|antipsychotic|ssri|lithium|eating disorder|anorexia|bulimia|substance|alcohol withdrawal|opioid use|ptsd|ocd|personality disorder|therapeutic communication|electroconvulsive|ect\b|grief)/.test(t) },
+  { id: 'maternity', icon: '🤰', name: 'Maternity & Newborn', level: 'y2',
+    desc: 'Pregnancy, labor & delivery, postpartum, newborn care',
+    match: (q, t) => /\b(pregnan|prenatal|antepartum|intrapartum|labor\b|in labor|contraction|fetal|fetus|gestation|trimester|preeclampsia|eclampsia|hellp|postpartum|lochia|fundus|fundal|cesarean|placenta|amniotic|oxytocin|pitocin|magnesium sulfate|breastfe|lactat|newborn|neonat|apgar|rh immune|rhogam|gravida|obstetric)/.test(t) },
+  { id: 'peds', icon: '🧸', name: 'Pediatrics', level: 'y2',
+    desc: 'Growth & development, childhood illness, family-centered care',
+    match: (q, t) => /\b(pediatric|paediatric|infant|toddler|preschool|school-age|adolescent|(?<!adult )child\b|(?<!adult )children|month-old|kawasaki|croup|epiglottitis|cystic fibrosis|intussusception|pyloric stenosis|tetralogy|wilms|immunization schedule)/.test(t) || _isChildAge(t) },
+  { id: 'critical', icon: '🚑', name: 'Critical Care & Emergency', level: 'senior',
+    desc: 'ICU, shock, ventilators, codes, emergency and trauma care',
+    match: (q, t) => /\b(icu|intensive care|critical care|shock|sepsis|septic|ards|mechanical ventilat|ventilator|intubat|arterial line|vasopressor|norepinephrine|cardiac arrest|code blue|acls|cpr|defibrillat|ventricular fibrillation|v-fib|pulseless|tension pneumothorax|intracranial pressure|icp\b|trauma|burn|emergency department|tpa|stemi|dic\b|status epilepticus|anaphyla)/.test(t) },
+  { id: 'leadership', icon: '📋', name: 'Leadership & Management', level: 'senior',
+    desc: 'Delegation, prioritization, ethics, legal issues, teamwork',
+    match: (q, t) => q.domain === 'management'
+      || /\b(delegat|prioritiz|assign|unlicensed|uap|charge nurse|scope of practice|informed consent|hipaa|confidential|incident report|sbar|handoff|advance directive|ethic|malpractice|negligence|chain of command|triage)/.test(t) },
+  { id: 'community', icon: '🏘️', name: 'Community & Public Health', level: 'senior',
+    desc: 'Screening, immunizations, health promotion, disasters, home care',
+    match: (q, t) => q.domain === 'health'
+      || /\b(screening|immuniz|vaccin|community|public health|home health|home care|disaster|bioterror|outbreak|epidemic|pandemic|health promotion|health fair|smoking cessation|tuberculosis|\btb\b|std|sti\b|sexually transmitted)/.test(t) },
+];
+
+const BODY_SYSTEMS = [
+  { id: 'cardio',  icon: '🫀', name: 'Cardiovascular',
+    re: /\b(heart|cardiac|cardio|myocardial|angina|mi\b|stemi|arrhythm|dysrhythm|atrial|ventricular|ecg|ekg|hypertension|blood pressure|dvt|deep vein|embol|aneurysm|peripheral arter|digoxin|anticoag|heparin|warfarin|troponin|pacemaker|endocarditis|jvd)/ },
+  { id: 'resp',    icon: '🫁', name: 'Respiratory',
+    re: /\b(respirat|lung|pulmonary|copd|asthma|pneumonia|oxygen|spo2|ventilat|airway|chest tube|pneumothorax|tracheost|abg|bronch|inhaler|tuberculosis|\btb\b|cystic fibrosis|croup|ards)/ },
+  { id: 'neuro',   icon: '🧠', name: 'Neurological',
+    re: /\b(neuro|stroke|cva|seizure|epilep|intracranial|icp\b|head injury|brain|spinal cord|meningitis|parkinson|alzheimer|dementia|multiple sclerosis|myasthenia|guillain|glasgow|gcs|delirium)/ },
+  { id: 'endo',    icon: '🦋', name: 'Endocrine',
+    re: /\b(diabet|insulin|glucose|hypoglyc|hyperglyc|dka|hhs|thyroid|graves|addison|cushing|adrenal|pituitary|siadh|diabetes insipidus|metformin)/ },
+  { id: 'renal',   icon: '🫘', name: 'Renal & Urinary',
+    re: /\b(renal|kidney|ckd|aki|dialysis|urin|bladder|creatinine|bun\b|nephr|catheter|prostat|turp|uti\b)/ },
+  { id: 'gi',      icon: '🍽️', name: 'Gastrointestinal & Hepatic',
+    re: /\b(gastro|gi\b|bowel|colon|stomach|liver|hepat|cirrhosis|pancrea|ulcer|crohn|colitis|appendic|cholecyst|ostomy|nasogastric|ng tube|tpn|enteral|feeding|dysphagia|ascites|varices|diarrhea|constipation|vomit)/ },
+  { id: 'fluids',  icon: '💧', name: 'Fluids, Electrolytes & Acid-Base',
+    re: /\b(potassium|sodium|calcium|magnesium|phosph|electrolyte|hyperkal|hypokal|hyponat|hypernat|hypocalc|hypercalc|acid-base|acidosis|alkalosis|abg|dehydrat|fluid volume|iv fluid|isotonic|hypotonic|hypertonic)/ },
+  { id: 'msk',     icon: '🦴', name: 'Musculoskeletal',
+    re: /\b(fracture|cast|traction|arthroplasty|hip|knee|osteo|arthritis|compartment syndrome|amputation|gout|bone|joint|crutch|walker)/ },
+  { id: 'heme',    icon: '🩸', name: 'Hematology & Oncology',
+    re: /\b(anemia|sickle|hemophilia|transfusion|blood product|platelet|neutropen|leukemia|lymphoma|cancer|oncolog|chemo|radiation|tumor|dic\b|thrombocytopen|inr|aptt)/ },
+  { id: 'immune',  icon: '🛡️', name: 'Immune & Infectious Disease',
+    re: /\b(infection|infectious|sepsis|septic|hiv|aids|immun|lupus|anaphyla|allerg|antibiotic|mrsa|c\. ?diff|isolation|precautions|vaccin|transplant|rejection)/ },
+  { id: 'integ',   icon: '🩹', name: 'Integumentary & Wounds',
+    re: /\b(skin|wound|pressure (injury|ulcer)|burn|dressing|incision|dehiscence|evisceration|rash|psoriasis|cellulitis|debridement)/ },
+  { id: 'repro',   icon: '🤱', name: 'Reproductive & Obstetric',
+    re: /\b(pregnan|labor\b|postpartum|fetal|newborn|neonat|breast|menstru|contracept|ovarian|uterine|cervical|testicular|prostate|obstetric|gestation)/ },
+];
+
+let _taxonomy = null;     // id -> { courses:Set, systems:Set, text }
+
+function _questionText(q) {
+  return [q.stem, ...(q.tags || []), q.rationale || '', q.tip || '',
+    q.caseData ? Object.values(q.caseData).join(' ') : ''].join(' ').toLowerCase();
+}
+
+function buildTaxonomy() {
+  if (_taxonomy) return _taxonomy;
+  _taxonomy = new Map();
+  QUESTION_BANK.forEach(q => {
+    // Courses and systems are matched on the stem and tags first — the
+    // rationale mentions plenty of things the question is not about.
+    const core = [q.stem, ...(q.tags || []), q.caseData ? Object.values(q.caseData).join(' ') : ''].join(' ').toLowerCase();
+    const courses = new Set();
+    // Maternity and peds go first: Med-Surg is "adult physiology that isn't them".
+    ['maternity', 'peds'].forEach(id => { if (COURSES.find(c => c.id === id).match(q, core, courses)) courses.add(id); });
+    COURSES.forEach(c => { if (!courses.has(c.id) && c.match(q, core, courses)) courses.add(c.id); });
+    if (!courses.size) courses.add(q.domain === 'psychosocial' ? 'mental' : 'medsurg');
+    const systems = new Set(BODY_SYSTEMS.filter(s => s.re.test(core)).map(s => s.id));
+    _taxonomy.set(q.id, { courses, systems, text: _questionText(q) });
+  });
+  return _taxonomy;
+}
+
+function courseById(id) { return COURSES.find(c => c.id === id); }
+
+// ══════════════════════════════════════════════════════════════════
+//  MED MATH — generated dosage-calculation problems
+// ══════════════════════════════════════════════════════════════════
+// Every nursing program gives a dosage-calculation exam each semester. These
+// problems are generated, so there is an endless supply, and the answer is
+// computed from the same numbers the stem shows — it cannot drift out of
+// sync. Drug strengths are common real-world presentations, but the point is
+// the arithmetic: always follow your facility's order and the label in hand.
+const MED_MATH_LEVELS = {
+  y1:     { name: 'Foundations', topics: 'Conversions, tablets, oral liquids', kinds: ['convert', 'tablets', 'liquid'] },
+  y2:     { name: 'Core Clinical', topics: 'Injections, IV pump & gravity rates, weight-based doses', kinds: ['inject', 'pump', 'ivpb', 'gravity', 'weight'] },
+  senior: { name: 'Senior & Critical Care', topics: 'Heparin, insulin drips, mcg/kg/min titrations', kinds: ['heparin', 'heparinWt', 'insulin', 'titrate', 'titrateFlat'] },
+};
+
+const _pick = a => a[Math.floor(Math.random() * a.length)];
+const _rint = (lo, hi) => lo + Math.floor(Math.random() * (hi - lo + 1));
+const _round = (x, d) => Math.round((x + Number.EPSILON) * 10 ** d) / 10 ** d;
+const _fmt = x => Number(x).toLocaleString('en-US', { maximumFractionDigits: 3 });
+const _ROUND_TXT = ['Round to the nearest whole number.', 'Round to the nearest tenth.', 'Round to the nearest hundredth.'];
+
+const MED_MATH_GEN = {
+  convert() {
+    const v = _pick([
+      () => { const mg = _pick([250, 500, 750, 1500, 2500]); return { stem: `Convert ${_fmt(mg)} mg to grams.`, ans: mg / 1000, unit: 'g', d: 2,
+        steps: [`1 g = 1,000 mg`, `${_fmt(mg)} mg ÷ 1,000 = ${_fmt(mg / 1000)} g`] }; },
+      () => { const g = _pick([0.25, 0.5, 1.5, 2]); return { stem: `A prescription reads ${g} g. Convert the dose to milligrams.`, ans: g * 1000, unit: 'mg', d: 0,
+        steps: [`1 g = 1,000 mg`, `${g} g × 1,000 = ${_fmt(g * 1000)} mg`] }; },
+      () => { const mcg = _pick([250, 500, 750]); return { stem: `Convert ${mcg} mcg to milligrams.`, ans: mcg / 1000, unit: 'mg', d: 2,
+        steps: [`1 mg = 1,000 mcg`, `${mcg} mcg ÷ 1,000 = ${_fmt(mcg / 1000)} mg`] }; },
+      () => { const lb = _rint(110, 260); return { stem: `A client weighs ${lb} lb. What is the client's weight in kilograms?`, ans: _round(lb / 2.2, 1), unit: 'kg', d: 1,
+        steps: [`1 kg = 2.2 lb`, `${lb} lb ÷ 2.2 = ${_fmt(lb / 2.2)} kg`, `Rounded: ${_round(lb / 2.2, 1)} kg`] }; },
+      () => { const oz = _pick([4, 6, 8, 10, 12]); return { stem: `A client drank ${oz} oz of apple juice. Record the intake in milliliters.`, ans: oz * 30, unit: 'mL', d: 0,
+        steps: [`1 oz = 30 mL`, `${oz} oz × 30 = ${oz * 30} mL`] }; },
+      () => { const tsp = _pick([1, 2, 3]); return { stem: `A parent is told to give ${tsp} teaspoon${tsp > 1 ? 's' : ''} of a liquid medication. How many milliliters is that?`, ans: tsp * 5, unit: 'mL', d: 0,
+        steps: [`1 tsp = 5 mL`, `${tsp} × 5 = ${tsp * 5} mL`, `Teach families to use an oral syringe or dosing cup marked in mL, never a kitchen spoon.`] }; },
+    ]);
+    return { ...v(), tags: ['conversions'] };
+  },
+  tablets() {
+    const [drug, have, hu, want, wu] = _pick([
+      ['metoprolol tartrate', 25, 'mg', 50, 'mg'], ['furosemide', 20, 'mg', 40, 'mg'],
+      ['acetaminophen', 325, 'mg', 650, 'mg'], ['levothyroxine', 50, 'mcg', 0.1, 'mg'],
+      ['lisinopril', 10, 'mg', 5, 'mg'], ['carvedilol', 6.25, 'mg', 12.5, 'mg'],
+      ['warfarin', 2.5, 'mg', 5, 'mg'], ['prednisone', 10, 'mg', 30, 'mg'],
+      ['digoxin', 125, 'mcg', 0.25, 'mg'], ['amlodipine', 5, 'mg', 10, 'mg'],
+    ]);
+    const wantSame = wu === hu ? want : want * 1000;
+    const ans = wantSame / have;
+    const steps = [];
+    if (wu !== hu) steps.push(`Convert first: ${want} mg × 1,000 = ${_fmt(wantSame)} mcg`);
+    steps.push(`Desired ÷ Have × Quantity: ${_fmt(wantSame)} ${hu} ÷ ${_fmt(have)} ${hu} × 1 tablet = ${_fmt(ans)} tablet${ans === 1 ? '' : 's'}`);
+    if (ans % 1) steps.push('Only split a tablet that is scored; otherwise ask pharmacy for a different strength.');
+    return { stem: `The provider prescribes ${drug} ${_fmt(want)} ${wu} PO. The tablets available are ${_fmt(have)} ${hu} each. How many tablets should the nurse give?`,
+      ans, unit: 'tablet(s)', d: 1, steps, tags: ['tablets', drug] };
+  },
+  liquid() {
+    const [drug, mg, ml, want, u] = _pick([
+      ['acetaminophen oral suspension', 160, 5, 240, 'mg'], ['amoxicillin oral suspension', 250, 5, 375, 'mg'],
+      ['cephalexin oral suspension', 250, 5, 500, 'mg'], ['ibuprofen oral suspension', 100, 5, 150, 'mg'],
+      ['potassium chloride oral solution', 20, 15, 40, 'mEq'], ['amoxicillin oral suspension', 400, 5, 300, 'mg'],
+      ['lactulose', 10, 15, 20, 'g'],
+    ]);
+    const ans = (want / mg) * ml;
+    return { stem: `The prescription is ${drug} ${want} ${u} PO. The bottle is labeled ${mg} ${u} per ${ml} mL. How many mL should the nurse give?`,
+      ans: _round(ans, 1), unit: 'mL', d: 1, tags: ['oral liquids', drug],
+      steps: [`Desired ÷ Have × Volume: ${want} ${u} ÷ ${mg} ${u} × ${ml} mL`, `= ${_fmt(ans)} mL`] };
+  },
+  inject() {
+    const [drug, conc, cu, want, route] = _pick([
+      ['morphine', 4, 'mg/mL', 2, 'IV'], ['morphine', 10, 'mg/mL', 4, 'IV'],
+      ['heparin', 5000, 'units/mL', 5000, 'subcutaneously'], ['heparin', 10000, 'units/mL', 5000, 'subcutaneously'],
+      ['ondansetron', 2, 'mg/mL', 4, 'IV'], ['furosemide', 10, 'mg/mL', 20, 'IV'],
+      ['hydromorphone', 2, 'mg/mL', 1, 'IV'], ['ketorolac', 30, 'mg/mL', 15, 'IV'],
+      ['promethazine', 25, 'mg/mL', 12.5, 'deep IM'],
+    ]);
+    const u = cu.split('/')[0];
+    const ans = want / conc;
+    return { stem: `The prescription is ${drug} ${_fmt(want)} ${u} ${route}. The vial is labeled ${_fmt(conc)} ${cu}. How many mL should the nurse draw up?`,
+      ans: _round(ans, 2), unit: 'mL', d: 2, tags: ['injections', drug],
+      steps: [`Desired ÷ Have × Volume: ${_fmt(want)} ${u} ÷ ${_fmt(conc)} ${u} × 1 mL = ${_fmt(ans)} mL`,
+        ...(drug === 'heparin' ? ['Heparin is a high-alert medication: have a second nurse independently double-check the dose.'] : [])] };
+  },
+  pump() {
+    const vol = _pick([250, 500, 1000]), hrs = _pick([4, 6, 8, 10, 12, 24]);
+    const fluid = _pick(['0.9% sodium chloride', 'lactated Ringer\'s', 'D5W', 'D5 ½NS']);
+    return { stem: `The prescription is ${vol} mL of ${fluid} IV over ${hrs} hours on an infusion pump. At what rate should the nurse set the pump, in mL/hr?`,
+      ans: _round(vol / hrs, 0), unit: 'mL/hr', d: 0, tags: ['IV rates'],
+      steps: [`mL/hr = total volume ÷ total hours`, `${vol} mL ÷ ${hrs} hr = ${_fmt(vol / hrs)} mL/hr`] };
+  },
+  ivpb() {
+    const vol = _pick([50, 100, 250]), min = _pick([20, 30, 45, 60, 90]);
+    const drug = _pick(['cefazolin', 'vancomycin', 'piperacillin-tazobactam', 'ceftriaxone']);
+    const ans = vol / (min / 60);
+    return { stem: `${drug.charAt(0).toUpperCase() + drug.slice(1)} is supplied in ${vol} mL to infuse over ${min} minutes. At what rate should the nurse program the pump, in mL/hr?`,
+      ans: _round(ans, 0), unit: 'mL/hr', d: 0, tags: ['IV piggyback', drug],
+      steps: [`Convert minutes to hours: ${min} min ÷ 60 = ${_fmt(min / 60)} hr`, `${vol} mL ÷ ${_fmt(min / 60)} hr = ${_fmt(ans)} mL/hr`] };
+  },
+  gravity() {
+    const vol = _pick([500, 1000, 250]), hrs = _pick([4, 6, 8, 12]), df = _pick([10, 15, 20, 60]);
+    const ans = (vol * df) / (hrs * 60);
+    return { stem: `A client is to receive ${vol} mL of IV fluid over ${hrs} hours by gravity. The tubing drop factor is ${df} gtt/mL. How many drops per minute should the nurse count?`,
+      ans: _round(ans, 0), unit: 'gtt/min', d: 0, tags: ['drip rates', 'gravity infusion'],
+      steps: [`gtt/min = volume (mL) × drop factor ÷ time (min)`, `${vol} × ${df} ÷ (${hrs} × 60) = ${_fmt(vol * df)} ÷ ${hrs * 60} = ${_fmt(ans)}`,
+        `You can't count part of a drop: ${_round(ans, 0)} gtt/min.`] };
+  },
+  weight() {
+    const kg = _rint(8, 30), lb = _round(kg * 2.2, 1);
+    const [drug, perKg, mg, ml] = _pick([['acetaminophen', 15, 160, 5], ['ibuprofen', 10, 100, 5]]);
+    const dose = perKg * kg, ans = (dose / mg) * ml;
+    return { stem: `A child who weighs ${lb} lb is prescribed ${drug} ${perKg} mg/kg PO. The suspension is ${mg} mg/${ml} mL. How many mL should the nurse give?`,
+      ans: _round(ans, 1), unit: 'mL', d: 1, tags: ['weight-based dosing', 'pediatrics', drug],
+      steps: [`Weight: ${lb} lb ÷ 2.2 = ${kg} kg`, `Dose: ${perKg} mg/kg × ${kg} kg = ${dose} mg`, `Volume: ${dose} mg ÷ ${mg} mg × ${ml} mL = ${_fmt(ans)} mL`] };
+  },
+  heparin() {
+    const [units, ml] = _pick([[25000, 250], [25000, 500]]), conc = units / ml;
+    const rate = _pick([800, 1000, 1100, 1200, 1300, 1500]);
+    const ans = rate / conc;
+    return { stem: `A heparin infusion of ${_fmt(units)} units in ${ml} mL D5W is prescribed to run at ${_fmt(rate)} units/hr. At what rate should the nurse set the pump, in mL/hr?`,
+      ans: _round(ans, 1), unit: 'mL/hr', d: 1, tags: ['heparin', 'high-alert medications'],
+      steps: [`Concentration: ${_fmt(units)} units ÷ ${ml} mL = ${conc} units/mL`, `${_fmt(rate)} units/hr ÷ ${conc} units/mL = ${_fmt(ans)} mL/hr`] };
+  },
+  heparinWt() {
+    const kg = _rint(55, 115), perKg = 18, conc = 100;
+    const unitsHr = perKg * kg, ans = unitsHr / conc;
+    return { stem: `Per the weight-based heparin protocol, a client weighing ${kg} kg is to start at ${perKg} units/kg/hr. The bag contains 25,000 units in 250 mL. Calculate the pump rate in mL/hr.`,
+      ans: _round(ans, 1), unit: 'mL/hr', d: 1, tags: ['heparin', 'weight-based dosing'],
+      steps: [`Dose: ${perKg} units/kg/hr × ${kg} kg = ${_fmt(unitsHr)} units/hr`, `Concentration: 25,000 units ÷ 250 mL = ${conc} units/mL`, `${_fmt(unitsHr)} ÷ ${conc} = ${_fmt(ans)} mL/hr`] };
+  },
+  insulin() {
+    const kg = _rint(50, 110);
+    const ans = 0.1 * kg;
+    return { stem: `A client in diabetic ketoacidosis who weighs ${kg} kg is prescribed a regular insulin infusion at 0.1 units/kg/hr. The bag contains 100 units of regular insulin in 100 mL 0.9% sodium chloride. At what rate should the pump be set, in mL/hr?`,
+      ans: _round(ans, 1), unit: 'mL/hr', d: 1, tags: ['insulin infusion', 'DKA'],
+      steps: [`Dose: 0.1 units/kg/hr × ${kg} kg = ${_fmt(ans)} units/hr`, `Concentration: 100 units ÷ 100 mL = 1 unit/mL`, `${_fmt(ans)} units/hr ÷ 1 unit/mL = ${_fmt(ans)} mL/hr`] };
+  },
+  titrate() {
+    const [drug, mg, ml, doses] = _pick([['dopamine', 400, 250, [3, 5, 8, 10]], ['dobutamine', 250, 250, [2.5, 5, 7.5, 10]], ['dobutamine', 500, 250, [2.5, 5, 10]]]);
+    const dose = _pick(doses), kg = _rint(55, 110);
+    const conc = (mg * 1000) / ml, ans = (dose * kg * 60) / conc;
+    return { stem: `${drug.charAt(0).toUpperCase() + drug.slice(1)} ${mg} mg in ${ml} mL is infusing for a client who weighs ${kg} kg. The prescribed dose is ${dose} mcg/kg/min. At what rate should the pump be set, in mL/hr?`,
+      ans: _round(ans, 1), unit: 'mL/hr', d: 1, tags: ['titration', 'vasoactive drips', drug],
+      steps: [`Concentration: ${mg} mg × 1,000 ÷ ${ml} mL = ${_fmt(conc)} mcg/mL`, `Dose per hour: ${dose} mcg/kg/min × ${kg} kg × 60 min = ${_fmt(dose * kg * 60)} mcg/hr`, `${_fmt(dose * kg * 60)} ÷ ${_fmt(conc)} = ${_fmt(ans)} mL/hr`] };
+  },
+  titrateFlat() {
+    const dose = _pick([2, 4, 6, 8, 10, 12]);
+    const conc = 16, ans = (dose * 60) / conc;
+    return { stem: `Norepinephrine 4 mg in 250 mL is prescribed at ${dose} mcg/min. At what rate should the nurse set the pump, in mL/hr?`,
+      ans: _round(ans, 1), unit: 'mL/hr', d: 1, tags: ['titration', 'vasopressors', 'norepinephrine'],
+      steps: [`Concentration: 4 mg × 1,000 ÷ 250 mL = ${conc} mcg/mL`, `${dose} mcg/min × 60 = ${dose * 60} mcg/hr`, `${dose * 60} ÷ ${conc} = ${_fmt(ans)} mL/hr`] };
+  },
+};
+
+let _calcSeq = 0;
+function generateCalcQuestion(kind) {
+  const p = MED_MATH_GEN[kind]();
+  return {
+    id: `calc-${kind}-${Date.now().toString(36)}-${_calcSeq++}`,
+    generated: true, kind, type: 'calc', domain: 'pharmacology',
+    stem: `${p.stem} ${_ROUND_TXT[p.d]}`,
+    calc: { answer: _round(p.ans, p.d), unit: p.unit, decimals: p.d },
+    steps: p.steps,
+    rationale: 'Worked solution:',
+    tip: 'Set it up the same way every time (Desired ÷ Have × Quantity, or dimensional analysis), check that the units cancel, then ask: is this answer reasonable? More than 3 tablets or a tiny fraction of a mL is a red flag to recheck.',
+    tags: ['dosage calculation', ...(p.tags || [])],
+  };
+}
+
+function startMedMath(level, count = 10) {
+  const kinds = level === 'all' ? Object.values(MED_MATH_LEVELS).flatMap(l => l.kinds) : MED_MATH_LEVELS[level].kinds;
+  // Cycle through the problem kinds so a set of 10 covers all of them.
+  const order = shuffle(kinds);
+  const qs = Array.from({ length: count }, (_, i) => generateCalcQuestion(order[i % order.length]));
+  launchSession('medmath', shuffle(qs), { tutor: true, timer: false, label: `Med Math · ${level === 'all' ? 'All levels' : MED_MATH_LEVELS[level].name}` });
+}
+
+function _parseNum(s) {
+  if (s === undefined || s === null) return NaN;
+  const t = String(s).replace(/,/g, '').trim();
+  return /^-?\d*\.?\d+$/.test(t) || /^-?\d+\.$/.test(t) ? parseFloat(t) : NaN;
+}
+
+function calcIsCorrect(q, a) {
+  const v = _parseNum(a);
+  return !isNaN(v) && Math.abs(_round(v, q.calc.decimals) - q.calc.answer) < 1e-9;
+}
+
+function renderCalc(q, idx, answered, reveal) {
+  const val = answered !== undefined ? answered : pendingCalc;
+  const cls = reveal ? (calcIsCorrect(q, val) ? 'correct' : 'incorrect') : '';
+  return `<div class="calc-box">
+    <label class="calc-lbl" for="calcInput">Your answer</label>
+    <div class="calc-row">
+      <input id="calcInput" class="calc-input ${cls}" type="text" inputmode="decimal" autocomplete="off"
+        value="${escapeHtml(val || '')}" ${answered !== undefined ? 'disabled' : ''}
+        oninput="pendingCalc = this.value" onkeydown="if(event.key==='Enter'){event.preventDefault();submitAnswer();}">
+      <span class="calc-unit">${escapeHtml(q.calc.unit)}</span>
+    </div>
+    ${reveal && !calcIsCorrect(q, val) ? `<div class="cloze-fix">✓ Correct answer: ${_fmt(q.calc.answer)} ${escapeHtml(q.calc.unit)}</div>` : ''}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  STUDY BUILDER — any course, system or topic
+// ══════════════════════════════════════════════════════════════════
+const _STUDY_PREFS_KEY = 'nclexStudyPrefs';
+let studyPrefs = { level: 'y1', courses: [], systems: [], query: '', style: 'quiz', count: 20, mathLevel: 'y1' };
+
+function _loadStudyPrefs() {
+  try { Object.assign(studyPrefs, JSON.parse(localStorage.getItem(_STUDY_PREFS_KEY) || '{}')); } catch (e) {}
+}
+function _saveStudyPrefs() {
+  try { localStorage.setItem(_STUDY_PREFS_KEY, JSON.stringify(studyPrefs)); } catch (e) {}
+}
+
+function openStudy(level) {
+  _loadStudyPrefs();
+  if (level) { studyPrefs.level = level; studyPrefs.mathLevel = level === 'nclex' ? 'all' : level; }
+  buildTaxonomy();
+  renderStudy();
+  showScreen('study');
+  setTimeout(() => {
+    const box = document.getElementById('studySearch');
+    if (box && !_isTouch() && studyPrefs.query) box.focus();
+  }, 50);
+}
+
+// Per-course history, derived from questionHistory through the taxonomy.
+function courseProgress(courseId) {
+  const tax = buildTaxonomy();
+  const hist = (progressData && progressData.questionHistory) || {};
+  let total = 0, seen = 0, ans = 0, right = 0;
+  tax.forEach((v, id) => {
+    if (!v.courses.has(courseId)) return;
+    total++;
+    const h = hist[id];
+    if (h) { seen++; ans += h.seen; right += h.correct; }
+  });
+  return { total, seen, pct: ans ? Math.round((right / ans) * 100) : null };
+}
+
+function studyPool() {
+  const tax = buildTaxonomy();
+  const terms = studyPrefs.query.toLowerCase().split(/\s+/).filter(Boolean);
+  const levelCourses = studyPrefs.level === 'nclex' ? null : new Set(_visibleCourses().map(c => c.id));
+  return QUESTION_BANK.filter(q => {
+    const v = tax.get(q.id);
+    if (studyPrefs.courses.length) {
+      if (!studyPrefs.courses.some(c => v.courses.has(c))) return false;
+    } else if (levelCourses && ![...v.courses].some(c => levelCourses.has(c))) return false;
+    if (studyPrefs.systems.length && !studyPrefs.systems.some(s => v.systems.has(s))) return false;
+    if (terms.length && !terms.every(t => v.text.includes(t))) return false;
+    return true;
+  });
+}
+
+function _visibleCourses() {
+  const lv = studyPrefs.level;
+  if (lv === 'nclex') return COURSES;
+  // Senior students still need everything from earlier years; earlier years
+  // see their own courses first and nothing they haven't reached yet.
+  const order = { y1: ['y1'], y2: ['y1', 'y2'], senior: ['y1', 'y2', 'senior'] }[lv];
+  return COURSES.filter(c => order.includes(c.level));
+}
+
+function renderStudy() {
+  const el = document.getElementById('studyContent');
+  if (!el) return;
+  const visible = new Set(_visibleCourses().map(c => c.id));
+  studyPrefs.courses = studyPrefs.courses.filter(c => visible.has(c));
+  const pool = studyPool();
+  const mathLv = studyPrefs.mathLevel;
+  const matches = matchingMnemonics(studyPrefs.query);
+
+  el.innerHTML = `<div class="study-wrap">
+    <h2 class="setup-title">Study for Class</h2>
+    <p class="setup-sub">Pick where you are in nursing school, then a course, a body system or any topic. Everything here also counts toward your streak, quests and NCLEX readiness.</p>
+
+    <div class="setup-label">🎓 Where are you in the program?</div>
+    <div class="level-tabs" role="tablist">
+      ${STUDY_LEVELS.map(l => `<button role="tab" aria-selected="${l.id === studyPrefs.level}" class="level-tab${l.id === studyPrefs.level ? ' on' : ''}"
+        onclick="setStudyLevel('${l.id}')"><strong>${l.name}</strong><span>${l.sub}</span></button>`).join('')}
+    </div>
+
+    <div class="setup-label" style="margin-top:28px">📚 Course <span class="setup-hint">tap one or more — or none for everything at this level</span></div>
+    <div class="course-grid">
+      ${_visibleCourses().map(c => {
+        const p = courseProgress(c.id);
+        const on = studyPrefs.courses.includes(c.id);
+        return `<button class="course-card${on ? ' on' : ''}" aria-pressed="${on}" onclick="toggleStudyCourse('${c.id}')">
+          <div class="course-top"><span class="course-icon">${c.icon}</span><span class="course-name">${escapeHtml(c.name)}</span></div>
+          <div class="course-desc">${escapeHtml(c.desc)}</div>
+          <div class="course-bar"><div class="course-fill" style="width:${p.total ? Math.round((p.seen / p.total) * 100) : 0}%"></div></div>
+          <div class="course-meta">${p.seen}/${p.total} seen${p.pct !== null ? ` · ${p.pct}% correct` : ''}</div>
+        </button>`;
+      }).join('')}
+    </div>
+
+    <div class="setup-label" style="margin-top:28px">🫀 Body system <span class="setup-hint">optional</span></div>
+    <div class="chip-group">
+      ${BODY_SYSTEMS.map(s => `<button class="chip${studyPrefs.systems.includes(s.id) ? ' selected' : ''}" onclick="toggleStudySystem('${s.id}')">${s.icon} ${escapeHtml(s.name)}</button>`).join('')}
+    </div>
+
+    <div class="setup-label" style="margin-top:28px">🔎 Topic <span class="setup-hint">e.g. heparin, preeclampsia, burns, delegation</span></div>
+    <input id="studySearch" class="study-search" type="search" placeholder="Search any topic…" value="${escapeHtml(studyPrefs.query)}"
+      oninput="setStudyQuery(this.value)" autocomplete="off" enterkeyhint="search">
+    <div id="studyMnemos">${renderMnemoMatches(matches)}</div>
+
+    <div class="study-launch">
+      <div class="study-count"><strong id="studyMatchCount">${pool.length.toLocaleString()}</strong> question${pool.length === 1 ? '' : 's'} match</div>
+      <div class="setup-label" style="margin:18px 0 10px">How do you want to study?</div>
+      <div class="style-tabs">
+        ${[['quiz', '💡 Quiz', 'Feedback after each question'], ['flash', '🃏 Flashcards', 'Read, recall, flip, rate yourself'], ['test', '📝 Practice test', 'Feedback only at the end']]
+          .map(([id, name, sub]) => `<button class="style-tab${studyPrefs.style === id ? ' on' : ''}" onclick="setStudyStyle('${id}')"><strong>${name}</strong><span>${sub}</span></button>`).join('')}
+      </div>
+      <div class="study-go">
+        <select class="number-select" id="studyCount" onchange="studyPrefs.count = Number(this.value); _saveStudyPrefs()" aria-label="Number of questions">
+          ${[10, 20, 40, 75].map(n => `<option value="${n}" ${studyPrefs.count === n ? 'selected' : ''}>${n} questions</option>`).join('')}
+        </select>
+        <button class="btn btn-primary" id="studyStartBtn" ${pool.length ? '' : 'disabled'} onclick="startStudy()">Start studying →</button>
+      </div>
+    </div>
+
+    <div class="medmath-card">
+      <div class="hub-top"><span class="hub-icon">🧮</span><span class="hub-title">Med Math — Dosage Calculation</span></div>
+      <div class="hub-desc">Fresh numbers every time, with a worked solution for each problem. Practice until the math is automatic before your dosage-calc exam.</div>
+      <div class="chip-group" style="margin:12px 0">
+        ${[...Object.entries(MED_MATH_LEVELS), ['all', { name: 'All levels', topics: 'A mix of everything' }]].map(([id, l]) =>
+          `<button class="chip${mathLv === id ? ' selected' : ''}" onclick="studyPrefs.mathLevel='${id}'; _saveStudyPrefs(); renderStudy()" title="${escapeHtml(l.topics)}">${escapeHtml(l.name)}</button>`).join('')}
+      </div>
+      <div class="hub-desc" style="margin-bottom:12px">${escapeHtml((MED_MATH_LEVELS[mathLv] || { topics: 'Conversions through critical-care titrations' }).topics)}</div>
+      <div class="study-go">
+        <button class="btn btn-primary" onclick="startMedMath(studyPrefs.mathLevel, 10)">10 problems →</button>
+        <button class="btn btn-secondary" onclick="startMedMath(studyPrefs.mathLevel, 25)">25 problems</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function setStudyLevel(id) { studyPrefs.level = id; studyPrefs.mathLevel = id === 'nclex' ? 'all' : id; _saveStudyPrefs(); renderStudy(); buzz('tap'); }
+function toggleStudyCourse(id) {
+  const i = studyPrefs.courses.indexOf(id);
+  if (i > -1) studyPrefs.courses.splice(i, 1); else studyPrefs.courses.push(id);
+  _saveStudyPrefs(); renderStudy(); buzz('tap');
+}
+function toggleStudySystem(id) {
+  const i = studyPrefs.systems.indexOf(id);
+  if (i > -1) studyPrefs.systems.splice(i, 1); else studyPrefs.systems.push(id);
+  _saveStudyPrefs(); renderStudy(); buzz('tap');
+}
+function setStudyStyle(id) { studyPrefs.style = id; _saveStudyPrefs(); renderStudy(); buzz('tap'); }
+
+// Typing must not rebuild the whole screen (it would steal focus), so only
+// the count, the start button and the mnemonic matches update live.
+let _studyQueryTimer = null;
+function setStudyQuery(v) {
+  studyPrefs.query = v;
+  clearTimeout(_studyQueryTimer);
+  _studyQueryTimer = setTimeout(() => {
+    _saveStudyPrefs();
+    const n = studyPool().length;
+    const c = document.getElementById('studyMatchCount');
+    if (c) c.textContent = n.toLocaleString();
+    const b = document.getElementById('studyStartBtn');
+    if (b) b.disabled = !n;
+    const m = document.getElementById('studyMnemos');
+    if (m) m.innerHTML = renderMnemoMatches(matchingMnemonics(v));
+  }, 150);
+}
+
+function studyLabel() {
+  const parts = [];
+  if (studyPrefs.courses.length) parts.push(studyPrefs.courses.map(c => courseById(c).name).join(' + '));
+  else if (studyPrefs.level !== 'nclex') parts.push(STUDY_LEVELS.find(l => l.id === studyPrefs.level).name);
+  if (studyPrefs.systems.length) parts.push(studyPrefs.systems.map(s => BODY_SYSTEMS.find(b => b.id === s).name).join(' + '));
+  if (studyPrefs.query.trim()) parts.push(`“${studyPrefs.query.trim()}”`);
+  return parts.join(' · ') || 'All topics';
+}
+
+function startStudy() {
+  const pool = freshFirst(studyPool()).slice(0, studyPrefs.count);
+  if (!pool.length) return;
+  if (studyPrefs.style === 'flash') return startFlashcards(pool, studyLabel());
+  launchSession('course', pool, { tutor: studyPrefs.style !== 'test', timer: studyPrefs.style === 'test', label: studyLabel() });
+}
+
+function studyCourse(id) {
+  _loadStudyPrefs();
+  const c = courseById(id);
+  studyPrefs.courses = [id]; studyPrefs.systems = []; studyPrefs.query = '';
+  if (studyPrefs.level !== 'nclex' && !_visibleCourses().some(x => x.id === id)) studyPrefs.level = c.level;
+  _saveStudyPrefs();
+  openStudy();
+}
+
+// ─── Mnemonics that match the topic ───────────────────────────────
+function matchingMnemonics(query) {
+  const terms = String(query || '').toLowerCase().split(/\s+/).filter(t => t.length > 2);
+  if (!terms.length || typeof MNEMONICS === 'undefined') return [];
+  return MNEMONICS.filter(m => {
+    const text = [m.cat, m.title, ...(m.rows || []).flat(), m.tip || ''].join(' ').toLowerCase();
+    return terms.every(t => text.includes(t));
+  }).slice(0, 3);
+}
+
+function renderMnemoMatches(list) {
+  if (!list.length) return '';
+  return `<div class="mnemo-matches">${list.map(m => `<div class="mnemo-mini">
+    <div class="mnemo-mini-title">📌 ${escapeHtml(m.title)}</div>
+    ${(m.rows || []).map(([k, v]) => `<div class="mnemo-mini-row"><strong>${escapeHtml(k)}</strong> ${escapeHtml(v)}</div>`).join('')}
+  </div>`).join('')}</div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════
+//  FLASHCARDS
+// ══════════════════════════════════════════════════════════════════
+// Active recall: read the question, answer it in your head, flip, and rate
+// yourself honestly. Self-rated cards do NOT touch your accuracy stats — only
+// real answers do — but they count as a study day and toward quests, and the
+// ones you were unsure of can be turned straight into a scored quiz.
+let flash = null;
+
+function startFlashcards(questions, label) {
+  flash = { cards: questions.map(q => prepareQuestion(q)), i: 0, flipped: false, known: [], unsure: [], label };
+  closePalette();
+  showScreen('flash');
+  renderFlash();
+}
+
+function renderFlash() {
+  const el = document.getElementById('flashContent');
+  if (!flash || !el) return;
+  if (flash.i >= flash.cards.length) return renderFlashDone();
+  const q = flash.cards[flash.i];
+  const tax = buildTaxonomy().get(q.id);
+  // Show the most specific course: the one being studied, else a specialty before a general course.
+  const PRIORITY = ['maternity', 'peds', 'mental', 'critical', 'pharm', 'assessment', 'community', 'leadership', 'medsurg', 'fundamentals'];
+  const cid = tax && ((studyPrefs.courses.find(c => tax.courses.has(c))) || PRIORITY.find(c => tax.courses.has(c)));
+  const course = cid ? courseById(cid) : null;
+  const n = flash.cards.length;
+  el.innerHTML = `<div class="flash-wrap">
+    <div class="flash-head">
+      <span class="flash-count">Card ${flash.i + 1} of ${n}</span>
+      <span class="flash-score">✅ ${flash.known.length} · 🔁 ${flash.unsure.length}</span>
+    </div>
+    <div class="progress-bar-wrap" style="border-radius:3px;margin-bottom:22px"><div class="progress-bar" style="width:${(flash.i / n) * 100}%"></div></div>
+    <div class="flash-card${flash.flipped ? ' flipped' : ''}">
+      <div class="q-meta" style="margin-bottom:14px">
+        ${course ? `<span class="q-category-badge">${course.icon} ${escapeHtml(course.name)}</span>` : ''}
+        <span class="q-type-badge">${typeLabel(q.type)}</span>
+      </div>
+      ${q.caseData ? renderCaseExhibit(q.caseData) : ''}
+      <div class="q-stem">${escapeHtml(q.stem)}</div>
+      ${flash.flipped ? `<div class="flash-answer">${answerRevealHtml(q)}</div>
+        <div class="fb-body flash-why">
+          <div class="rationale-title">Why</div>
+          <p>${escapeHtml(q.rationale || (q.matrix && q.matrix.rationale) || '')}</p>
+          ${q.tip ? `<div class="nclex-tip"><strong>Remember:</strong> ${escapeHtml(q.tip)}</div>` : ''}
+        </div>` : (q.options ? `<ul class="flash-opts">${q.options.map((o, i) => `<li><span>${_LETTERS[i]}</span>${escapeHtml(o)}</li>`).join('')}</ul>` : '')}
+    </div>
+    <div class="flash-actions">
+      ${flash.flipped
+        ? `<button class="btn btn-secondary flash-btn" onclick="rateFlash(false)">🔁 Still learning <kbd>1</kbd></button>
+           <button class="btn btn-primary flash-btn" onclick="rateFlash(true)">✅ Knew it <kbd>2</kbd></button>`
+        : `<button class="btn btn-primary flash-btn" onclick="flipFlash()">Show answer <kbd>Space</kbd></button>`}
+    </div>
+    <div style="text-align:center;margin-top:18px"><button class="prog-btn" onclick="endFlashcards()">Finish early</button></div>
+  </div>`;
+  document.querySelectorAll('#flashContent .exhibit-tab').forEach((tab, i) => {
+    tab.onclick = () => {
+      document.querySelectorAll('#flashContent .exhibit-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('#flashContent .exhibit-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('#flashContent .exhibit-content')[i]?.classList.add('active');
+    };
+  });
+}
+
+// The correct answer, laid out for whichever format the card is.
+function answerRevealHtml(q) {
+  const ok = t => `<li class="ans-ok">✓ ${escapeHtml(t)}</li>`;
+  const no = t => `<li class="ans-no">${escapeHtml(t)}</li>`;
+  if (q.type === 'mcq') return `<ul class="ans-list">${q.options.map((o, i) => i === q.correct ? ok(o) : no(o)).join('')}</ul>`;
+  if (q.type === 'sata') return `<ul class="ans-list">${q.options.map((o, i) => q.correct.includes(i) ? ok(o) : no(o)).join('')}</ul>`;
+  if (q.type === 'ordering') return `<ol class="ans-order">${q.items.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ol>`;
+  if (q.type === 'cloze') {
+    return `<div class="cloze-text">${q.cloze.template.split(/\{(\d+)\}/).map((p, k) =>
+      k % 2 ? `<strong class="ans-fill">${escapeHtml(q.cloze.blanks[Number(p)].options[q.cloze.blanks[Number(p)].correct])}</strong>` : escapeHtml(p)).join('')}</div>`;
+  }
+  if (q.type === 'ngn_matrix') {
+    const m = matrixModel(q);
+    return `<ul class="ans-list">${m.rows.map((r, i) => `<li class="ans-ok">${escapeHtml(r)} <span class="ans-col">→ ${escapeHtml(m.cols[m.correct[i]])}</span></li>`).join('')}</ul>`;
+  }
+  if (q.type === 'ngn_bowties') {
+    const b = bowtieModel(q);
+    return [[b.titles[0], b.causes, b.correctCauses], [b.titles[1], b.actions, b.correctActions], [b.titles[2], b.outcomes, b.correctOutcomes]]
+      .filter(([, items]) => items && items.length)
+      .map(([t, items, c]) => `<div class="ans-sec">${t}</div><ul class="ans-list">${c.map(i => ok(items[i])).join('')}</ul>`).join('');
+  }
+  if (q.type === 'calc') return `<div class="ans-calc">${_fmt(q.calc.answer)} ${escapeHtml(q.calc.unit)}</div><ol class="ans-order">${q.steps.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ol>`;
+  return '';
+}
+
+function flipFlash() { if (!flash || flash.flipped) return; flash.flipped = true; buzz('tap'); playSound('tap'); renderFlash(); }
+
+function rateFlash(knew) {
+  if (!flash || !flash.flipped) return;
+  (knew ? flash.known : flash.unsure).push(flash.cards[flash.i]);
+  buzz(knew ? 'correct' : 'tap'); if (knew) playSound('correct');
+  flash.i++; flash.flipped = false;
+  renderFlash();
+  window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+}
+
+function endFlashcards() { if (flash) { flash.cards = flash.cards.slice(0, flash.i); renderFlash(); } }
+
+function renderFlashDone() {
+  const el = document.getElementById('flashContent');
+  const reviewed = flash.known.length + flash.unsure.length;
+  if (reviewed && !flash.saved) {
+    flash.saved = true;
+    const before = gameSnapshot(progressData);
+    if (!progressData) progressData = _progressEmpty();
+    progressData.flashLog = progressData.flashLog || [];
+    progressData.flashLog.push({ date: todayStr(), n: reviewed, known: flash.known.length, label: flash.label || '' });
+    _autoSaveProgress(); updateProgressBadge();
+    const after = gameSnapshot(progressData);
+    flash.rewards = renderSessionRewards(before, after);
+    if (after.rank.index > before.rank.index) { buzz('rankup'); playSound('rankup'); celebrate('big'); }
+    else if (after.badges.length > before.badges.length || after.quests.done.length > before.quests.done.length) { buzz('unlock'); playSound('unlock'); celebrate('small'); }
+  }
+  el.innerHTML = `<div class="flash-wrap" style="text-align:center">
+    <div class="results-badge">🃏</div>
+    <div class="results-mode">Flashcards${flash.label ? ' · ' + escapeHtml(flash.label) : ''}</div>
+    <h2 class="results-title">${reviewed} card${reviewed === 1 ? '' : 's'} reviewed</h2>
+    <p class="results-sub">✅ Knew ${flash.known.length} · 🔁 Still learning ${flash.unsure.length}</p>
+    <div style="margin-top:28px">${flash.rewards || ''}</div>
+    <div class="retry-row" style="margin-top:8px">
+      ${flash.unsure.length ? `<button class="btn btn-primary" onclick="quizUnsure()">💡 Quiz me on the ${flash.unsure.length} I'm still learning</button>` : ''}
+      ${flash.unsure.length ? `<button class="btn btn-secondary" onclick="flashAgain()">🃏 Flip those again</button>` : ''}
+      <button class="btn btn-secondary" onclick="openStudy()">📚 Study builder</button>
+      <button class="btn btn-secondary" onclick="showScreen('home')">← Home</button>
+    </div>
+    <p class="dash-sub">Self-rated cards don't change your accuracy stats. A quiz does — and it schedules your misses for Smart Review.</p>
+  </div>`;
+}
+
+function _bankFor(cards) {
+  const byId = new Map(QUESTION_BANK.map(q => [q.id, q]));
+  return cards.map(c => c.generated ? c : byId.get(c.id)).filter(Boolean);
+}
+function quizUnsure() { launchSession('course', shuffle(_bankFor(flash.unsure)), { tutor: true, timer: false, label: `${flash.label || 'Flashcards'} · still learning` }); }
+function flashAgain() { startFlashcards(shuffle(_bankFor(flash.unsure)), flash.label); }
+
+function initFlashKeys() {
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('flash')?.classList.contains('active') || !flash) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === ' ' || e.key === 'Enter') { if (!flash.flipped && flash.i < flash.cards.length) { e.preventDefault(); flipFlash(); } }
+    else if (flash.flipped && (e.key === '1' || e.key === 'ArrowLeft')) rateFlash(false);
+    else if (flash.flipped && (e.key === '2' || e.key === 'ArrowRight')) rateFlash(true);
+  });
+}
+document.addEventListener('DOMContentLoaded', initFlashKeys);
 </script>
 <input type="file" id="progressFileInput" accept=".json" style="display:none" onchange="importProgressFile(event)">
 </body>

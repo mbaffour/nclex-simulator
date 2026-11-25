@@ -12,6 +12,9 @@ A Next Gen NCLEX practice simulator built with love for nursing students prepari
 
 | Feature | Details |
 |---|---|
+| **Study for Class** | Pick your stage of nursing school (Foundations → Core Clinical → Senior), then any of 10 courses, 12 body systems, or a free-text topic search |
+| **Flashcards** | Active-recall cards from any question set; rate yourself, then quiz on the ones you're still learning |
+| **Med Math** | Endless generated dosage-calculation problems with worked solutions, from conversions to mcg/kg/min titrations |
 | **Practice Modes** | Practice (tutor), CAT Simulation, Next Gen NCLEX, Rapid Review, Daily Challenge, Smart Review, Bookmarks |
 | **Question Types** | MCQ, SATA, Ordered Response, NGN Matrix Grid, NGN Bow-tie, NGN Drop-down Cloze |
 | **Shuffled Options** | Answer order is randomised every session, so you can't learn the key's position |
@@ -101,6 +104,12 @@ Exam conditions: no feedback until the end, no going back, and 85–150 question
 
 ### 🧠 Next Gen NCLEX (NGN)
 Only NGN items: Matrix Grid, Bow-tie and Drop-down Cloze, built on client-chart case data. The 2023+ NCLEX format.
+
+### 📚 Study for Class (any nursing course)
+Not at NCLEX yet? Choose where you are in the program, then filter by course — Fundamentals, Health Assessment, Pharmacology, Med-Surg, Mental Health, Maternity & Newborn, Pediatrics, Critical Care, Leadership, Community Health — by body system, or search any topic (`heparin`, `preeclampsia`, `delegation`). Matching mnemonics show up as you type. Study as a quiz, flashcards, or a practice test. Questions are mapped to courses automatically from their content, so one question can count for several courses.
+
+### 🧮 Med Math
+Generated dosage-calculation problems in three levels: conversions, tablets and oral liquids; injections, IV pump and gravity rates and weight-based pediatric doses; heparin, insulin drips and mcg/kg/min titrations. Every problem shows a worked solution.
 
 ### ⚡ Rapid Review
 A mixed 25-question sprint. Good daily warm-up.

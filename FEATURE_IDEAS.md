@@ -46,6 +46,8 @@ no build step and no new dependencies.
 ## Still open
 
 - Printable score summary (#3 below).
+- Course mapping is keyword-based (`COURSES` in the app); an explicit `courses:` field on questions would be more precise.
+- More Foundations-level questions — the bank is NCLEX-weighted, so first-semester topics are thinner.
 - `reviewed:` dates and a validator check for stale items (rest of #6).
 - Rewrite distractors so the key isn't the longest option 84% of the time.
 - Rebalance domains — Physiological Adaptation holds 43% of the bank.
